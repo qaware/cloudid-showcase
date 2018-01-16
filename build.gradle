@@ -11,16 +11,11 @@ buildscript {
         classpath "gradle.plugin.com.palantir.gradle.docker:gradle-docker:0.17.2"
     }
 }
-//plugins {
-//    id 'com.palantir.docker' version '0.17.2'
-//}
 
 apply plugin: 'java'
 apply plugin: 'org.springframework.boot'
 apply plugin: "com.palantir.docker"
 
-group = 'de.qaware.cloud.id'
-version = '0.0.1-SNAPSHOT'
 sourceCompatibility = 1.8
 
 repositories {
@@ -29,10 +24,6 @@ repositories {
 
 ext {
     springCloudVersion = 'Edgware.RELEASE'
-
-    // create version with git-hash
-    hash = 'git rev-parse --short HEAD'.execute().text.trim()
-    fullVersion = "${project.version}.${hash}"
 }
 
 dependencies {
@@ -56,7 +47,7 @@ jar {
 }
 
 docker {
-    name "qaware.de/cloud-id/demo-server:${fullVersion}"
+    name "artifactory.qaware.de/cloud-id/demo-server"
     tags 'latest'
     dockerfile project.file('src/main/docker/Dockerfile')
     files jar.archivePath

@@ -4,6 +4,9 @@
 # https://github.com/gradle/gradle
 image: gradle:alpine
 
+services:
+  - docker:dind
+
 # Disable the Gradle daemon for Continuous Integration servers as correctness
 # is usually a priority over speed in CI environments. Using a fresh
 # runtime for each build is more reliable since the runtime is completely
@@ -13,17 +16,18 @@ variables:
 
 before_script:
   - export GRADLE_USER_HOME=`pwd`/.gradle
+  - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
 
 build:
   stage: build
-  script: gradle --build-cache assemble
+  script:
+    - gradle --build-cache assemble dockerPrepare
   cache:
     key: "$CI_COMMIT_REF_NAME"
     policy: push
     paths:
       - build
       - .gradle
-
 
 test:
   stage: test
@@ -35,3 +39,19 @@ test:
       - build
       - .gradle
 
+
+build-master:
+  stage: docker-build
+  script:
+    - docker build --pull -t "$CI_REGISTRY_IMAGE" build/docker
+    - docker push "$CI_REGISTRY_IMAGE"
+  only:
+    - master
+
+build:
+  stage: docker-build
+  script:
+    - docker build --pull -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG" build/docker
+    - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
+  except:
+    - master
