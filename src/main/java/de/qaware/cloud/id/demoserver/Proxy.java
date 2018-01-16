@@ -7,6 +7,8 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.entity.InputStreamEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -25,6 +27,7 @@ import java.util.Collections;
  */
 @Controller
 public class Proxy {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Proxy.class);
 
     @Value("${de.qaware.cloud.id.demoserver.backend}")
     private String backend;
@@ -35,6 +38,7 @@ public class Proxy {
     @RequestMapping("/proxy/{path}")
     public ResponseEntity forwardRequest(@PathVariable String path, HttpServletRequest request) throws IOException {
         HttpUriRequest backendRequest = buildBackendRequest(path, request);
+        LOGGER.info("Proxy request {} to {}", path, backendRequest);
         HttpResponse response = httpClient.execute(backendRequest);
 
         HttpHeaders responseHeaders = convertResponseHeaders(response);
@@ -42,6 +46,7 @@ public class Proxy {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         response.getEntity().writeTo(outputStream);
         String charsetName = responseHeaders.getContentType() != null ? responseHeaders.getContentType().getCharset().name() : "UTF-8";
+        LOGGER.info("Request was successfully: {}", response.getStatusLine());
         return ResponseEntity.status(response.getStatusLine()
                 .getStatusCode())
                 .headers(responseHeaders)
