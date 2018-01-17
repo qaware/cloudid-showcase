@@ -1,0 +1,77 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: spire-server-config
+data:
+  server.conf: |
+    BindAddress = "0.0.0.0"
+    BindPort = "8081"
+    BindHTTPPort = "8080"
+    TrustDomain = "example.org"
+    PluginDir = "/spire/config/plugin"
+    LogLevel = "DEBUG"
+    BaseSVIDTtl = 999999
+    ServerSVIDTtl = 999999
+    Umask = ""
+#---
+#apiVersion: v1
+#kind: ConfigMap
+#metadata:
+#  name: spire-server-plugins
+#data:
+  plugin-ca_memory.conf: |
+    pluginName = "ca" //needs to match the name used in plugin serverConfig
+
+    pluginCmd = "/opt/spire/plugin/server/ca-memory"
+    pluginChecksum = ""
+    enabled = true
+    pluginType = "ControlPlaneCA"
+    pluginData {
+      trust_domain = "example.org",
+      key_size = 2048,
+      backdate_seconds = 1,
+      cert_subject = {
+        Country = ["US"],
+        Organization = ["SPIFFE"],
+        CommonName = "",
+      }
+    }
+  plugin-ds_sqlite.conf: |
+    pluginName = "datastore"
+    pluginCmd = "/opt/spire/plugin/server/datastore-sqlite"
+    pluginChecksum = ""
+    enabled = true
+    pluginType = "DataStore"
+    pluginData {
+     fileName = "/spire/datastore/datastore.sqlite"
+    }
+  plugin-join_token.conf: |
+    pluginName = "join_token" //needs to match the name used in plugin serverConfig
+
+    pluginCmd = "/opt/spire/plugin/server/nodeattestor-jointoken"
+    pluginChecksum = ""
+    enabled = true
+    pluginType = "NodeAttestor" //needs to match the handshake
+    pluginData {
+    	trust_domain = "example.org"
+    }
+  plugin-noop.conf: |
+    pluginName = "noop"
+    pluginCmd = "/opt/spire/plugin/server/noderesolver-noop"
+    pluginChecksum = ""
+    enabled = true
+    pluginType = "NodeResolver"
+    pluginData {}
+  plugin-upstream_ca_memory.conf: |
+    pluginName = "upstream_ca" //needs to match the name used in plugin serverConfig
+
+    pluginCmd = "/opt/spire/plugin/server/upstreamca-memory"
+    pluginChecksum = ""
+    enabled = true
+    pluginType = "UpstreamCA"
+    pluginData {
+      trust_domain = "example.org"
+      ttl = "1h"
+      key_file_path = "/spire/tls/tls.key"
+      cert_file_path = "/spire/tls/tls.crt"
+    }

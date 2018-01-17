@@ -1,0 +1,83 @@
+apiVersion: apps/v1beta2 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: spire-server
+  labels:
+    app: spire-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spire-server
+  template:
+    metadata:
+      labels:
+        app: spire-server
+    spec:
+      containers:
+        - name: spire-server
+          imagePullPolicy: Never
+          image: spire-server
+          command:
+            - /opt/spire/spire-server
+            - run
+            - -config
+            - /spire/config/server.conf
+          volumeMounts:
+            - name: spire-config
+              mountPath: /spire/config
+              readOnly: true
+            #- name: spire-plugins
+            #  mountPath: /spire/plugins
+            #  readOnly: true
+            - name: spire-tls
+              mountPath: /spire/tls
+              readOnly: true
+            - name: spire-ds
+              mountPath: /spire/datastore
+              readOnly: false
+          ports:
+            - name: http
+              containerPort: 8080
+            - name: grpc
+              containerPort: 8081
+          livenessProbe:
+            failureThreshold: 3
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 1
+          readinessProbe:
+            failureThreshold: 3
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 1
+      volumes:
+        - name: spire-config
+          configMap:
+            name: spire-server-config
+            items:
+              - key: server.conf
+                path: server.conf
+              - key: plugin-ca_memory.conf
+                path: plugin/ca_memory.conf
+              - key: plugin-ds_sqlite.conf
+                path: plugin/ds_sqlite.conf
+              - key: plugin-join_token.conf
+                path: plugin/join_token.conf
+              - key: plugin-noop.conf
+                path: plugin/noop.conf
+              - key: plugin-upstream_ca_memory.conf
+                path: plugin/upstream_ca_memory.conf
+#        - name: spire-plugins
+#          configMap:
+#            name: spire-server-plugins
+        - name: spire-tls
+          secret:
+            secretName: spire-server-upstream-ca
+        - name: spire-ds
+          hostPath:
+            path: /Volumes/Cloud-ID/codebase/spire-k8s/datastore
