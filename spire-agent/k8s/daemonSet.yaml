@@ -1,0 +1,78 @@
+apiVersion: apps/v1beta2 # for versions before 1.9.0 use apps/v1beta2
+kind: DaemonSet
+metadata:
+  name: spire-agent
+  labels:
+    app: spire-agent
+spec:
+#  replicas: 1
+  selector:
+    matchLabels:
+      app: spire-agent
+  template:
+    metadata:
+      labels:
+        app: spire-agent
+    spec:
+      hostPID: true
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      containers:
+        - name: spire-agent
+          imagePullPolicy: Never
+          image: spire-agent
+          securityContext:
+            privileged: true
+          command:
+#            - sleep
+#            - '900000'
+            - /opt/start.sh
+            - /spire/config/agent.conf
+            - example.org
+            - spire-server-service:8081
+          volumeMounts:
+            - name: spire-config
+              mountPath: /spire/config
+              readOnly: true
+            - name: spire-socket
+              mountPath: /spire/socket
+              readOnly: false
+#          ports:
+#            - name: http
+#              containerPort: 8080
+#          livenessProbe:
+#            failureThreshold: 3
+#            tcpSocket:
+#              port: 8080
+#            initialDelaySeconds: 10
+#            periodSeconds: 10
+#            timeoutSeconds: 1
+#          readinessProbe:
+#            failureThreshold: 3
+#            tcpSocket:
+#              port: 8080
+#            initialDelaySeconds: 10
+#            periodSeconds: 10
+#            timeoutSeconds: 1
+      volumes:
+        - name: spire-config
+          configMap:
+            name: spire-agent-config
+            items:
+              - key: agent.conf
+                path: agent.conf
+              - key: ca.crt
+                path: ca.crt
+              - key: plugin-join_token.conf
+                path: plugin/join_token.conf
+              - key: plugin-km_memory.conf
+                path: plugin/km_memory.conf
+              - key: plugin-wla_k8s.conf
+                path: plugin/wla_k8s.conf
+              - key: plugin-wla_secret_file.conf
+                path: plugin/wla_secret_file.conf
+              - key: plugin-wla_unix.conf
+                path: plugin/wla_unix.conf
+        - name: spire-socket
+          hostPath:
+            path: /Volumes/Cloud-ID/codebase/spire-k8s/socket
