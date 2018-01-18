@@ -13,12 +13,6 @@ data:
     BaseSVIDTtl = 999999
     ServerSVIDTtl = 999999
     Umask = ""
-#---
-#apiVersion: v1
-#kind: ConfigMap
-#metadata:
-#  name: spire-server-plugins
-#data:
   plugin-ca_memory.conf: |
     pluginName = "ca" //needs to match the name used in plugin serverConfig
 
@@ -31,8 +25,8 @@ data:
       key_size = 2048,
       backdate_seconds = 1,
       cert_subject = {
-        Country = ["US"],
-        Organization = ["SPIFFE"],
+        Country = ["DE"],
+        Organization = ["QAware GmbH"],
         CommonName = "",
       }
     }
