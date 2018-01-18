@@ -1,0 +1,31 @@
+apiVersion: apps/v1beta2 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: spire-proxy
+  labels:
+    app: spire-proxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spire-proxy
+  template:
+    metadata:
+      labels:
+        app: spire-proxy
+    spec:
+      containers:
+        - name: spire-proxy
+          imagePullPolicy: Never
+          image: spire-proxy
+          volumeMounts:
+            - name: spire-socket
+              mountPath: /spire/socket
+              readOnly: false
+          ports:
+            - name: http
+              containerPort: 8082
+      volumes:
+        - name: spire-socket
+          hostPath:
+            path: /Volumes/Cloud-ID/codebase/spire-k8s/socket
