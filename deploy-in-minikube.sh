@@ -10,15 +10,14 @@ docker build -t spire-proxy spire-proxy
 kubectl apply -f spire-server/k8s/configmap.yaml
 kubectl apply -f spire-server/k8s/secrets.yaml
 kubectl apply -f spire-server/k8s/service.yaml
-kubectl apply -f spire-server/k8s/deploymenet.yaml
+kubectl apply -f spire-server/k8s/deployment.yaml
 
 # deploy agent to k8s
 kubectl apply -f spire-agent/k8s/configmap.yaml
 kubectl apply -f spire-agent/k8s/daemonSet.yaml
 
-# deploy proxy to k8s
-kubectl apply -f spire-agent/k8s/service.yaml
-kubectl apply -f spire-agent/k8s/deployment.yaml
+# kubectl apply -f spire-agent/k8s/service.yaml
+# kubectl apply -f spire-agent/k8s/deployment.yaml
 
 # Register the workload: (replace the pod id with the real one of the spire server)
 # kubectl exec spire-server-PODID /opt/spire/spire-server register -parentID spiffe://example.org/k8s/node/minikube -spiffeID spiffe://example.org/host/workload -selector k8s:ns:default
