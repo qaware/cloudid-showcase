@@ -13,6 +13,17 @@ This allows a generic host name within the cluster.
 The Spire-Server is configured using a Kuberetes [ConfigMap](spire-server/k8s/configmap.yaml).
 Additionally it requires a [Secret](spire-server/k8s/secrets.yaml) to store the certificates for the Upstream CA.
 
+### Register the workload
+```bash
+kubectl exec $(kubectl get pod | grep -o 'spire-server-[a-z0-9\]*') -- /opt/spire/spire-server register -parentID spiffe://example.org/k8s/node/minikube -spiffeID spiffe://example.org/host/workload -selector k8s:ns:default
+```
+
+### Fetches the certificates within the workload 
+```bash
+kubectl exec $(kubectl get pod | grep -o 'spire-agent-[a-z0-9\]*') -- /opt/spire/spire-agent api fetch -socketPath /spire/socket/agent.sock -write /root
+```
+
+
 ## Spire-Agent
 The Spire-Agent must run on every node which should schedule SPIRE secured pods.
 To start the agent it automatically retrieves a join token from the Spire-Server.
