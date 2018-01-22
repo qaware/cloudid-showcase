@@ -9,7 +9,7 @@ data:
     DataDir = "/spire/socket"
     LogLevel = "DEBUG"
     PluginDir = "/spire/config/plugin"
-    ServerAddress = "spire-server-service"
+    ServerAddress = "spire-server"
     ServerPort = "8081"
     SocketPath ="/spire/socket/agent.sock"
     TrustBundlePath = "/spire/config/ca.crt"

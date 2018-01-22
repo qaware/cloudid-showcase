@@ -29,7 +29,7 @@ spec:
             # TrustDomain; Must be the same as in the agent's configuration file!
             - example.org
             # Host Name and port of the Spire Server. Must also be the the same as in the agent's configuration file.
-            - spire-server-service:8081
+            - spire-server:8081
           volumeMounts:
             - name: spire-config
               mountPath: /spire/config
@@ -40,20 +40,20 @@ spec:
           ports:
             - name: http
               containerPort: 8080
-          livenessProbe:
-            failureThreshold: 3
-            tcpSocket:
-              port: 8080
-            initialDelaySeconds: 10
-            periodSeconds: 10
-            timeoutSeconds: 1
-          readinessProbe:
-            failureThreshold: 3
-            tcpSocket:
-              port: 8080
-            initialDelaySeconds: 10
-            periodSeconds: 10
-            timeoutSeconds: 1
+#          livenessProbe:
+#            failureThreshold: 3
+#            tcpSocket:
+#              port: 8080
+#            initialDelaySeconds: 10
+#            periodSeconds: 10
+#            timeoutSeconds: 1
+#          readinessProbe:
+#            failureThreshold: 3
+#            tcpSocket:
+#              port: 8080
+#            initialDelaySeconds: 10
+#            periodSeconds: 10
+#            timeoutSeconds: 1
       volumes:
         - name: spire-config
           configMap:
