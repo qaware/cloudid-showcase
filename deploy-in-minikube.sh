@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 eval $(minikube docker-env)
 
+# OR: find . -type f -name '*.yaml' | xargs -n1 kubectl apply -f
+
 # build docker images
 docker build -t spire-server spire-server
 docker build -t spire-agent spire-agent
