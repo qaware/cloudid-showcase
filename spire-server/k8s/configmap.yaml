@@ -27,7 +27,7 @@ data:
       cert_subject = {
         Country = ["DE"],
         Organization = ["QAware GmbH"],
-        CommonName = "",
+        CommonName = "spire-server",
       }
     }
   plugin-ds_sqlite.conf: |
