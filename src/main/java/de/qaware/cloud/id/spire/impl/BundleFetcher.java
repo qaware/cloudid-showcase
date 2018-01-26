@@ -18,7 +18,6 @@ import spire.api.workload.WorkloadGrpc;
 import spire.api.workload.WorkloadOuterClass;
 import spire.api.workload.WorkloadOuterClass.Bundles;
 import spire.api.workload.WorkloadOuterClass.WorkloadEntry;
-import sun.plugin.dom.exception.InvalidStateException;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -92,8 +91,9 @@ public class BundleFetcher {
 
         KeyPair keyPair = getKeyPair(workloadEntry);
         if (!Objects.equals(svidCertificate.getPublicKey(), keyPair.getPublic())) {
-            throw new InvalidStateException("Certificates public key and the delivered private key did not match.");
+            throw new IllegalStateException("Certificates public key and the delivered private key did not match.");
         }
+
         return new SVIDBundle(workloadEntry.getSpiffeId(), svidCertificate, keyPair, certPath);
     }
 
