@@ -17,7 +17,7 @@ gradle-build:
     expire_in: 1 day
     paths:
       - docker/*
-  script: "./gradlew --build-cache build dockerPrepare"
+  script: "./gradlew --build-cache build dockerPrepare --info --stacktrace"
 
 
 #sonarqube:
