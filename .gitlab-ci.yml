@@ -2,7 +2,7 @@ variables:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
   DOCKER_IMAGE_NAME: $CI_PROJECT_NAME
   CACHE_KEY: $CI_COMMIT_REF_SLUG
-  GRADLE_CACHE: /root/.gradle/
+  GRADLE_CACHE: /root/.gradle/**
 
 
 stages:
