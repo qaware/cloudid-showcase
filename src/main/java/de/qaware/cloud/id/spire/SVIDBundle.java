@@ -1,5 +1,6 @@
 package de.qaware.cloud.id.spire;
 
+import de.qaware.cloud.id.util.Certificates;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -7,6 +8,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import java.security.KeyPair;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.time.Instant;
 import java.util.List;
 
 /**
@@ -39,6 +41,42 @@ public class SVIDBundle {
 
     public String getSvId() {
         return svId;
+    }
+
+    /**
+     * Get the first instant after which this bundle will no longer be valid.
+     *
+     * @return first instant after which this bundle will no longer be valid
+     */
+    public Instant getNotAfter() {
+        Instant result = Certificates.getNotAfter(certificate);
+
+        for (Certificate certificate : caCertificates) {
+            Instant notAfter = Certificates.getNotAfter(certificate);
+            if (notAfter.isBefore(result)) {
+                result = notAfter;
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Get the instant after which the certificate chain of this bundle will be valid.
+     *
+     * @return instant after which the certificate chain of this bundle will be valid.
+     */
+    public Instant getNotBefore() {
+        Instant result = Certificates.getNotBefore(certificate);
+
+        for (Certificate certificate : caCertificates) {
+            Instant notBefore = Certificates.getNotBefore(certificate);
+            if (notBefore.isAfter(result)) {
+                result = notBefore;
+            }
+        }
+
+        return result;
     }
 
     @Override
