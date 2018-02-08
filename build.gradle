@@ -100,3 +100,9 @@ docker {
     files jar.archivePath
 }
 docker.dependsOn(assemble)
+
+sonarqube {
+    properties {
+        property "sonar.exclusions", "**/*Generated.java, build/generated/**"
+    }
+}
