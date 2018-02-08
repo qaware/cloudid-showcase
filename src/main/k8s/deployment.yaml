@@ -17,7 +17,8 @@ spec:
       containers:
       - name: demo-server
         image: qaware.de/cloud-id/demo-server:latest
-        imagePullPolicy: Never # change to Always after artifactory is available
+        # Depends on QAware-internal Artifactory
+        imagePullPolicy: Always
         volumeMounts:
           - name: application-config
             mountPath: /demo-server/config
