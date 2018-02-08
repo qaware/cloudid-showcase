@@ -1,0 +1,40 @@
+variables:
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+
+stages:
+  - build     # compile, unit-tests, integration-tests, package
+  - analyze   # run SonarQube analysis
+  - push      # build docker image and push image to Artifactory
+
+gradle-build:
+  stage: build
+  image: openjdk:8-jdk-alpine
+  cache:
+    key: $CACHE_KEY
+    paths:
+      - $MAVEN_REPO_LOCAL_PATH
+  artifacts:
+    expire_in: 1 day
+    paths:
+      - docker/*
+  script: "./gradlew --build-cache build dockerPrepare"
+
+
+#sonarqube:
+#  stage: analyze
+#  image: openjdk:8-jdk-alpine
+#  cache:
+#    key: $CI_PROJECT_PATH
+#    paths:
+#      - $MAVEN_REPO_LOCAL_PATH
+#  script:
+#    - if [ "$CI_COMMIT_REF_NAME" == "master" ]; then SONAR_BRANCH_NAME=""; else SONAR_BRANCH_NAME="-Dsonar.branch.name=$CI_COMMIT_REF_NAME"; fi
+#    - "./mvnw $MAVEN_CLI_OPTS $SONAR_MAVEN_GOAL $SONAR_BRANCH_NAME -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_TOKEN"
+
+docker-build:
+  stage: push
+  image: docker:18.01.0-ce
+  script:
+    - docker login -u "$DOCKER_REGISTRY_USER" -p "$DOCKER_REGISTRY_PASS" $DOCKER_REGISTRY_URL
+    - docker build --pull -t "$DOCKER_REGISTRY_URL/$DOCKER_REGISTRY_REPO/$DOCKER_IMAGE_NAME" docker
+    - docker push "$DOCKER_REGISTRY_URL/$DOCKER_REGISTRY_REPO/$DOCKER_IMAGE_NAME"
