@@ -117,6 +117,6 @@ docker.dependsOn(assemble)
 sonarqube {
     properties {
         property "sonar.exclusions", "**/*Generated.java, build/generated/**"
-        projects "sonar.projectName", "Cloud ID SPIRE Demo-Server"
+        property "sonar.projectName", "Cloud ID SPIRE Demo-Server"
     }
 }
