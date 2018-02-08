@@ -16,8 +16,8 @@ spec:
     spec:
       containers:
       - name: demo-server
-        image: qaware.de/cloud-id/demo-server:latest
         # Depends on QAware-internal Artifactory
+        image: artifactory.qaware.de/qaware-internal-docker/demo-server:latest
         imagePullPolicy: Always
         volumeMounts:
           - name: application-config
@@ -45,6 +45,9 @@ spec:
           periodSeconds: 10
           successThreshold: 1
           timeoutSeconds: 1
+      imagePullSecrets:
+        # Needs to be definied for this deployment to work
+        - name: qaware-artifactory
       volumes:
         - name: application-config
           configMap:
