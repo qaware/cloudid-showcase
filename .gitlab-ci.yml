@@ -1,5 +1,9 @@
 variables:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+  DOCKER_IMAGE_NAME: $CI_PROJECT_NAME
+  CACHE_KEY: $CI_COMMIT_REF_SLUG
+  GRADLE_CACHE: /root/.gradle
+
 
 stages:
   - build     # compile, unit-tests, integration-tests, package
@@ -8,33 +12,34 @@ stages:
 
 gradle-build:
   stage: build
-  image: openjdk:8-jdk-alpine
+  image: openjdk:8-jdk
   cache:
     key: $CACHE_KEY
     paths:
-      - $MAVEN_REPO_LOCAL_PATH
+      - $GRADLE_CACHE
   artifacts:
     expire_in: 1 day
     paths:
-      - docker/*
-  script: "./gradlew --build-cache build dockerPrepare --info --stacktrace"
+      - build/docker/*
+  script: "./gradlew --build-cache assemble dockerPrepare --stacktrace"
 
 
-#sonarqube:
-#  stage: analyze
-#  image: openjdk:8-jdk-alpine
-#  cache:
-#    key: $CI_PROJECT_PATH
-#    paths:
-#      - $MAVEN_REPO_LOCAL_PATH
-#  script:
-#    - if [ "$CI_COMMIT_REF_NAME" == "master" ]; then SONAR_BRANCH_NAME=""; else SONAR_BRANCH_NAME="-Dsonar.branch.name=$CI_COMMIT_REF_NAME"; fi
-#    - "./mvnw $MAVEN_CLI_OPTS $SONAR_MAVEN_GOAL $SONAR_BRANCH_NAME -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_TOKEN"
+sonarqube:
+  stage: analyze
+  image: openjdk:8-jdk
+  cache:
+    key: $CACHE_KEY
+    paths:
+      - $GRADLE_CACHE
+  script:
+    - if [ "$CI_COMMIT_REF_NAME" == "master" ]; then SONAR_BRANCH_NAME=""; else SONAR_BRANCH_NAME="-Dsonar.branch.name=$CI_COMMIT_REF_NAME"; fi
+    - "./gradlew sonarqube $SONAR_BRANCH_NAME -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_TOKEN --stacktrace"
 
 docker-build:
   stage: push
   image: docker:18.01.0-ce
   script:
+    - if [ "$CI_COMMIT_REF_NAME" == "master" ]; then DOCKER_TAG_NAME="latest"; else DOCKER_TAG_NAME="${CI_COMMIT_REF_NAME}"; fi
     - docker login -u "$DOCKER_REGISTRY_USER" -p "$DOCKER_REGISTRY_PASS" $DOCKER_REGISTRY_URL
-    - docker build --pull -t "$DOCKER_REGISTRY_URL/$DOCKER_REGISTRY_REPO/$DOCKER_IMAGE_NAME" docker
-    - docker push "$DOCKER_REGISTRY_URL/$DOCKER_REGISTRY_REPO/$DOCKER_IMAGE_NAME"
+    - docker build --pull -t "$DOCKER_REGISTRY_URL/$DOCKER_REGISTRY_REPO/$DOCKER_IMAGE_NAME:$DOCKER_TAG_NAME" build/docker
+    - docker push "$DOCKER_REGISTRY_URL/$DOCKER_REGISTRY_REPO/$DOCKER_IMAGE_NAME:$DOCKER_TAG_NAME"
