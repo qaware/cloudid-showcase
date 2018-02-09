@@ -9,16 +9,16 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 /**
- * Unit test for the {@link BundleFetcher}.
+ * Unit test for the {@link RawBundlesSupplier}.
  */
-public class BundleFetcherTest {
+public class RawBundlesSupplierTest {
 
     @Test
     public void testGetBundle() throws Exception {
-        BundleFetcher bundleFetcher = new BundleFetcher(new SocketChannelFactory("/tmp/test.sock"));
+        RawBundlesSupplier rawBundlesSupplier = new RawBundlesSupplier(new SocketChannelFactory("/tmp/test.sock"));
         WorkloadOuterClass.Bundles bundles = WorkloadOuterClass.Bundles.parseFrom(getClass().getResourceAsStream("fetchAllBundles.grpc"));
 
-        SVIDBundle bundle = bundleFetcher.getBundle(bundles.getBundles(0));
+        SVIDBundle bundle = rawBundlesSupplier.getBundle(bundles.getBundles(0));
         assertThat(bundle.getSvId(), is(equalTo("spiffe://example.org/host/workload")));
         assertThat(bundle.getCertificate().getSubjectAlternativeNames(), hasSize(1));
         assertThat(bundle.getKeyPair().getPrivate(), is(notNullValue()));

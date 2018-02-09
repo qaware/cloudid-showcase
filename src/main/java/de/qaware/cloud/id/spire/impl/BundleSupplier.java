@@ -35,7 +35,7 @@ public class BundleSupplier implements Supplier<SVIDBundle> {
     private Thread updaterThread;
     private final AtomicBoolean running = new AtomicBoolean();
 
-    private final BundleFetcher bundleFetcher;
+    private final RawBundlesSupplier rawBundlesSupplier;
     private final Duration forceUpdateAfter;
     private final Duration updateAhead;
 
@@ -44,12 +44,12 @@ public class BundleSupplier implements Supplier<SVIDBundle> {
     /**
      * Constructor.
      *
-     * @param bundleFetcher    bundle updater
+     * @param rawBundlesSupplier    bundle updater
      * @param forceUpdateAfter force an update after this time
      * @param updateAhead      update bundles this duration before expiry
      */
-    public BundleSupplier(BundleFetcher bundleFetcher, Duration forceUpdateAfter, Duration updateAhead) {
-        this.bundleFetcher = bundleFetcher;
+    public BundleSupplier(RawBundlesSupplier rawBundlesSupplier, Duration forceUpdateAfter, Duration updateAhead) {
+        this.rawBundlesSupplier = rawBundlesSupplier;
         this.forceUpdateAfter = forceUpdateAfter;
         this.updateAhead = updateAhead;
     }
@@ -109,7 +109,7 @@ public class BundleSupplier implements Supplier<SVIDBundle> {
     }
 
     private List<SVIDBundle> update() {
-        List<SVIDBundle> bundles = bundleFetcher.fetchBundle();
+        List<SVIDBundle> bundles = rawBundlesSupplier.get();
 
         // Verify the assumption that this workload has exactly one SPIFFE Id
         verify(bundles.stream().map(SVIDBundle::getSvId).collect(toSet()).size() != 1,

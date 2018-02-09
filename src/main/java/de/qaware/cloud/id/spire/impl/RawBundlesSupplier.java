@@ -23,24 +23,25 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.Security;
-import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
+import java.util.function.Supplier;
 
 import static java.util.stream.Collectors.toList;
 
 /**
- * Fetches the spiffe workload bundles from the spire agent.
+ * Fetches  SPIFFE workload bundles from the SPIRE agent.
  */
-public class BundleFetcher {
-    private static final Logger LOGGER = LoggerFactory.getLogger(BundleFetcher.class);
+public class RawBundlesSupplier implements Supplier<List<SVIDBundle>> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(RawBundlesSupplier.class);
     private final ChannelFactory<?> channelFactory;
 
     static {
+        // TODO: Move this to a better placeK
         Security.addProvider(new BouncyCastleProvider());
     }
 
@@ -49,7 +50,7 @@ public class BundleFetcher {
      *
      * @param channelFactory The channel factory to create the connection.
      */
-    public BundleFetcher(ChannelFactory<?> channelFactory) {
+    public RawBundlesSupplier(ChannelFactory<?> channelFactory) {
         this.channelFactory = channelFactory;
     }
 
@@ -58,7 +59,8 @@ public class BundleFetcher {
      *
      * @return A list of {@link SVIDBundle}s which contains the certificates and the private key. The list may be empty.
      */
-    public List<SVIDBundle> fetchBundle() {
+    @Override
+    public List<SVIDBundle> get() {
         List<SVIDBundle> bundleList = new ArrayList<>();
 
         ManagedChannel channel = channelFactory.createChannel().build();
