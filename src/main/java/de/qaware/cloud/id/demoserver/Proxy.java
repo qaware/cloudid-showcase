@@ -1,5 +1,6 @@
 package de.qaware.cloud.id.demoserver;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.Header;
 import org.apache.http.HeaderElement;
 import org.apache.http.HttpResponse;
@@ -7,8 +8,6 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.entity.InputStreamEntity;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -25,9 +24,9 @@ import java.util.Collections;
 /**
  * Simple proxy controller. Performs some requests against a configurable backend.
  */
+@Slf4j
 @Controller
 public class Proxy {
-    private static final Logger LOGGER = LoggerFactory.getLogger(Proxy.class);
 
     @Value("${de.qaware.cloud.id.demoserver.backend}")
     private String backend;

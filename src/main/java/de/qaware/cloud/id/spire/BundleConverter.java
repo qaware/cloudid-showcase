@@ -1,5 +1,6 @@
 package de.qaware.cloud.id.spire;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.sec.ECPrivateKey;
@@ -8,8 +9,6 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.openssl.PEMKeyPair;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import spire.api.workload.WorkloadOuterClass.WorkloadEntry;
 
 import java.io.IOException;
@@ -27,9 +26,8 @@ import static java.util.stream.Collectors.toList;
 /**
  * Converts a workload entry to a SVID bundle.
  */
+@Slf4j
 public class BundleConverter implements Function<WorkloadEntry, SVIDBundle> {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(BundleConverter.class);
 
     private final CertificateFactory certFactory;
 

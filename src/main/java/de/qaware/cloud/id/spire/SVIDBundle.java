@@ -1,9 +1,7 @@
 package de.qaware.cloud.id.spire;
 
 import de.qaware.cloud.id.util.Certificates;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import lombok.Data;
 
 import java.security.KeyPair;
 import java.security.cert.X509Certificate;
@@ -13,34 +11,13 @@ import java.util.List;
 /**
  * A data transfer object that contains the parsed informations about a spiffe workload id.
  */
+@Data
 public class SVIDBundle {
+
     private final String svId;
     private final X509Certificate certificate;
     private final KeyPair keyPair;
     private final List<X509Certificate> certChain;
-
-    public SVIDBundle(String svId, X509Certificate certificate, KeyPair keyPair, List<X509Certificate> certChain) {
-        this.certificate = certificate;
-        this.keyPair = keyPair;
-        this.certChain = certChain;
-        this.svId = svId;
-    }
-
-    public X509Certificate getCertificate() {
-        return certificate;
-    }
-
-    public KeyPair getKeyPair() {
-        return keyPair;
-    }
-
-    public List<X509Certificate> getCertChain() {
-        return certChain;
-    }
-
-    public String getSvId() {
-        return svId;
-    }
 
     /**
      * Get the first instant after which this bundle will no longer be valid.
@@ -78,40 +55,4 @@ public class SVIDBundle {
         return result;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        SVIDBundle that = (SVIDBundle) o;
-
-        return new EqualsBuilder()
-                .append(getCertificate(), that.getCertificate())
-                .append(getKeyPair(), that.getKeyPair())
-                .append(getCertChain(), that.getCertChain())
-                .append(getSvId(), that.getSvId())
-                .isEquals();
-    }
-
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder(17, 37)
-                .append(getCertificate())
-                .append(getKeyPair())
-                .append(getCertChain())
-                .append(getSvId())
-                .toHashCode();
-    }
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-                .append("svId", svId)
-                .toString();
-    }
 }

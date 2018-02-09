@@ -1,6 +1,7 @@
 package de.qaware.cloud.id.spire.impl;
 
 import de.qaware.cloud.id.spire.SVIDBundle;
+import lombok.RequiredArgsConstructor;
 
 import javax.net.ssl.X509TrustManager;
 import java.security.cert.CertificateException;
@@ -10,18 +11,10 @@ import java.util.function.Supplier;
 /**
  * X.509 trust manager backed by a SPIFFE identity.
  */
+@RequiredArgsConstructor
 public class SpiffeTrustManager implements X509TrustManager {
 
     private final Supplier<SVIDBundle> bundleSupplier;
-
-    /**
-     * Constructor.
-     *
-     * @param bundleSupplier bundle supplier
-     */
-    public SpiffeTrustManager(Supplier<SVIDBundle> bundleSupplier) {
-        this.bundleSupplier = bundleSupplier;
-    }
 
 
     @Override

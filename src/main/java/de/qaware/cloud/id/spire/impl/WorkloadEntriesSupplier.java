@@ -2,6 +2,7 @@ package de.qaware.cloud.id.spire.impl;
 
 import de.qaware.cloud.id.spire.ChannelFactory;
 import io.grpc.ManagedChannel;
+import lombok.RequiredArgsConstructor;
 import spire.api.workload.WorkloadGrpc;
 import spire.api.workload.WorkloadOuterClass;
 
@@ -11,18 +12,10 @@ import java.util.function.Supplier;
 /**
  * Fetches  SPIFFE workload bundles from the SPIRE agent.
  */
+@RequiredArgsConstructor
 class WorkloadEntriesSupplier implements Supplier<List<WorkloadOuterClass.WorkloadEntry>> {
 
     private final ChannelFactory<?> channelFactory;
-
-    /**
-     * Initializes the bundle fetcher.
-     *
-     * @param channelFactory The channel factory used to connect to the SPIRE agent.
-     */
-    public WorkloadEntriesSupplier(ChannelFactory<?> channelFactory) {
-        this.channelFactory = channelFactory;
-    }
 
     /**
      * Fetches all bundles that are valid for the current workload.

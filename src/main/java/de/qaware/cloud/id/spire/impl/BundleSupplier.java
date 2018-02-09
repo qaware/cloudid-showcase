@@ -2,8 +2,8 @@ package de.qaware.cloud.id.spire.impl;
 
 import de.qaware.cloud.id.spire.SVIDBundle;
 import de.qaware.cloud.id.util.InterruptibleSupplier;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -24,9 +24,9 @@ import static java.util.stream.Collectors.toSet;
 /**
  * Provides up-to-date bundles.
  */
+@Slf4j
+@RequiredArgsConstructor
 public class BundleSupplier implements Supplier<SVIDBundle> {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(BundleSupplier.class);
 
     /**
      * Minimum backoff for polling bundles.
@@ -44,19 +44,6 @@ public class BundleSupplier implements Supplier<SVIDBundle> {
 
     private Thread updaterThread;
 
-
-    /**
-     * Constructor.
-     *
-     * @param bundlesSupplier  interruptible bundles supplier
-     * @param forceUpdateAfter force an update after this time
-     * @param updateAhead      update bundles this duration before expiry
-     */
-    public BundleSupplier(InterruptibleSupplier<List<SVIDBundle>> bundlesSupplier, Duration forceUpdateAfter, Duration updateAhead) {
-        this.bundlesSupplier = bundlesSupplier;
-        this.forceUpdateAfter = forceUpdateAfter;
-        this.updateAhead = updateAhead;
-    }
 
     /**
      * Get the bundle.

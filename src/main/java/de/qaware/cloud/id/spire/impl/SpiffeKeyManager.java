@@ -1,6 +1,7 @@
 package de.qaware.cloud.id.spire.impl;
 
 import de.qaware.cloud.id.spire.SVIDBundle;
+import lombok.RequiredArgsConstructor;
 
 import javax.net.ssl.X509KeyManager;
 import java.net.Socket;
@@ -12,19 +13,10 @@ import java.util.function.Supplier;
 /**
  * X.509 key manager backed by a SPIFFE SVId.
  */
+@RequiredArgsConstructor
 public class SpiffeKeyManager implements X509KeyManager {
 
     private final Supplier<SVIDBundle> bundleSupplier;
-
-    /**
-     * Constructor.
-     *
-     * @param bundleSupplier bundle supplier
-     */
-    public SpiffeKeyManager(Supplier<SVIDBundle> bundleSupplier) {
-        this.bundleSupplier = bundleSupplier;
-    }
-
 
     @Override
     public String[] getClientAliases(String s, Principal[] principals) {

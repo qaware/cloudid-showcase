@@ -11,20 +11,18 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.ServerSocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.unix.DomainSocketAddress;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.SystemUtils;
 
 import java.io.File;
 
+@RequiredArgsConstructor
 public class SocketChannelFactory implements ChannelFactory<NettyChannelBuilder> {
 
     private final File socketFile;
 
     public SocketChannelFactory(String socketFile) {
         this(new File(socketFile));
-    }
-
-    public SocketChannelFactory(File socketFile) {
-        this.socketFile = socketFile;
     }
 
     @Override
@@ -62,11 +60,9 @@ public class SocketChannelFactory implements ChannelFactory<NettyChannelBuilder>
     private static SocketType getCurrentSocketType() {
         if (SystemUtils.IS_OS_LINUX) {
             return SocketType.E_POLL;
-        }
-        else if (SystemUtils.IS_OS_MAC) {
+        } else if (SystemUtils.IS_OS_MAC) {
             return SocketType.K_QUEUE;
-        }
-        else {
+        } else {
             return SocketType.NIO;
         }
     }

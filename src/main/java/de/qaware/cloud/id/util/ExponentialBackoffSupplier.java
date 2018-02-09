@@ -1,7 +1,6 @@
 package de.qaware.cloud.id.util;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.function.Supplier;
 
@@ -10,9 +9,8 @@ import java.util.function.Supplier;
  *
  * @param <T> value type
  */
+@Slf4j
 public class ExponentialBackoffSupplier<T> implements InterruptibleSupplier<T> {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExponentialBackoffSupplier.class);
 
     private final Supplier<T> supplier;
     private final long initalMs;
