@@ -32,6 +32,7 @@ public class SpiffeKeyManagerFactorySpi extends KeyManagerFactorySpi {
         // TODO: Make this work and remove the mock below
         // SocketChannelFactory channelFactory = new SocketChannelFactory("/tmp/test.sock");
         // WorkloadEntriesSupplier workloadEntriesSupplier = new WorkloadEntriesSupplier(channelFactory);
+
         Supplier<List<WorkloadEntry>> workloadEntriesSupplier = () -> TestResources.getTestBundles().getBundlesList();
 
         InterruptibleSupplier<List<SVIDBundle>> bundlesSupplier = new ExponentialBackoffSupplier<>(

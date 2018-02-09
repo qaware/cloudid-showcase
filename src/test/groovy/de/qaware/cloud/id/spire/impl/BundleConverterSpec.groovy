@@ -16,7 +16,7 @@ class BundleConverterSpec extends Specification {
 
     def 'convert'() {
         given:
-        def bundles = TestResources.getTestBundles()
+        def bundles = TestResources.testBundles
         BundleConverter bundleConverter = new BundleConverter()
 
         when:
