@@ -3,6 +3,7 @@ package de.qaware.cloud.id.spire.impl;
 import de.qaware.cloud.id.TestResources;
 import de.qaware.cloud.id.spire.SVIDBundle;
 import de.qaware.cloud.id.util.ExponentialBackoffSupplier;
+import lombok.extern.slf4j.Slf4j;
 import spire.api.workload.WorkloadOuterClass.WorkloadEntry;
 
 import javax.net.ssl.KeyManager;
@@ -13,18 +14,19 @@ import java.time.Duration;
 import java.util.List;
 import java.util.function.Supplier;
 
+@Slf4j
 public class SpiffeKeyManagerFactory extends KeyManagerFactorySpi {
 
     private KeyManager keyManager;
 
     @Override
     protected void engineInit(KeyStore keyStore, char[] chars) {
-        throw new UnsupportedOperationException();
+        LOGGER.error("Delegating to a keystore backed key manager is not supported yet");
     }
 
     @Override
     protected void engineInit(ManagerFactoryParameters managerFactoryParameters) {
-        throw new UnsupportedOperationException();
+        LOGGER.error("Delegating to a keystore backed key manager is not supported yet");
     }
 
     private void init() {

@@ -101,7 +101,7 @@ public class BundleSupplier implements Supplier<SVIDBundle> {
 
                 // Log if the bundle is expired
                 if (bundleExpiry.isBefore(now)) {
-                    LOGGER.error("Received a bundle that expired on {}",
+                    LOGGER.error("Received a bundle that has expired on {}",
                             LocalDateTime.ofInstant(bundleExpiry, ZoneId.systemDefault())
                     );
                 }

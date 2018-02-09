@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        springBootVersion = '1.5.9.RELEASE'
+        springBootVersion = '1.5.10.RELEASE'
     }
     repositories {
         mavenCentral()
@@ -32,19 +32,27 @@ repositories {
 }
 
 ext {
-    springCloudVersion = 'Edgware.RELEASE'
+    springCloudVersion = 'Edgware.SR1'
     grpcVersion = '1.5.0'
     nettyVersion = '4.1.12.Final'
     nettyTcnativeVersion = '2.0.5.Final'
+    bouncyCastleVersion = '1.59'
+    lombokVersion = '1.16.20'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
 }
 
 dependencies {
     // Spring Boot
-    //compile('org.springframework.cloud:spring-cloud-starter-config')
-    compile('org.springframework.boot:spring-boot-starter-actuator')
-    compile('org.springframework.boot:spring-boot-starter-web')
-    testCompile('org.springframework.boot:spring-boot-starter-test')
-    testCompile('org.springframework.restdocs:spring-restdocs-mockmvc')
+    compile "org.springframework.boot:spring-boot-starter-actuator:${springBootVersion}"
+    compile "org.springframework.boot:spring-boot-starter-web:${springBootVersion}"
+    testCompile "org.springframework.boot:spring-boot-starter-test:${springBootVersion}"
+    // Spring Restdocs
+    testCompile 'org.springframework.restdocs:spring-restdocs-mockmvc:2.0.0.RELEASE'
 
     compile 'org.apache.httpcomponents:httpclient:4.5.4'
 
@@ -55,30 +63,30 @@ dependencies {
     compile "io.netty:netty-transport-native-epoll:${nettyVersion}:linux-x86_64"
     compile "io.netty:netty-transport-native-kqueue:${nettyVersion}:osx-x86_64"
     compile "io.netty:netty-tcnative-boringssl-static:${nettyTcnativeVersion}"
-    compile 'org.bouncycastle:bcprov-jdk15on:1.59'
-    compile 'org.bouncycastle:bcpkix-jdk15on:1.59'
+
+    // Apache Commons Lang 3
     compile 'org.apache.commons:commons-lang3:3.7'
 
+    // BouncyCastle
+    compile "org.bouncycastle:bcprov-jdk15on:${bouncyCastleVersion}"
+    compile "org.bouncycastle:bcpkix-jdk15on:${bouncyCastleVersion}"
+
     // Lombok
-    compileOnly('org.projectlombok:lombok')
-    testCompileOnly('org.projectlombok:lombok')
+    compileOnly "org.projectlombok:lombok:${lombokVersion}"
+    testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
 
     // Spock tests
-    // mandatory dependencies for using Spock
     testCompile "org.codehaus.groovy:groovy-all:2.4.13"
     testCompile "org.spockframework:spock-core:1.1-groovy-2.4"
+    testCompile "org.hamcrest:hamcrest-core:1.3"
+    testRuntime "net.bytebuddy:byte-buddy:1.6.5"
+    testRuntime "org.objenesis:objenesis:2.5.1"
 
-    // optional dependencies for using Spock
-    testCompile "org.hamcrest:hamcrest-core:1.3" // only necessary if Hamcrest matchers are used
-    testRuntime "net.bytebuddy:byte-buddy:1.6.5"          // allows mocking of classes (in addition to interfaces)
-    testRuntime "org.objenesis:objenesis:2.5.1"    // allows mocking of classes without default constructor (together with CGLIB)
+    // WireMock
+    // Use standalone as WireMock depends on an outdated version of Jetty that clashes with Spring Boot
+    testCompileOnly "com.github.tomakehurst:wiremock-standalone:2.14.0"
 }
 
-dependencyManagement {
-    imports {
-        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-    }
-}
 
 jar {
     archiveName "${project.name}.jar"
