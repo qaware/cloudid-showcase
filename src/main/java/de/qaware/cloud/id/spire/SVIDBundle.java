@@ -6,7 +6,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.security.KeyPair;
-import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.time.Instant;
 import java.util.List;
@@ -18,9 +17,9 @@ public class SVIDBundle {
     private final String svId;
     private final X509Certificate certificate;
     private final KeyPair keyPair;
-    private final List<? extends Certificate> caCertificates;
+    private final List<X509Certificate> caCertificates;
 
-    public SVIDBundle(String svId, X509Certificate certificate, KeyPair keyPair, List<? extends Certificate> caCertificates) {
+    public SVIDBundle(String svId, X509Certificate certificate, KeyPair keyPair, List<X509Certificate> caCertificates) {
         this.certificate = certificate;
         this.keyPair = keyPair;
         this.caCertificates = caCertificates;
@@ -35,7 +34,7 @@ public class SVIDBundle {
         return keyPair;
     }
 
-    public List<? extends Certificate> getCaCertificates() {
+    public List<X509Certificate> getCaCertificates() {
         return caCertificates;
     }
 
@@ -51,7 +50,7 @@ public class SVIDBundle {
     public Instant getNotAfter() {
         Instant result = Certificates.getNotAfter(certificate);
 
-        for (Certificate certificate : caCertificates) {
+        for (X509Certificate certificate : caCertificates) {
             Instant notAfter = Certificates.getNotAfter(certificate);
             if (notAfter.isBefore(result)) {
                 result = notAfter;
@@ -69,7 +68,7 @@ public class SVIDBundle {
     public Instant getNotBefore() {
         Instant result = Certificates.getNotBefore(certificate);
 
-        for (Certificate certificate : caCertificates) {
+        for (X509Certificate certificate : caCertificates) {
             Instant notBefore = Certificates.getNotBefore(certificate);
             if (notBefore.isAfter(result)) {
                 result = notBefore;

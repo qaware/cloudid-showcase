@@ -29,6 +29,9 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * Fetches the spiffe workload bundles from the spire agent.
@@ -83,9 +86,18 @@ public class BundleFetcher {
      * @throws IOException              In case of the private key were unable to read.
      */
     SVIDBundle getBundle(WorkloadEntry workloadEntry) throws GeneralSecurityException, IOException {
-        CertificateFactory certificateFactory = CertificateFactory.getInstance("x509");
-        X509Certificate svidCertificate = (X509Certificate) certificateFactory.generateCertificate(workloadEntry.getSvid().newInput());
-        List<? extends Certificate> certPath = new ArrayList<>(certificateFactory.generateCertificates(workloadEntry.getSvidBundle().newInput()));
+        CertificateFactory certFactory = CertificateFactory.getInstance("x509");
+
+        X509Certificate svidCertificate = (X509Certificate) certFactory.generateCertificate(workloadEntry.getSvid().newInput());
+
+        // Assume the cert path to be all X.509 certificates as anything else doesn't make sense here
+        List<X509Certificate> certPath = certFactory
+                .generateCertificates(workloadEntry.getSvidBundle().newInput())
+                .stream()
+                .map(c -> (X509Certificate) c)
+                .collect(toList());
+
+        // Smoke test the certificate
         svidCertificate.verify(certPath.get(0).getPublicKey());
 
 

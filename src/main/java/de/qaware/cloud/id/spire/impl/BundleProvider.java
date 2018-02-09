@@ -1,5 +1,6 @@
 package de.qaware.cloud.id.spire.impl;
 
+import com.google.common.base.Supplier;
 import de.qaware.cloud.id.spire.SVIDBundle;
 import de.qaware.cloud.id.util.ExponentialBackoffSupplyStrategy;
 import de.qaware.cloud.id.util.SupplyStrategy;
@@ -21,7 +22,7 @@ import static java.util.stream.Collectors.toSet;
 /**
  * Provides up-to-date bundles.
  */
-public class BundleProvider {
+public class BundleProvider implements Supplier<SVIDBundle> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BundleProvider.class);
 
@@ -58,6 +59,7 @@ public class BundleProvider {
      *
      * @return bundle
      */
+    @Override
     public SVIDBundle get() {
         Instant now = now();
 
