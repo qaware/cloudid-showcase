@@ -1,6 +1,5 @@
 package de.qaware.cloud.id.spire.impl;
 
-import com.google.common.base.Supplier;
 import de.qaware.cloud.id.spire.SVIDBundle;
 import de.qaware.cloud.id.util.ExponentialBackoffSupplyStrategy;
 import de.qaware.cloud.id.util.SupplyStrategy;
@@ -11,6 +10,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Supplier;
 
 import static com.google.common.base.Verify.verify;
 import static java.lang.Math.min;
