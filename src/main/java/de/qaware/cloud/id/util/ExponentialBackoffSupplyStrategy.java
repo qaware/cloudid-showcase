@@ -1,6 +1,5 @@
 package de.qaware.cloud.id.util;
 
-import de.qaware.cloud.id.spire.impl.BundleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,7 +12,7 @@ import java.util.function.Supplier;
  */
 public class ExponentialBackoffSupplyStrategy<T> implements SupplyStrategy<T> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(BundleProvider.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExponentialBackoffSupplyStrategy.class);
 
     private final Supplier<T> supplier;
     private final long initalMs;

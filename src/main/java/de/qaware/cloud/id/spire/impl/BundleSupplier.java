@@ -22,9 +22,9 @@ import static java.util.stream.Collectors.toSet;
 /**
  * Provides up-to-date bundles.
  */
-public class BundleProvider implements Supplier<SVIDBundle> {
+public class BundleSupplier implements Supplier<SVIDBundle> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(BundleProvider.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BundleSupplier.class);
 
     private final SupplyStrategy<List<SVIDBundle>> bundleSupplier = new ExponentialBackoffSupplyStrategy<>(
             this::update,
@@ -48,7 +48,7 @@ public class BundleProvider implements Supplier<SVIDBundle> {
      * @param forceUpdateAfter force an update after this time
      * @param updateAhead      update bundles this duration before expiry
      */
-    public BundleProvider(BundleFetcher bundleFetcher, Duration forceUpdateAfter, Duration updateAhead) {
+    public BundleSupplier(BundleFetcher bundleFetcher, Duration forceUpdateAfter, Duration updateAhead) {
         this.bundleFetcher = bundleFetcher;
         this.forceUpdateAfter = forceUpdateAfter;
         this.updateAhead = updateAhead;
