@@ -3,7 +3,6 @@ package de.qaware.cloud.id.spire.impl;
 import de.qaware.cloud.id.TestResources;
 import de.qaware.cloud.id.spire.SVIDBundle;
 import de.qaware.cloud.id.util.ExponentialBackoffSupplier;
-import de.qaware.cloud.id.util.InterruptibleSupplier;
 import spire.api.workload.WorkloadOuterClass.WorkloadEntry;
 
 import javax.net.ssl.KeyManager;
@@ -35,7 +34,7 @@ public class SpiffeKeyManagerFactorySpi extends KeyManagerFactorySpi {
 
         Supplier<List<WorkloadEntry>> workloadEntriesSupplier = () -> TestResources.getTestBundles().getBundlesList();
 
-        InterruptibleSupplier<List<SVIDBundle>> bundlesSupplier = new ExponentialBackoffSupplier<>(
+        Supplier<List<SVIDBundle>> bundlesSupplier = new ExponentialBackoffSupplier<>(
                 new BundlesSupplier(workloadEntriesSupplier),
                 2_000,
                 60_000,

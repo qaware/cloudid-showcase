@@ -1,5 +1,6 @@
 package de.qaware.cloud.id.util;
 
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.function.Supplier;
@@ -10,7 +11,7 @@ import java.util.function.Supplier;
  * @param <T> value type
  */
 @Slf4j
-public class ExponentialBackoffSupplier<T> implements InterruptibleSupplier<T> {
+public class ExponentialBackoffSupplier<T> implements Supplier<T> {
 
     private final Supplier<T> supplier;
     private final long initalMs;
@@ -32,8 +33,9 @@ public class ExponentialBackoffSupplier<T> implements InterruptibleSupplier<T> {
         this.exp = exp;
     }
 
+    @SneakyThrows
     @Override
-    public T get() throws InterruptedException {
+    public T get() {
         long backoff = initalMs;
         for (; ; ) {
             try {

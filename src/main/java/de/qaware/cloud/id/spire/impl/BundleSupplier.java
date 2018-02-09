@@ -1,7 +1,6 @@
 package de.qaware.cloud.id.spire.impl;
 
 import de.qaware.cloud.id.spire.SVIDBundle;
-import de.qaware.cloud.id.util.InterruptibleSupplier;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -35,7 +34,7 @@ public class BundleSupplier implements Supplier<SVIDBundle> {
 
     private static final String THREAD_NAME = "spiffe-bundle-updater";
 
-    private final InterruptibleSupplier<List<SVIDBundle>> bundlesSupplier;
+    private final Supplier<List<SVIDBundle>> bundlesSupplier;
     private final Duration forceUpdateAfter;
     private final Duration updateAhead;
 
@@ -123,7 +122,7 @@ public class BundleSupplier implements Supplier<SVIDBundle> {
         }
     }
 
-    private List<SVIDBundle> fetchBundles() throws InterruptedException {
+    private List<SVIDBundle> fetchBundles() {
         List<SVIDBundle> bundles = bundlesSupplier.get();
 
         // Verify the assumption that this workload has exactly one SPIFFE Id
