@@ -17,12 +17,12 @@ public class SVIDBundle {
     private final String svId;
     private final X509Certificate certificate;
     private final KeyPair keyPair;
-    private final List<X509Certificate> caCertificates;
+    private final List<X509Certificate> certChain;
 
-    public SVIDBundle(String svId, X509Certificate certificate, KeyPair keyPair, List<X509Certificate> caCertificates) {
+    public SVIDBundle(String svId, X509Certificate certificate, KeyPair keyPair, List<X509Certificate> certChain) {
         this.certificate = certificate;
         this.keyPair = keyPair;
-        this.caCertificates = caCertificates;
+        this.certChain = certChain;
         this.svId = svId;
     }
 
@@ -34,8 +34,8 @@ public class SVIDBundle {
         return keyPair;
     }
 
-    public List<X509Certificate> getCaCertificates() {
-        return caCertificates;
+    public List<X509Certificate> getCertChain() {
+        return certChain;
     }
 
     public String getSvId() {
@@ -50,7 +50,7 @@ public class SVIDBundle {
     public Instant getNotAfter() {
         Instant result = Certificates.getNotAfter(certificate);
 
-        for (X509Certificate certificate : caCertificates) {
+        for (X509Certificate certificate : certChain) {
             Instant notAfter = Certificates.getNotAfter(certificate);
             if (notAfter.isBefore(result)) {
                 result = notAfter;
@@ -68,7 +68,7 @@ public class SVIDBundle {
     public Instant getNotBefore() {
         Instant result = Certificates.getNotBefore(certificate);
 
-        for (X509Certificate certificate : caCertificates) {
+        for (X509Certificate certificate : certChain) {
             Instant notBefore = Certificates.getNotBefore(certificate);
             if (notBefore.isAfter(result)) {
                 result = notBefore;
@@ -93,7 +93,7 @@ public class SVIDBundle {
         return new EqualsBuilder()
                 .append(getCertificate(), that.getCertificate())
                 .append(getKeyPair(), that.getKeyPair())
-                .append(getCaCertificates(), that.getCaCertificates())
+                .append(getCertChain(), that.getCertChain())
                 .append(getSvId(), that.getSvId())
                 .isEquals();
     }
@@ -103,7 +103,7 @@ public class SVIDBundle {
         return new HashCodeBuilder(17, 37)
                 .append(getCertificate())
                 .append(getKeyPair())
-                .append(getCaCertificates())
+                .append(getCertChain())
                 .append(getSvId())
                 .toHashCode();
     }

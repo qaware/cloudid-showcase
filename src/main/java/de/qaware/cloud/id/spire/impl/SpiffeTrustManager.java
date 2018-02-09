@@ -36,7 +36,7 @@ public class SpiffeTrustManager implements X509TrustManager {
 
     @Override
     public X509Certificate[] getAcceptedIssuers() {
-        return new X509Certificate[]{bundleSupplier.get().getCaCertificates().get(0)};
+        return new X509Certificate[]{bundleSupplier.get().getCertChain().get(0)};
     }
 
 }
