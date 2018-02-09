@@ -1,12 +1,17 @@
 package de.qaware.cloud.id.util;
 
+import lombok.NoArgsConstructor;
+
 import java.security.cert.X509Certificate;
 import java.time.Instant;
 import java.util.Date;
 
+import static lombok.AccessLevel.PRIVATE;
+
 /**
  * Utilities for certificates.
  */
+@NoArgsConstructor(access = PRIVATE)
 public class Certificates {
 
     /**
@@ -29,12 +34,6 @@ public class Certificates {
     public static Instant getNotBefore(X509Certificate certificate) {
         Date date = certificate.getNotBefore();
         return date != null ? date.toInstant() : Instant.MIN;
-    }
-
-    /**
-     * No instantiation.
-     */
-    private Certificates() {
     }
 
 }

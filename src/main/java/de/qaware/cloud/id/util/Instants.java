@@ -1,10 +1,15 @@
 package de.qaware.cloud.id.util;
 
+import lombok.NoArgsConstructor;
+
 import java.time.Instant;
+
+import static lombok.AccessLevel.PRIVATE;
 
 /**
  * Utilities for instants.
  */
+@NoArgsConstructor(access = PRIVATE)
 public class Instants {
 
     /**
@@ -16,13 +21,6 @@ public class Instants {
      */
     public static Instant min(Instant a, Instant b) {
         return a.isBefore(b) ? a : b;
-    }
-
-    /**
-     * No instantiation.
-     */
-    private Instants() {
-
     }
 
 }

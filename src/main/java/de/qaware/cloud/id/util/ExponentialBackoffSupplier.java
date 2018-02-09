@@ -1,5 +1,6 @@
 package de.qaware.cloud.id.util;
 
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
@@ -11,27 +12,13 @@ import java.util.function.Supplier;
  * @param <T> value type
  */
 @Slf4j
+@RequiredArgsConstructor
 public class ExponentialBackoffSupplier<T> implements Supplier<T> {
 
     private final Supplier<T> supplier;
     private final long initalMs;
     private final long maxMs;
     private final double exp;
-
-    /**
-     * Constructor.
-     *
-     * @param supplier delegate supplier
-     * @param initalMs initial backoff in ms
-     * @param maxMs    max. backoff in ms
-     * @param exp      backoff exponent
-     */
-    public ExponentialBackoffSupplier(Supplier<T> supplier, long initalMs, long maxMs, double exp) {
-        this.supplier = supplier;
-        this.initalMs = initalMs;
-        this.maxMs = maxMs;
-        this.exp = exp;
-    }
 
     @SneakyThrows
     @Override
