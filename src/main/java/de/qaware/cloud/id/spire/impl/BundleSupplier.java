@@ -35,7 +35,7 @@ public class BundleSupplier implements Supplier<SVIDBundle> {
     private Thread updaterThread;
     private final AtomicBoolean running = new AtomicBoolean();
 
-    private final RawBundlesSupplier rawBundlesSupplier;
+    private final Supplier<List<SVIDBundle>> rawBundlesSupplier;
     private final Duration forceUpdateAfter;
     private final Duration updateAhead;
 
@@ -44,11 +44,11 @@ public class BundleSupplier implements Supplier<SVIDBundle> {
     /**
      * Constructor.
      *
-     * @param rawBundlesSupplier    bundle updater
-     * @param forceUpdateAfter force an update after this time
-     * @param updateAhead      update bundles this duration before expiry
+     * @param rawBundlesSupplier bundle updater
+     * @param forceUpdateAfter   force an update after this time
+     * @param updateAhead        update bundles this duration before expiry
      */
-    public BundleSupplier(RawBundlesSupplier rawBundlesSupplier, Duration forceUpdateAfter, Duration updateAhead) {
+    public BundleSupplier(Supplier<List<SVIDBundle>> rawBundlesSupplier, Duration forceUpdateAfter, Duration updateAhead) {
         this.rawBundlesSupplier = rawBundlesSupplier;
         this.forceUpdateAfter = forceUpdateAfter;
         this.updateAhead = updateAhead;
@@ -61,12 +61,13 @@ public class BundleSupplier implements Supplier<SVIDBundle> {
      */
     @Override
     public SVIDBundle get() {
-        Instant now = now();
+        List<SVIDBundle> bundles = getBundles();
 
         // This selects the first tuple with that is valid, preferring tuples with longer validity.
         // Bundles are sorted descending by notAfter.
-        return getBundles(now).stream()
-                .filter(b -> b.getNotBefore().isBefore(now()))
+        Instant now = now();
+        return bundles.stream()
+                .filter(b -> b.getNotBefore().isBefore(now))
                 .findFirst()
                 .orElseThrow(IllegalStateException::new);
     }
@@ -104,7 +105,7 @@ public class BundleSupplier implements Supplier<SVIDBundle> {
         this.bundles = bundles;
     }
 
-    private synchronized List<SVIDBundle> getBundles(Instant now) {
+    private synchronized List<SVIDBundle> getBundles() {
         return bundles;
     }
 
