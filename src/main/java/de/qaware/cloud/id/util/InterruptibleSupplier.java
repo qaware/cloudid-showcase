@@ -1,11 +1,11 @@
 package de.qaware.cloud.id.util;
 
 /**
- * Supply strategy.
+ * Interruptible supplier.
  *
  * @param <T> value type
  */
-public interface SupplyStrategy<T> {
+public interface InterruptibleSupplier<T> {
 
     /**
      * Get a value.

@@ -1,20 +1,22 @@
 package de.qaware.cloud.id.spire.impl;
 
 import de.qaware.cloud.id.spire.SVIDBundle;
-import de.qaware.cloud.id.util.ExponentialBackoffSupplyStrategy;
-import de.qaware.cloud.id.util.SupplyStrategy;
+import de.qaware.cloud.id.util.InterruptibleSupplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 import static com.google.common.base.Verify.verify;
+import static java.lang.Math.max;
 import static java.lang.Math.min;
-import static java.time.Duration.between;
 import static java.time.Instant.now;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toSet;
@@ -26,29 +28,31 @@ public class BundleSupplier implements Supplier<SVIDBundle> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BundleSupplier.class);
 
-    private final SupplyStrategy<List<SVIDBundle>> bundleSupplier = new ExponentialBackoffSupplyStrategy<>(
-            this::update,
-            2_000,
-            60_000,
-            1.5);
+    /**
+     * Minimum backoff for polling bundles.
+     */
+    private static final Duration MIN_BACKOFF = Duration.ofSeconds(30);
 
-    private Thread updaterThread;
-    private final AtomicBoolean running = new AtomicBoolean();
+    private static final String THREAD_NAME = "spiffe-bundle-updater";
 
-    private final Supplier<List<SVIDBundle>> bundlesSupplier;
+    private final InterruptibleSupplier<List<SVIDBundle>> bundlesSupplier;
     private final Duration forceUpdateAfter;
     private final Duration updateAhead;
 
-    private List<SVIDBundle> bundles = emptyList();
+    private final AtomicReference<List<SVIDBundle>> bundles = new AtomicReference<>(emptyList());
+    private final AtomicBoolean running = new AtomicBoolean();
+
+    private Thread updaterThread;
+
 
     /**
      * Constructor.
      *
-     * @param bundlesSupplier  bundles supplier
+     * @param bundlesSupplier  interruptible bundles supplier
      * @param forceUpdateAfter force an update after this time
      * @param updateAhead      update bundles this duration before expiry
      */
-    public BundleSupplier(Supplier<List<SVIDBundle>> bundlesSupplier, Duration forceUpdateAfter, Duration updateAhead) {
+    public BundleSupplier(InterruptibleSupplier<List<SVIDBundle>> bundlesSupplier, Duration forceUpdateAfter, Duration updateAhead) {
         this.bundlesSupplier = bundlesSupplier;
         this.forceUpdateAfter = forceUpdateAfter;
         this.updateAhead = updateAhead;
@@ -61,12 +65,10 @@ public class BundleSupplier implements Supplier<SVIDBundle> {
      */
     @Override
     public SVIDBundle get() {
-        List<SVIDBundle> bundles = getBundles();
-
         // This selects the first tuple with that is valid, preferring tuples with longer validity.
         // Bundles are sorted descending by notAfter.
         Instant now = now();
-        return bundles.stream()
+        return this.bundles.get().stream()
                 .filter(b -> b.getNotBefore().isBefore(now))
                 .findFirst()
                 .orElseThrow(IllegalStateException::new);
@@ -80,7 +82,7 @@ public class BundleSupplier implements Supplier<SVIDBundle> {
             throw new IllegalStateException("Already running");
         }
 
-        updaterThread = new Thread(this::updater);
+        updaterThread = new Thread(this::updater, THREAD_NAME);
         updaterThread.start();
     }
 
@@ -101,42 +103,50 @@ public class BundleSupplier implements Supplier<SVIDBundle> {
         updaterThread = null;
     }
 
-    private synchronized void setBundles(List<SVIDBundle> bundles) {
-        this.bundles = bundles;
-    }
-
-    private synchronized List<SVIDBundle> getBundles() {
-        return bundles;
-    }
-
-    private List<SVIDBundle> update() {
-        List<SVIDBundle> bundles = bundlesSupplier.get();
-
-        // Verify the assumption that this workload has exactly one SPIFFE Id
-        verify(bundles.stream().map(SVIDBundle::getSvId).collect(toSet()).size() != 1,
-                "This workload must receive exactly one SPIFFE Id");
-
-        // Sort descending by notAfter
-        bundles.sort((a, b) -> b.getNotAfter().compareTo(a.getNotAfter()));
-
-        return bundles;
-    }
-
     private void updater() {
         try {
             while (running.get()) {
-                List<SVIDBundle> bundles = bundleSupplier.get();
+                List<SVIDBundle> bundles = fetchBundles();
 
-                setBundles(bundles);
+                this.bundles.set(bundles);
 
-                Instant bundleExpiry = bundles.get(bundles.size() - 1).getNotAfter().minus(updateAhead);
-                Thread.sleep(min(between(now(), bundleExpiry).toMillis(), forceUpdateAfter.toMillis()));
+                Instant bundleExpiry = bundles.get(0).getNotAfter();
+                Instant now = now();
+
+                // Log if the bundle is expired
+                if (bundleExpiry.isBefore(now)) {
+                    LOGGER.error("Received a bundle that expired on {}",
+                            LocalDateTime.ofInstant(bundleExpiry, ZoneId.systemDefault())
+                    );
+                }
+
+                // Backoff until the newest bundle expires minus a safety period
+                // Use a minimum backoff to prevent swamping the supplier if the supplier
+                // does not provide bundles that live long enough.
+                Thread.sleep(max(
+                        min(
+                                Duration.between(now, bundleExpiry.minus(updateAhead)).toMillis(),
+                                forceUpdateAfter.toMillis()),
+                        MIN_BACKOFF.toMillis()));
             }
         } catch (InterruptedException e) {
             LOGGER.trace("Interrupted", e);
         } catch (Throwable e) {
             LOGGER.error("Updater died unexpectedly", e);
         }
+    }
+
+    private List<SVIDBundle> fetchBundles() throws InterruptedException {
+        List<SVIDBundle> bundles = bundlesSupplier.get();
+
+        // Verify the assumption that this workload has exactly one SPIFFE Id
+        verify(bundles.stream().map(SVIDBundle::getSvId).collect(toSet()).size() == 1,
+                "This workload must receive exactly one SPIFFE Id");
+
+        // Sort descending by notAfter
+        bundles.sort((a, b) -> b.getNotAfter().compareTo(a.getNotAfter()));
+
+        return bundles;
     }
 
 }

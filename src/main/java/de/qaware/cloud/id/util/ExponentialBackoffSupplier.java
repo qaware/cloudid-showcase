@@ -10,9 +10,9 @@ import java.util.function.Supplier;
  *
  * @param <T> value type
  */
-public class ExponentialBackoffSupplyStrategy<T> implements SupplyStrategy<T> {
+public class ExponentialBackoffSupplier<T> implements InterruptibleSupplier<T> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExponentialBackoffSupplyStrategy.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExponentialBackoffSupplier.class);
 
     private final Supplier<T> supplier;
     private final long initalMs;
@@ -27,8 +27,7 @@ public class ExponentialBackoffSupplyStrategy<T> implements SupplyStrategy<T> {
      * @param maxMs    max. backoff in ms
      * @param exp      backoff exponent
      */
-    public ExponentialBackoffSupplyStrategy(Supplier<T> supplier,
-                                            long initalMs, long maxMs, double exp) {
+    public ExponentialBackoffSupplier(Supplier<T> supplier, long initalMs, long maxMs, double exp) {
         this.supplier = supplier;
         this.initalMs = initalMs;
         this.maxMs = maxMs;
