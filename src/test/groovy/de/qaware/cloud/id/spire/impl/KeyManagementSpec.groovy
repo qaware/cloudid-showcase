@@ -9,11 +9,10 @@ import java.security.Principal
  * Specification testing key management with SPIFFE.
  */
 class KeyManagementSpec extends Specification {
-    SpiffeKeyManagerFactorySpi keyManagerFactory
+    SpiffeKeyManagerFactory keyManagerFactory
 
     void setup() {
-        keyManagerFactory = new SpiffeKeyManagerFactorySpi()
-        keyManagerFactory.engineInit(null)
+        keyManagerFactory = new SpiffeKeyManagerFactory()
     }
 
     def 'get key managers'() {

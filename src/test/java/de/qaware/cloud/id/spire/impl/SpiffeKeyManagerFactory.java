@@ -8,23 +8,23 @@ import spire.api.workload.WorkloadOuterClass.WorkloadEntry;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactorySpi;
 import javax.net.ssl.ManagerFactoryParameters;
-import java.security.*;
+import java.security.KeyStore;
 import java.time.Duration;
 import java.util.List;
 import java.util.function.Supplier;
 
-public class SpiffeKeyManagerFactorySpi extends KeyManagerFactorySpi {
+public class SpiffeKeyManagerFactory extends KeyManagerFactorySpi {
 
     private KeyManager keyManager;
 
     @Override
-    protected void engineInit(KeyStore keyStore, char[] chars) throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException {
-        init();
+    protected void engineInit(KeyStore keyStore, char[] chars) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
-    protected void engineInit(ManagerFactoryParameters managerFactoryParameters) throws InvalidAlgorithmParameterException {
-        init();
+    protected void engineInit(ManagerFactoryParameters managerFactoryParameters) {
+        throw new UnsupportedOperationException();
     }
 
     private void init() {
@@ -52,6 +52,11 @@ public class SpiffeKeyManagerFactorySpi extends KeyManagerFactorySpi {
 
     @Override
     protected KeyManager[] engineGetKeyManagers() {
+        if (keyManager == null) {
+            init();
+        }
+
         return new KeyManager[]{keyManager};
     }
+
 }

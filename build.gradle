@@ -39,9 +39,13 @@ ext {
 }
 
 dependencies {
+    // Spring Boot
     //compile('org.springframework.cloud:spring-cloud-starter-config')
     compile('org.springframework.boot:spring-boot-starter-actuator')
     compile('org.springframework.boot:spring-boot-starter-web')
+    testCompile('org.springframework.boot:spring-boot-starter-test')
+    testCompile('org.springframework.restdocs:spring-restdocs-mockmvc')
+
     compile 'org.apache.httpcomponents:httpclient:4.5.4'
 
     compile "io.grpc:grpc-netty:${grpcVersion}"
@@ -54,10 +58,10 @@ dependencies {
     compile 'org.bouncycastle:bcprov-jdk15on:1.59'
     compile 'org.bouncycastle:bcpkix-jdk15on:1.59'
     compile 'org.apache.commons:commons-lang3:3.7'
-    compileOnly('org.projectlombok:lombok')
-    testCompile('org.springframework.boot:spring-boot-starter-test')
-    testCompile('org.springframework.restdocs:spring-restdocs-mockmvc')
 
+    // Lombok
+    compileOnly('org.projectlombok:lombok')
+    testCompileOnly('org.projectlombok:lombok')
 
     // Spock tests
     // mandatory dependencies for using Spock
