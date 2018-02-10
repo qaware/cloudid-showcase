@@ -4,6 +4,9 @@ import spock.lang.Specification
 
 import javax.net.ssl.X509KeyManager
 import java.security.Principal
+import java.time.Duration
+
+import static de.qaware.cloud.id.spire.impl.TestUtils.waitUntilBundleIsAvailable
 
 /**
  * Specification testing key management with SPIFFE.
@@ -26,16 +29,16 @@ class KeyManagementSpec extends Specification {
 
     def 'use key manager'() {
         given:
-        def keyManager = (X509KeyManager) keyManagerFactory.engineGetKeyManagers()[0]
+        def svId = 'spiffe://example.org/host/workload'
 
         when:
-        // Wait for the updater thread to do it's work
-        Thread.sleep(2_000)
+        def keyManager = (X509KeyManager) keyManagerFactory.engineGetKeyManagers()[0]
+        waitUntilBundleIsAvailable(Duration.ofSeconds(5))
 
         then:
-        keyManager.getPrivateKey('') != null
-        keyManager.getCertificateChain('').length > 0
-        keyManager.getClientAliases('', [] as Principal[]).toList() == ['spiffe://example.org/host/workload']
+        keyManager.getPrivateKey(svId) != null
+        keyManager.getCertificateChain(svId).length > 0
+        keyManager.getClientAliases('', [] as Principal[]).toList() == [svId]
     }
 
 }

@@ -17,7 +17,6 @@ import static de.qaware.cloud.id.spire.impl.TestUtils.waitUntilBundleIsAvailable
 class SpiffeProviderSpec extends Specification {
 
     void setupSpec() {
-        //Security.addProvider(new BouncyCastleProvider())
         new SpiffeProvider().install(true)
 
         waitUntilBundleIsAvailable(Duration.ofSeconds(5))

@@ -2,16 +2,9 @@ package de.qaware.cloud.id.spire.impl
 
 import de.qaware.cloud.id.TestResources
 import de.qaware.cloud.id.spire.SVIDBundle
-import org.bouncycastle.jce.provider.BouncyCastleProvider
 import spock.lang.Specification
 
-import java.security.Security
-
 class BundleConverterSpec extends Specification {
-
-    void setupSpec() {
-        Security.addProvider(new BouncyCastleProvider())
-    }
 
     def 'convert'() {
         given:
@@ -25,6 +18,8 @@ class BundleConverterSpec extends Specification {
         bundle.svId == 'spiffe://example.org/host/workload'
         bundle.certificate.subjectAlternativeNames.size() == 1
         bundle.keyPair.private != null
-        bundle.keyPair.public.algorithm == 'ECDSA'
+        // Sun JCE = EC
+        // BouncyCastle = ECDSA
+        bundle.keyPair.public.algorithm =~ /^EC(DSA)?$/
     }
 }
