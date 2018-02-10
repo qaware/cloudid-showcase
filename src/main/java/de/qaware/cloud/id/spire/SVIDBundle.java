@@ -17,7 +17,7 @@ public class SVIDBundle {
     private final String svId;
     private final X509Certificate certificate;
     private final KeyPair keyPair;
-    private final List<X509Certificate> certChain;
+    private final List<X509Certificate> caCertChain;
 
     /**
      * Get the key type.
@@ -36,7 +36,7 @@ public class SVIDBundle {
     public Instant getNotAfter() {
         Instant result = Certificates.getNotAfter(certificate);
 
-        for (X509Certificate certificate : certChain) {
+        for (X509Certificate certificate : caCertChain) {
             Instant notAfter = Certificates.getNotAfter(certificate);
             if (notAfter.isBefore(result)) {
                 result = notAfter;
@@ -54,7 +54,7 @@ public class SVIDBundle {
     public Instant getNotBefore() {
         Instant result = Certificates.getNotBefore(certificate);
 
-        for (X509Certificate certificate : certChain) {
+        for (X509Certificate certificate : caCertChain) {
             Instant notBefore = Certificates.getNotBefore(certificate);
             if (notBefore.isAfter(result)) {
                 result = notBefore;

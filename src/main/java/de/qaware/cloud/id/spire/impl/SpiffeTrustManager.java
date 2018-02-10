@@ -2,34 +2,80 @@ package de.qaware.cloud.id.spire.impl;
 
 import de.qaware.cloud.id.spire.SVIDBundle;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
-import javax.net.ssl.X509TrustManager;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
+import javax.net.ssl.SSLEngine;
+import javax.net.ssl.X509ExtendedTrustManager;
+import java.net.Socket;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.cert.*;
 import java.util.function.Supplier;
+
+import static de.qaware.cloud.id.util.Certificates.*;
+import static java.util.Arrays.asList;
 
 /**
  * X.509 trust manager backed by a SPIFFE identity.
  */
+@Slf4j
 @RequiredArgsConstructor
-public class SpiffeTrustManager implements X509TrustManager {
+public class SpiffeTrustManager extends X509ExtendedTrustManager {
 
     private final Supplier<SVIDBundle> bundleSupplier;
 
-
-    @Override
-    public void checkClientTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
-        // TODO: Implement
-    }
-
-    @Override
-    public void checkServerTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
-        // TODO: Implement
-    }
-
     @Override
     public X509Certificate[] getAcceptedIssuers() {
-        return new X509Certificate[]{bundleSupplier.get().getCertChain().get(0)};
+        LOGGER.debug("No accepted issuers");
+        return new X509Certificate[0];
+    }
+
+    @Override
+    public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+        LOGGER.debug("Validating client {}, {}", chain, authType);
+
+        LOGGER.warn("Blindly trusting client");
+        // TODO: Provide proper long-lived test certificates
+        // validate(chain);
+    }
+
+    @Override
+    public void checkClientTrusted(X509Certificate[] chain, String authType, Socket socket) throws CertificateException {
+        checkClientTrusted(chain, authType);
+    }
+
+    @Override
+    public void checkClientTrusted(X509Certificate[] chain, String authType, SSLEngine sslEngine) throws CertificateException {
+        checkClientTrusted(chain, authType);
+    }
+
+    @Override
+    public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+        LOGGER.debug("Validating server {}, {}", chain, authType);
+
+        LOGGER.warn("Blindly trusting server");
+        // TODO: Provide proper long-lived test certificates
+        // validate(chain);
+    }
+
+    @Override
+    public void checkServerTrusted(X509Certificate[] chain, String authType, Socket socket) throws CertificateException {
+        checkServerTrusted(chain, authType);
+    }
+
+    @Override
+    public void checkServerTrusted(X509Certificate[] chain, String authType, SSLEngine sslEngine) throws CertificateException {
+        checkServerTrusted(chain, authType);
+    }
+
+    private void validate(X509Certificate[] chain) throws CertificateException {
+        PKIXParameters pkixParameters = getPkixParameters(bundleSupplier.get().getCaCertChain().get(0));
+        CertPath certPath = getX509CertFactory().generateCertPath(asList(chain));
+
+        try {
+            getCertPathValidator().validate(certPath, pkixParameters);
+        } catch (CertPathValidatorException | InvalidAlgorithmParameterException e) {
+            throw new CertificateException(e);
+        }
     }
 
 }

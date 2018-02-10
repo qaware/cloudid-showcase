@@ -7,6 +7,8 @@ import javax.net.ssl.KeyManagerFactorySpi;
 import javax.net.ssl.ManagerFactoryParameters;
 import java.security.KeyStore;
 
+import static de.qaware.cloud.id.spire.impl.BundleSupplierFactory.getBundleSupplier;
+
 @Slf4j
 public class SpiffeKeyManagerFactory extends KeyManagerFactorySpi {
 
@@ -23,7 +25,7 @@ public class SpiffeKeyManagerFactory extends KeyManagerFactorySpi {
     }
 
     private void init() {
-        keyManager = new SpiffeKeyManager(BundleSupplierFactory.getInstance());
+        keyManager = new SpiffeKeyManager(getBundleSupplier());
     }
 
     @Override

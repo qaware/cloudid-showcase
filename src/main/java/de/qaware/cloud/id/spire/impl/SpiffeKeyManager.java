@@ -43,7 +43,7 @@ class SpiffeKeyManager extends X509ExtendedKeyManager {
         SVIDBundle svidBundle = bundleSupplier.get();
 
         X509Certificate[] certChain = Objects.equals(alias, svidBundle.getSvId())
-                ? Stream.of(singleton(svidBundle.getCertificate()), svidBundle.getCertChain())
+                ? Stream.of(singleton(svidBundle.getCertificate()), svidBundle.getCaCertChain())
                 .flatMap(Collection::stream)
                 .toArray(X509Certificate[]::new)
                 : null;

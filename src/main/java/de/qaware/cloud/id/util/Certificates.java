@@ -2,10 +2,13 @@ package de.qaware.cloud.id.util;
 
 import lombok.NoArgsConstructor;
 
-import java.security.cert.X509Certificate;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.*;
 import java.time.Instant;
 import java.util.Date;
 
+import static java.util.Collections.singleton;
 import static lombok.AccessLevel.PRIVATE;
 
 /**
@@ -13,6 +16,7 @@ import static lombok.AccessLevel.PRIVATE;
  */
 @NoArgsConstructor(access = PRIVATE)
 public class Certificates {
+
 
     /**
      * Get the notAfter instant of a X.509 certificate.
@@ -36,4 +40,47 @@ public class Certificates {
         return date != null ? date.toInstant() : Instant.MIN;
     }
 
+    /**
+     * Get a X.509 certificate factory
+     *
+     * @return {@code CertificateFactory.getInstance("X.509")}
+     */
+    public static CertificateFactory getX509CertFactory() {
+        try {
+            return CertificateFactory.getInstance("X.509");
+        } catch (CertificateException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    /**
+     * Get a PKIX certificate path validator.
+     *
+     * @return {@code CertPathValidator.getInstance("PKIX")}
+     */
+    public static CertPathValidator getCertPathValidator() {
+        try {
+            return CertPathValidator.getInstance("PKIX");
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    /**
+     * Get PKIX parameters.
+     * <p>
+     * Certificate revocation will be disabled.
+     *
+     * @param certificate trust anchor
+     * @return PKIX parameters
+     */
+    public static PKIXParameters getPkixParameters(X509Certificate certificate) {
+        try {
+            PKIXParameters pkixParameters = new PKIXParameters(singleton(new TrustAnchor(certificate, null)));
+            pkixParameters.setRevocationEnabled(false);
+            return pkixParameters;
+        } catch (InvalidAlgorithmParameterException e) {
+            throw new IllegalStateException(e);
+        }
+    }
 }

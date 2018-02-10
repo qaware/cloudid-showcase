@@ -13,13 +13,13 @@ class BundleSupplierFactory {
     private static final Duration FORCE_UPDATE_AFTER = Duration.ofMinutes(15);
     private static final Duration UPDATE_AHEAD = Duration.ofMinutes(1);
 
-    private static BundleSupplier instance;
+    private static BundleSupplier bundleSupplier;
 
-    public static synchronized BundleSupplier getInstance() {
-        if (instance == null) {
-            instance = create();
+    public static synchronized BundleSupplier getBundleSupplier() {
+        if (bundleSupplier == null) {
+            bundleSupplier = create();
         }
-        return instance;
+        return bundleSupplier;
     }
 
     private static BundleSupplier create() {

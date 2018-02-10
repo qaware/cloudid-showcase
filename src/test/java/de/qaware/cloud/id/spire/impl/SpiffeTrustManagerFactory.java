@@ -2,11 +2,12 @@ package de.qaware.cloud.id.spire.impl;
 
 import lombok.extern.slf4j.Slf4j;
 
-import javax.net.ssl.*;
-import java.net.Socket;
+import javax.net.ssl.ManagerFactoryParameters;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactorySpi;
 import java.security.KeyStore;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
+
+import static de.qaware.cloud.id.spire.impl.BundleSupplierFactory.getBundleSupplier;
 
 @Slf4j
 public class SpiffeTrustManagerFactory extends TrustManagerFactorySpi {
@@ -23,44 +24,6 @@ public class SpiffeTrustManagerFactory extends TrustManagerFactorySpi {
 
     @Override
     protected TrustManager[] engineGetTrustManagers() {
-        return new TrustManager[]{
-                new X509ExtendedTrustManager() {
-                    @Override
-                    public void checkClientTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
-                        LOGGER.warn("Trusting {}, {}", s, x509Certificates);
-                    }
-
-                    @Override
-                    public void checkServerTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
-                        LOGGER.warn("Trusting {}, {}", s, x509Certificates);
-                    }
-
-                    @Override
-                    public X509Certificate[] getAcceptedIssuers() {
-                        LOGGER.warn("No accepted issuers");
-                        return new X509Certificate[0];
-                    }
-
-                    @Override
-                    public void checkClientTrusted(X509Certificate[] x509Certificates, String s, Socket socket) {
-                        LOGGER.warn("Trusting {}, {}", s, x509Certificates);
-                    }
-
-                    @Override
-                    public void checkServerTrusted(X509Certificate[] x509Certificates, String s, Socket socket) {
-                        LOGGER.warn("Trusting {}, {}", s, x509Certificates);
-                    }
-
-                    @Override
-                    public void checkClientTrusted(X509Certificate[] x509Certificates, String s, SSLEngine sslEngine) {
-                        LOGGER.warn("Trusting {}, {}", s, x509Certificates);
-                    }
-
-                    @Override
-                    public void checkServerTrusted(X509Certificate[] x509Certificates, String s, SSLEngine sslEngine) {
-                        LOGGER.warn("Trusting {}, {}", s, x509Certificates);
-                    }
-                }
-        };
+        return new TrustManager[]{new SpiffeTrustManager(getBundleSupplier())};
     }
 }

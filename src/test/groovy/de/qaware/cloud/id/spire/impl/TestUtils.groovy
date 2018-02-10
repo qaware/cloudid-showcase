@@ -17,7 +17,7 @@ class TestUtils {
 
         while (Duration.between(start, Instant.now()) < timeout) {
             try {
-                BundleSupplierFactory.instance.get()
+                BundleSupplierFactory.bundleSupplier.get()
                 return
             } catch (IllegalStateException ignored) {
                 Thread.sleep(100)
