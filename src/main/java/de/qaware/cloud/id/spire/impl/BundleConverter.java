@@ -1,5 +1,6 @@
-package de.qaware.cloud.id.spire;
+package de.qaware.cloud.id.spire.impl;
 
+import de.qaware.cloud.id.spire.SVIDBundle;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
@@ -27,7 +28,7 @@ import static java.util.stream.Collectors.toList;
  * Converts a workload entry to a SVID bundle.
  */
 @Slf4j
-public class BundleConverter implements Function<WorkloadEntry, SVIDBundle> {
+class BundleConverter implements Function<WorkloadEntry, SVIDBundle> {
 
     private final CertificateFactory certFactory;
 

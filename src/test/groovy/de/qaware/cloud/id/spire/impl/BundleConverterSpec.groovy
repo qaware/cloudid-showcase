@@ -1,7 +1,6 @@
 package de.qaware.cloud.id.spire.impl
 
 import de.qaware.cloud.id.TestResources
-import de.qaware.cloud.id.spire.BundleConverter
 import de.qaware.cloud.id.spire.SVIDBundle
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import spock.lang.Specification

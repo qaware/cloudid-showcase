@@ -6,10 +6,12 @@ import spock.lang.Specification
 
 import javax.net.ssl.KeyManagerFactory
 import javax.net.ssl.SSLSocketFactory
+import java.time.Duration
 
 import static com.github.tomakehurst.wiremock.client.WireMock.get
 import static com.github.tomakehurst.wiremock.client.WireMock.ok
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options
+import static de.qaware.cloud.id.spire.impl.TestUtils.waitUntilBundleIsAvailable
 
 @Slf4j
 class SpiffeProviderSpec extends Specification {
@@ -17,6 +19,8 @@ class SpiffeProviderSpec extends Specification {
     void setupSpec() {
         //Security.addProvider(new BouncyCastleProvider())
         new SpiffeProvider().install(true)
+
+        waitUntilBundleIsAvailable(Duration.ofSeconds(5))
     }
 
     void cleanupSpec() {
@@ -67,5 +71,6 @@ class SpiffeProviderSpec extends Specification {
         cleanup:
         server.shutdown()
     }
+
 
 }
