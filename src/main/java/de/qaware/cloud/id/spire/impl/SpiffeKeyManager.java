@@ -10,7 +10,12 @@ import java.net.Socket;
 import java.security.Principal;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
+import java.util.Collection;
+import java.util.Objects;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
+
+import static java.util.Collections.singleton;
 
 /**
  * X.509 key manager backed by a SPIFFE SVId.
@@ -21,53 +26,73 @@ class SpiffeKeyManager extends X509ExtendedKeyManager {
 
     private final Supplier<SVIDBundle> bundleSupplier;
 
-    // TODO: Take the algorithm into account
-
     @Override
-    public String[] getClientAliases(String algorithm, Principal[] principals) {
-        LOGGER.info("Get client aliases for {}, {}", algorithm, principals);
-        return new String[]{this.bundleSupplier.get().getSvId()};
-    }
+    public PrivateKey getPrivateKey(String alias) {
+        SVIDBundle svidBundle = bundleSupplier.get();
 
-    @Override
-    public String chooseClientAlias(String[] algorithms, Principal[] principals, Socket socket) {
-        LOGGER.info("Choose client alias for {}, {}, {}", algorithms, principals, socket);
-        return this.bundleSupplier.get().getSvId();
-    }
+        PrivateKey privateKey = Objects.equals(alias, svidBundle.getSvId())
+                ? svidBundle.getKeyPair().getPrivate()
+                : null;
 
-    @Override
-    public String[] getServerAliases(String algorithm, Principal[] principals) {
-        LOGGER.info("Get server aliases for {}, {}", algorithm, principals);
-        return new String[]{this.bundleSupplier.get().getSvId()};
-    }
-
-    @Override
-    public String chooseServerAlias(String algorithm, Principal[] principals, Socket socket) {
-        LOGGER.info("Choose server alias for {}, {}, {}", algorithm, principals, socket);
-        return this.bundleSupplier.get().getSvId();
+        LOGGER.debug("getPrivateKey({}) = {}", alias, privateKey);
+        return privateKey;
     }
 
     @Override
     public X509Certificate[] getCertificateChain(String alias) {
-        LOGGER.info("Get certificate chain for {}", alias);
-        return new X509Certificate[]{bundleSupplier.get().getCertificate()};
+        SVIDBundle svidBundle = bundleSupplier.get();
+
+        X509Certificate[] certChain = Objects.equals(alias, svidBundle.getSvId())
+                ? Stream.of(singleton(svidBundle.getCertificate()), svidBundle.getCertChain())
+                .flatMap(Collection::stream)
+                .toArray(X509Certificate[]::new)
+                : null;
+
+        LOGGER.debug("getCertificateChain({}) = {}", alias, certChain);
+        return certChain;
     }
 
     @Override
-    public PrivateKey getPrivateKey(String alias) {
-        LOGGER.info("Get private key for {}", alias);
-        return bundleSupplier.get().getKeyPair().getPrivate();
+    public String[] getClientAliases(String keyType, Principal[] issuers) {
+        LOGGER.info("Get client aliases for {}, {}", keyType, issuers);
+        return new String[]{this.bundleSupplier.get().getSvId()};
     }
 
     @Override
-    public String chooseEngineClientAlias(String[] algorithms, Principal[] principals, SSLEngine sslEngine) {
-        LOGGER.info("Choose client alias for {}, {}, {}", algorithms, principals, sslEngine);
+    public String chooseClientAlias(String[] keyTypes, Principal[] issuers, Socket socket) {
+        LOGGER.info("Choose client alias for {}, {}, {}", keyTypes, issuers, socket);
         return this.bundleSupplier.get().getSvId();
     }
 
     @Override
-    public String chooseEngineServerAlias(String algorithm, Principal[] principals, SSLEngine sslEngine) {
-        LOGGER.info("Choose server alias for {}, {}, {}", algorithm, principals, sslEngine);
+    public String chooseEngineClientAlias(String[] keyTypes, Principal[] issuers, SSLEngine sslEngine) {
+        LOGGER.info("Choose client alias for {}, {}, {}", keyTypes, issuers, sslEngine);
         return this.bundleSupplier.get().getSvId();
+    }
+
+    @Override
+    public String[] getServerAliases(String keyType, Principal[] issuers) {
+        return new String[]{chooseServerAlias(keyType, issuers)};
+    }
+
+    @Override
+    public String chooseEngineServerAlias(String keyType, Principal[] issuers, SSLEngine sslEngine) {
+        return chooseServerAlias(keyType, issuers);
+    }
+
+    @Override
+    public String chooseServerAlias(String keyType, Principal[] issuers, Socket socket) {
+        return chooseServerAlias(keyType, issuers);
+    }
+
+    private String chooseServerAlias(String keyType, Principal[] issuers) {
+        SVIDBundle svidBundle = bundleSupplier.get();
+
+        String serverAlias = Objects.equals(keyType, svidBundle.getKeyType())
+                ? svidBundle.getSvId()
+                : null;
+
+        LOGGER.debug("chooseServerAlias({}, {}) = {}", keyType, issuers, serverAlias);
+        return serverAlias;
     }
 }

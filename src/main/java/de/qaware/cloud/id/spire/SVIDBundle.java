@@ -20,6 +20,15 @@ public class SVIDBundle {
     private final List<X509Certificate> certChain;
 
     /**
+     * Get the key type.
+     *
+     * @return key type / algorithm
+     */
+    public String getKeyType() {
+        return keyPair.getPublic().getAlgorithm();
+    }
+
+    /**
      * Get the first instant after which this bundle will no longer be valid.
      *
      * @return first instant after which this bundle will no longer be valid
