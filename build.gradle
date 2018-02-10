@@ -84,7 +84,7 @@ dependencies {
 
     // WireMock
     // Use standalone as WireMock depends on an outdated version of Jetty that clashes with Spring Boot
-    testCompileOnly "com.github.tomakehurst:wiremock-standalone:2.14.0"
+    testCompile "com.github.tomakehurst:wiremock-standalone:2.14.0"
 }
 
 
