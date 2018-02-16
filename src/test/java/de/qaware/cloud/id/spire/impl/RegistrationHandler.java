@@ -1,30 +1,36 @@
 package de.qaware.cloud.id.spire.impl;
 
-import de.qaware.cloud.id.spire.ChannelFactory;
-import io.grpc.ManagedChannel;
+import io.grpc.Channel;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import spire.api.registration.RegistrationGrpc;
+import spire.api.registration.RegistrationGrpc.RegistrationBlockingStub;
 import spire.common.Common;
 
+import java.util.function.Supplier;
+
+import static spire.api.registration.RegistrationGrpc.newBlockingStub;
+
+@RequiredArgsConstructor
 public class RegistrationHandler {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(RegistrationHandler.class);
-    private final ChannelFactory<?> channelFactory;
 
-    public RegistrationHandler(ChannelFactory<?> channelFactory) {
-        this.channelFactory = channelFactory;
+    private final Supplier<Channel> channelSupplier;
+
+    private static Common.Empty newRequest() {
+        return Common.Empty.newBuilder().build();
     }
-
 
     public void register(String selector, String parentId, String id) {
 
     }
 
     public void fetchEntries() {
-        ManagedChannel channel = channelFactory.createChannel().build();
-        RegistrationGrpc.RegistrationBlockingStub registrationGrpc = RegistrationGrpc.newBlockingStub(channel);
-        Common.RegistrationEntries entries = registrationGrpc.fetchEntries(Common.Empty.newBuilder().build());
+        RegistrationBlockingStub registrationGrpc = newBlockingStub(channelSupplier.get());
 
-        LOGGER.info("entries: {}");
+        Common.RegistrationEntries entries = registrationGrpc.fetchEntries(newRequest());
+
+        LOGGER.info("entries: {}", entries);
     }
 }
