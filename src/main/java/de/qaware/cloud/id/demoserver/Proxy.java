@@ -34,6 +34,14 @@ public class Proxy {
     @Autowired
     private HttpClient httpClient;
 
+    /**
+     * Forwards a request 1:1 to the target defined in {@code de.qaware.cloud.id.demoserver.backend}.
+     *
+     * @param path    request path
+     * @param request request
+     * @return response entity
+     * @throws IOException if a transmission error occurs
+     */
     @RequestMapping("/proxy/{path}")
     public ResponseEntity forwardRequest(@PathVariable String path, HttpServletRequest request) throws IOException {
         HttpUriRequest backendRequest = buildBackendRequest(path, request);

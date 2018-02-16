@@ -41,7 +41,7 @@ public class BundleSupplier implements Supplier<SVIDBundle> {
     private final Duration forceUpdateAfter;
     private final Duration updateAhead;
 
-    private final AtomicReference<Optional<Bundles>> bundles = new AtomicReference<>(empty());
+    private final AtomicReference<Optional<Bundles>> bundlesRef = new AtomicReference<>(empty());
     private final AtomicBoolean running = new AtomicBoolean();
 
     private Thread updaterThread;
@@ -100,7 +100,7 @@ public class BundleSupplier implements Supplier<SVIDBundle> {
             while (running.get()) {
                 Bundles bundles = bundlesSupplier.get();
 
-                this.bundles.set(Optional.of(bundles));
+                bundlesRef.set(Optional.of(bundles));
 
                 Instant bundleExpiry = bundles.getExpiry();
                 Instant now = now();
@@ -128,9 +128,9 @@ public class BundleSupplier implements Supplier<SVIDBundle> {
     }
 
     private List<SVIDBundle> getBundleList() {
-        return this.bundles.get()
+        return bundlesRef.get()
                 .orElseThrow(IllegalStateException::new)
-                .getBundles();
+                .getBundleList();
     }
 
     private static void interrupt(InterruptedException e) {

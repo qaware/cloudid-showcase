@@ -11,7 +11,7 @@ import java.util.List;
 @Data
 public class Bundles {
 
-    private final List<SVIDBundle> bundles;
+    private final List<SVIDBundle> bundleList;
     private final Instant expiry;
 
 }

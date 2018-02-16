@@ -9,6 +9,7 @@ import static lombok.AccessLevel.PRIVATE;
 /**
  * Utilities for instants.
  */
+@SuppressWarnings("squid:S1118") // Sonar rule is not Lombok aware
 @NoArgsConstructor(access = PRIVATE)
 public class Instants {
 
