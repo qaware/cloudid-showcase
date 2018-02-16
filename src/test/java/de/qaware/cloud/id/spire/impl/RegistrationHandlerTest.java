@@ -1,0 +1,63 @@
+package de.qaware.cloud.id.spire.impl;
+
+import de.qaware.cloud.id.spire.ChannelFactory;
+import io.grpc.netty.GrpcSslContexts;
+import io.grpc.netty.NettyChannelBuilder;
+import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+
+import javax.net.ssl.SSLException;
+import java.time.Duration;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+
+/**
+ * Unit test for the {@link RegistrationHandler}.
+ */
+@Ignore("Manual execution only")
+public class RegistrationHandlerTest {
+
+    private RegistrationHandler handler;
+
+    @Before
+    public void setUp() {
+        // ChannelFactory<NettyChannelBuilder> serverChannelFactory = () -> NettyChannelBuilder.forAddress("192.168.99.100", 32610).usePlaintext(false);
+        ChannelFactory<NettyChannelBuilder> serverChannelFactory1 = () -> {
+            try {
+                return NettyChannelBuilder.forAddress("192.168.99.100", 30055)
+                        .sslContext(GrpcSslContexts.forClient().trustManager(InsecureTrustManagerFactory.INSTANCE).build())
+                ;
+            }
+            catch (SSLException e) {
+                throw new IllegalStateException(e);
+            }
+        };
+        handler = new RegistrationHandler(serverChannelFactory1);
+
+        TestUtils.waitUntilBundleIsAvailable(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void testFetchEntries() {
+        handler.fetchEntries();
+    }
+
+
+    @Test
+    public void testFetchBundle() {
+//        ChannelFactory<?> socketChannelFactory = new SocketChannelFactory("/Volumes/Cloud-ID/codebase/spire-k8s/socket/agent.sock");
+        ChannelFactory<NettyChannelBuilder> proxyChannelFactory = () -> NettyChannelBuilder.forAddress("192.168.99.100", 31524).usePlaintext(true);
+//        ChannelFactory<?> serverChannelFactory = new TCPChannelFactory("192.168.99.100", 32610);
+//        ChannelFactory<?> serverChannelFactory1 = new TCPChannelFactory("192.168.99.100", 30055);
+//        ChannelFactory<?> channelFactory2 = new TCPChannelFactory("localhost", 32655);
+
+        BundleSupplier bundleSupplier = BundleSupplierFactory.getBundleSupplier();
+
+        assertThat(bundleSupplier.get(), is(notNullValue()));
+    }
+
+}
