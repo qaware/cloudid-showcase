@@ -22,7 +22,7 @@ import static java.util.Collections.singleton;
  */
 @Slf4j
 @RequiredArgsConstructor
-class SpiffeKeyManager extends X509ExtendedKeyManager {
+public class SpiffeKeyManager extends X509ExtendedKeyManager {
 
     private final Supplier<SVIDBundle> bundleSupplier;
 
