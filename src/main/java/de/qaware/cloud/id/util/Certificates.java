@@ -14,8 +14,9 @@ import static lombok.AccessLevel.PRIVATE;
 /**
  * Utilities for certificates.
  */
+@SuppressWarnings("squid:S1118") // Sonar rule is not Lombok aware
 @NoArgsConstructor(access = PRIVATE)
-public class Certificates {
+public final class Certificates {
 
 
     /**
@@ -83,4 +84,5 @@ public class Certificates {
             throw new IllegalStateException(e);
         }
     }
+
 }

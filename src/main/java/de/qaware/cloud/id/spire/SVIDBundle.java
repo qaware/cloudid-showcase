@@ -36,8 +36,8 @@ public class SVIDBundle {
     public Instant getNotAfter() {
         Instant result = Certificates.getNotAfter(certificate);
 
-        for (X509Certificate certificate : caCertChain) {
-            Instant notAfter = Certificates.getNotAfter(certificate);
+        for (X509Certificate caCert : caCertChain) {
+            Instant notAfter = Certificates.getNotAfter(caCert);
             if (notAfter.isBefore(result)) {
                 result = notAfter;
             }
@@ -54,8 +54,8 @@ public class SVIDBundle {
     public Instant getNotBefore() {
         Instant result = Certificates.getNotBefore(certificate);
 
-        for (X509Certificate certificate : caCertChain) {
-            Instant notBefore = Certificates.getNotBefore(certificate);
+        for (X509Certificate caCert : caCertChain) {
+            Instant notBefore = Certificates.getNotBefore(caCert);
             if (notBefore.isAfter(result)) {
                 result = notBefore;
             }

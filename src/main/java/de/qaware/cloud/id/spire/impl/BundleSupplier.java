@@ -87,11 +87,14 @@ public class BundleSupplier implements Supplier<SVIDBundle> {
         try {
             updaterThread.join();
         } catch (InterruptedException e) {
-            throw new IllegalStateException(e);
+            interrupt(e);
         }
         updaterThread = null;
     }
 
+    // Intentionally catching Throwable as the stack trace would be lost otherwise
+
+    @SuppressWarnings("squid:S1181")
     private void updater() {
         try {
             while (running.get()) {
@@ -118,17 +121,21 @@ public class BundleSupplier implements Supplier<SVIDBundle> {
                         MIN_BACKOFF.toMillis()));
             }
         } catch (InterruptedException e) {
-            LOGGER.trace("Interrupted", e);
+            interrupt(e);
         } catch (Throwable e) {
             LOGGER.error("Updater died unexpectedly", e);
         }
     }
 
-
     private List<SVIDBundle> getBundleList() {
         return this.bundles.get()
                 .orElseThrow(IllegalStateException::new)
                 .getBundles();
+    }
+
+    private static void interrupt(InterruptedException e) {
+        LOGGER.info("Interrupted", e);
+        Thread.currentThread().interrupt();
     }
 
 }
