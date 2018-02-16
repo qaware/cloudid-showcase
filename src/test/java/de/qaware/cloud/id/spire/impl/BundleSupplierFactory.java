@@ -1,10 +1,10 @@
 package de.qaware.cloud.id.spire.impl;
 
 import de.qaware.cloud.id.TestResources;
-import de.qaware.cloud.id.spire.SVIDBundle;
+import de.qaware.cloud.id.spire.Bundles;
 
 import java.time.Duration;
-import java.util.List;
+import java.time.Instant;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -27,10 +27,12 @@ class BundleSupplierFactory {
         // SocketChannelFactory channelFactory = new SocketChannelFactory("/tmp/test.sock");
         // WorkloadEntriesSupplier workloadEntriesSupplier = new WorkloadEntriesSupplier(channelFactory);
 
-        Supplier<List<SVIDBundle>> bundlesSupplier = () ->
-                TestResources.getTestBundles().getBundlesList().stream()
-                        .map(new BundleConverter())
-                        .collect(Collectors.toList());
+        Supplier<Bundles> bundlesSupplier = () ->
+                new Bundles(
+                        TestResources.getTestBundles().getBundlesList().stream()
+                                .map(new BundleConverter())
+                                .collect(Collectors.toList()),
+                        Instant.MAX);
 
         // TODO: Add exponential backoff when the socket connection works
 

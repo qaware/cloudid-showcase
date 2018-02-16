@@ -1,5 +1,6 @@
 package de.qaware.cloud.id.spire.impl;
 
+import de.qaware.cloud.id.spire.Bundles;
 import de.qaware.cloud.id.spire.SVIDBundle;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,19 +10,21 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
-import static com.google.common.base.Verify.verify;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.time.Instant.now;
-import static java.util.Collections.emptyList;
-import static java.util.stream.Collectors.toSet;
+import static java.util.Optional.empty;
 
 /**
  * Provides up-to-date bundles.
+ * <p>
+ * Updates the backing bundles according to the expiry of the last bundle.
+ * Selects the bundle with the max. time to life while skipping bundles that have not yet become valid.
  */
 @Slf4j
 @RequiredArgsConstructor
@@ -34,11 +37,11 @@ public class BundleSupplier implements Supplier<SVIDBundle> {
 
     private static final String THREAD_NAME = "spiffe-bundle-updater";
 
-    private final Supplier<List<SVIDBundle>> bundlesSupplier;
+    private final Supplier<Bundles> bundlesSupplier;
     private final Duration forceUpdateAfter;
     private final Duration updateAhead;
 
-    private final AtomicReference<List<SVIDBundle>> bundles = new AtomicReference<>(emptyList());
+    private final AtomicReference<Optional<Bundles>> bundles = new AtomicReference<>(empty());
     private final AtomicBoolean running = new AtomicBoolean();
 
     private Thread updaterThread;
@@ -54,7 +57,7 @@ public class BundleSupplier implements Supplier<SVIDBundle> {
         // This selects the first tuple with that is valid, preferring tuples with longer validity.
         // Bundles are sorted descending by notAfter.
         Instant now = now();
-        return this.bundles.get().stream()
+        return getBundleList().stream()
                 .filter(b -> b.getNotBefore().isBefore(now))
                 .findFirst()
                 .orElseThrow(IllegalStateException::new);
@@ -92,18 +95,17 @@ public class BundleSupplier implements Supplier<SVIDBundle> {
     private void updater() {
         try {
             while (running.get()) {
-                List<SVIDBundle> bundles = fetchBundles();
+                Bundles bundles = bundlesSupplier.get();
 
-                this.bundles.set(bundles);
+                this.bundles.set(Optional.of(bundles));
 
-                Instant bundleExpiry = bundles.get(0).getNotAfter();
+                Instant bundleExpiry = bundles.getExpiry();
                 Instant now = now();
 
                 // Log if the bundle is expired
                 if (bundleExpiry.isBefore(now)) {
                     LOGGER.error("Received a bundle that has expired on {}",
-                            LocalDateTime.ofInstant(bundleExpiry, ZoneId.systemDefault())
-                    );
+                            LocalDateTime.ofInstant(bundleExpiry, ZoneId.systemDefault()));
                 }
 
                 // Backoff until the newest bundle expires minus a safety period
@@ -122,17 +124,11 @@ public class BundleSupplier implements Supplier<SVIDBundle> {
         }
     }
 
-    private List<SVIDBundle> fetchBundles() {
-        List<SVIDBundle> bundles = bundlesSupplier.get();
 
-        // Verify the assumption that this workload has exactly one SPIFFE Id
-        verify(bundles.stream().map(SVIDBundle::getSvId).collect(toSet()).size() == 1,
-                "This workload must receive exactly one SPIFFE Id");
-
-        // Sort descending by notAfter
-        bundles.sort((a, b) -> b.getNotAfter().compareTo(a.getNotAfter()));
-
-        return bundles;
+    private List<SVIDBundle> getBundleList() {
+        return this.bundles.get()
+                .orElseThrow(IllegalStateException::new)
+                .getBundles();
     }
 
 }

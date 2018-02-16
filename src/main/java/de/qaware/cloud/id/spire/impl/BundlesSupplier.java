@@ -1,52 +1,84 @@
 package de.qaware.cloud.id.spire.impl;
 
+import de.qaware.cloud.id.spire.Bundles;
 import de.qaware.cloud.id.spire.ChannelFactory;
 import de.qaware.cloud.id.spire.SVIDBundle;
 import io.grpc.ManagedChannel;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import spire.api.workload.WorkloadGrpc.WorkloadBlockingStub;
+import spire.api.workload.WorkloadOuterClass;
 import spire.api.workload.WorkloadOuterClass.Empty;
 import spire.api.workload.WorkloadOuterClass.WorkloadEntry;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import static com.google.common.base.Verify.verify;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 import static spire.api.workload.WorkloadGrpc.newBlockingStub;
 
 /**
- * Fetches  SPIFFE workload bundles from the SPIRE agent.
+ * Supplier for SPIRE workload bundles from the SPIRE agent.
  */
+@Slf4j
 @RequiredArgsConstructor
-class BundlesSupplier implements Supplier<List<SVIDBundle>> {
+class BundlesSupplier implements Supplier<Bundles> {
 
     private static final Empty EMPTY_REQUEST = Empty.newBuilder().build();
-
-    private final Function<WorkloadEntry, SVIDBundle> bundleConverter = new BundleConverter();
+    private static final Function<WorkloadEntry, SVIDBundle> BUNDLE_CONVERTER = new BundleConverter();
 
     private final ChannelFactory<?> channelFactory;
+
+    private static Instant getExpiry(WorkloadOuterClass.Bundles bundles) {
+        // TODO: Verifiy that the TTL is indeed provided in seconds
+        return Instant.now().plusSeconds(bundles.getTtl());
+    }
 
     /**
      * Fetches all bundles that are valid for the current workload.
      *
-     * @return A list of {@link SVIDBundle}s which contains the certificates and the private key. The list may be empty.
+     * @return bundles. The bundle list will be sorted descending by {@code notAfter}.
      */
     @Override
-    public List<SVIDBundle> get() {
-        return getWorkloadEntries().stream()
-                .map(bundleConverter)
-                .collect(toList());
+    public Bundles get() {
+        WorkloadOuterClass.Bundles bundles = fetchBundles();
+
+        LOGGER.debug("Received {} bundles with a TTL of {}s", bundles.getBundlesList().size(), bundles.getTtl());
+
+        return new Bundles(
+                sort(convert(bundles)),
+                getExpiry(bundles));
 
     }
 
-    private List<WorkloadEntry> getWorkloadEntries() {
-        ManagedChannel channel = channelFactory.createChannel().build();
+    private List<SVIDBundle> convert(WorkloadOuterClass.Bundles bundles) {
+        List<SVIDBundle> bundlesList = bundles.getBundlesList().stream()
+                .map(BUNDLE_CONVERTER)
+                .collect(toList());
 
+        // Verify the assumption that this workload has exactly one SPIFFE Id
+        verify(bundlesList.stream()
+                        .map(SVIDBundle::getSvId)
+                        .collect(toSet()).size() == 1,
+                "This workload must receive exactly one SPIFFE Id");
+
+        return bundlesList;
+    }
+
+    private WorkloadOuterClass.Bundles fetchBundles() {
+        ManagedChannel channel = channelFactory.createChannel().build();
         WorkloadBlockingStub workload = newBlockingStub(channel);
 
-        return workload.fetchAllBundles(EMPTY_REQUEST)
-                .getBundlesList();
+        return workload.fetchAllBundles(EMPTY_REQUEST);
+    }
+
+    private static List<SVIDBundle> sort(List<SVIDBundle> bundlesList) {
+        bundlesList.sort((a, b) -> b.getNotAfter().compareTo(a.getNotAfter()));
+        return bundlesList;
     }
 
 }
