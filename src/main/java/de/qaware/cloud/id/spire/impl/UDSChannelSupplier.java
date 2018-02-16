@@ -1,6 +1,6 @@
-package de.qaware.cloud.id.spire;
+package de.qaware.cloud.id.spire.impl;
 
-import io.grpc.ManagedChannelBuilder;
+import io.grpc.Channel;
 import io.grpc.netty.NettyChannelBuilder;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.epoll.EpollEventLoopGroup;
@@ -14,26 +14,26 @@ import io.netty.channel.unix.DomainSocketAddress;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.SystemUtils;
 
-import java.io.File;
+import java.util.function.Supplier;
 
+/**
+ * Supplier for UNIX domain socket channel.
+ */
 @RequiredArgsConstructor
-public class SocketChannelFactory implements ChannelFactory<NettyChannelBuilder> {
+class UDSChannelSupplier implements Supplier<Channel> {
 
-    private final File socketFile;
-
-    public SocketChannelFactory(String socketFile) {
-        this(new File(socketFile));
-    }
+    private final String socketFile;
 
     @Override
-    public ManagedChannelBuilder<NettyChannelBuilder> createChannel() {
+    public Channel get() {
         return NettyChannelBuilder.forAddress(new DomainSocketAddress(socketFile))
                 .eventLoopGroup(getEventLoopGroup())
                 .channelType(getServerSocketChannelClass())
-                .usePlaintext(true);
+                .usePlaintext(true)
+                .build();
     }
 
-    private EventLoopGroup getEventLoopGroup() {
+    private static EventLoopGroup getEventLoopGroup() {
         switch (getCurrentSocketType()) {
             case E_POLL:
                 return new EpollEventLoopGroup();
@@ -45,7 +45,7 @@ public class SocketChannelFactory implements ChannelFactory<NettyChannelBuilder>
         }
     }
 
-    private Class<? extends ServerSocketChannel> getServerSocketChannelClass() {
+    private static Class<? extends ServerSocketChannel> getServerSocketChannelClass() {
         switch (getCurrentSocketType()) {
             case E_POLL:
                 return EpollServerSocketChannel.class;
@@ -70,4 +70,5 @@ public class SocketChannelFactory implements ChannelFactory<NettyChannelBuilder>
     private enum SocketType {
         E_POLL, K_QUEUE, NIO
     }
+
 }

@@ -24,7 +24,7 @@ class BundleSupplierFactory {
 
     private static BundleSupplier create() {
         // TODO: Make this work and remove the mock below
-        // SocketChannelFactory channelFactory = new SocketChannelFactory("/tmp/test.sock");
+        // UDSChannelSupplier channelFactory = new UDSChannelSupplier("/tmp/test.sock");
         // WorkloadEntriesSupplier workloadEntriesSupplier = new WorkloadEntriesSupplier(channelFactory);
 
         Supplier<Bundles> bundlesSupplier = () ->

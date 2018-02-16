@@ -1,14 +1,12 @@
 package de.qaware.cloud.id.spire.impl;
 
 import de.qaware.cloud.id.spire.Bundles;
-import de.qaware.cloud.id.spire.ChannelFactory;
 import de.qaware.cloud.id.spire.SVIDBundle;
-import io.grpc.ManagedChannel;
+import io.grpc.Channel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import spire.api.workload.WorkloadGrpc.WorkloadBlockingStub;
 import spire.api.workload.WorkloadOuterClass;
-import spire.api.workload.WorkloadOuterClass.Empty;
 import spire.api.workload.WorkloadOuterClass.WorkloadEntry;
 
 import java.time.Instant;
@@ -28,34 +26,16 @@ import static spire.api.workload.WorkloadGrpc.newBlockingStub;
 @RequiredArgsConstructor
 class BundlesSupplier implements Supplier<Bundles> {
 
-    private static final Empty EMPTY_REQUEST = Empty.newBuilder().build();
     private static final Function<WorkloadEntry, SVIDBundle> BUNDLE_CONVERTER = new BundleConverter();
 
-    private final ChannelFactory<?> channelFactory;
+    private final Supplier<Channel> channelSupplier;
 
     private static Instant getExpiry(WorkloadOuterClass.Bundles bundles) {
         // TODO: Verifiy that the TTL is indeed provided in seconds
         return Instant.now().plusSeconds(bundles.getTtl());
     }
 
-    /**
-     * Fetches all bundles that are valid for the current workload.
-     *
-     * @return bundles. The bundle list will be sorted descending by {@code notAfter}.
-     */
-    @Override
-    public Bundles get() {
-        WorkloadOuterClass.Bundles bundles = fetchBundles();
-
-        LOGGER.debug("Received {} bundles with a TTL of {}s", bundles.getBundlesList().size(), bundles.getTtl());
-
-        return new Bundles(
-                sort(convert(bundles)),
-                getExpiry(bundles));
-
-    }
-
-    private List<SVIDBundle> convert(WorkloadOuterClass.Bundles bundles) {
+    private static List<SVIDBundle> convert(WorkloadOuterClass.Bundles bundles) {
         List<SVIDBundle> bundlesList = bundles.getBundlesList().stream()
                 .map(BUNDLE_CONVERTER)
                 .collect(toList());
@@ -69,16 +49,34 @@ class BundlesSupplier implements Supplier<Bundles> {
         return bundlesList;
     }
 
-    private WorkloadOuterClass.Bundles fetchBundles() {
-        ManagedChannel channel = channelFactory.createChannel().build();
-        WorkloadBlockingStub workload = newBlockingStub(channel);
-
-        return workload.fetchAllBundles(EMPTY_REQUEST);
-    }
-
     private static List<SVIDBundle> sort(List<SVIDBundle> bundlesList) {
         bundlesList.sort((a, b) -> b.getNotAfter().compareTo(a.getNotAfter()));
         return bundlesList;
+    }
+
+    /**
+     * Fetches all bundles that are valid for the current workload.
+     *
+     * @return bundles. The bundle list will be sorted descending by {@code notAfter}.
+     */
+    @Override
+    public Bundles get() {
+        WorkloadOuterClass.Bundles bundles = getStub().fetchAllBundles(newRequest());
+
+        LOGGER.debug("Received {} bundles with a TTL of {}s", bundles.getBundlesList().size(), bundles.getTtl());
+
+        return new Bundles(
+                sort(convert(bundles)),
+                getExpiry(bundles));
+
+    }
+
+    private WorkloadBlockingStub getStub() {
+        return newBlockingStub(channelSupplier.get());
+    }
+
+    private static WorkloadOuterClass.Empty newRequest() {
+        return WorkloadOuterClass.Empty.newBuilder().build();
     }
 
 }

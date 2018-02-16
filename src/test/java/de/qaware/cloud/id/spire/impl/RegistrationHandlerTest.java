@@ -1,6 +1,6 @@
 package de.qaware.cloud.id.spire.impl;
 
-import de.qaware.cloud.id.spire.ChannelFactory;
+import io.grpc.Channel;
 import io.grpc.netty.GrpcSslContexts;
 import io.grpc.netty.NettyChannelBuilder;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
@@ -10,6 +10,7 @@ import org.junit.Test;
 
 import javax.net.ssl.SSLException;
 import java.time.Duration;
+import java.util.function.Supplier;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -26,17 +27,19 @@ public class RegistrationHandlerTest {
     @Before
     public void setUp() {
         // ChannelFactory<NettyChannelBuilder> serverChannelFactory = () -> NettyChannelBuilder.forAddress("192.168.99.100", 32610).usePlaintext(false);
-        ChannelFactory<NettyChannelBuilder> serverChannelFactory1 = () -> {
+        Supplier<Channel> channelSupplier = () -> {
             try {
-                return NettyChannelBuilder.forAddress("192.168.99.100", 30055)
-                        .sslContext(GrpcSslContexts.forClient().trustManager(InsecureTrustManagerFactory.INSTANCE).build())
-                ;
-            }
-            catch (SSLException e) {
+                return NettyChannelBuilder
+                        .forAddress("192.168.99.100", 30055)
+                        .sslContext(GrpcSslContexts.forClient()
+                                .trustManager(InsecureTrustManagerFactory.INSTANCE)
+                                .build())
+                        .build();
+            } catch (SSLException e) {
                 throw new IllegalStateException(e);
             }
         };
-        handler = new RegistrationHandler(serverChannelFactory1);
+        handler = new RegistrationHandler(channelSupplier);
 
         TestUtils.waitUntilBundleIsAvailable(Duration.ofSeconds(5));
     }
@@ -49,11 +52,15 @@ public class RegistrationHandlerTest {
 
     @Test
     public void testFetchBundle() {
-//        ChannelFactory<?> socketChannelFactory = new SocketChannelFactory("/Volumes/Cloud-ID/codebase/spire-k8s/socket/agent.sock");
-        ChannelFactory<NettyChannelBuilder> proxyChannelFactory = () -> NettyChannelBuilder.forAddress("192.168.99.100", 31524).usePlaintext(true);
+//        ChannelFactory<?> socketChannelFactory = new UDSChannelSupplier("/Volumes/Cloud-ID/codebase/spire-k8s/socket/agent.sock");
 //        ChannelFactory<?> serverChannelFactory = new TCPChannelFactory("192.168.99.100", 32610);
 //        ChannelFactory<?> serverChannelFactory1 = new TCPChannelFactory("192.168.99.100", 30055);
 //        ChannelFactory<?> channelFactory2 = new TCPChannelFactory("localhost", 32655);
+
+        Supplier<Channel> proxyChannelFactory = () -> NettyChannelBuilder
+                .forAddress("192.168.99.100", 31524)
+                .usePlaintext(true)
+                .build();
 
         BundleSupplier bundleSupplier = BundleSupplierFactory.getBundleSupplier();
 
