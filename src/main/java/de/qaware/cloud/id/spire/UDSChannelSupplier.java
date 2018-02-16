@@ -1,4 +1,4 @@
-package de.qaware.cloud.id.spire.impl;
+package de.qaware.cloud.id.spire;
 
 import io.grpc.Channel;
 import io.grpc.netty.NettyChannelBuilder;

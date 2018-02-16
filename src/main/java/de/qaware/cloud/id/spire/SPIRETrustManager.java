@@ -1,6 +1,5 @@
-package de.qaware.cloud.id.spire.impl;
+package de.qaware.cloud.id.spire;
 
-import de.qaware.cloud.id.spire.SVIDBundle;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -15,11 +14,11 @@ import static de.qaware.cloud.id.util.Certificates.*;
 import static java.util.Arrays.asList;
 
 /**
- * X.509 trust manager backed by a SPIFFE identity.
+ * X.509 trust manager backed by SPIRE bundles.
  */
 @Slf4j
 @RequiredArgsConstructor
-public class SpiffeTrustManager extends X509ExtendedTrustManager {
+public class SPIRETrustManager extends X509ExtendedTrustManager {
 
     private final Supplier<SVIDBundle> bundleSupplier;
 

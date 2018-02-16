@@ -1,6 +1,5 @@
-package de.qaware.cloud.id.spire.impl;
+package de.qaware.cloud.id.spire;
 
-import de.qaware.cloud.id.spire.SVIDBundle;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -18,11 +17,11 @@ import java.util.stream.Stream;
 import static java.util.Collections.singleton;
 
 /**
- * X.509 key manager backed by a SPIFFE SVId.
+ * X.509 key manager backed by SPIRE bundles.
  */
 @Slf4j
 @RequiredArgsConstructor
-public class SpiffeKeyManager extends X509ExtendedKeyManager {
+public class SPIREKeyManager extends X509ExtendedKeyManager {
 
     private final Supplier<SVIDBundle> bundleSupplier;
 

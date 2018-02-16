@@ -4,7 +4,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.Duration;
 import java.util.function.Supplier;
+
+import static java.lang.Math.min;
+import static java.lang.Math.pow;
 
 /**
  * Exponential backoff supply strategy.
@@ -16,14 +20,16 @@ import java.util.function.Supplier;
 public class ExponentialBackoffSupplier<T> implements Supplier<T> {
 
     private final Supplier<T> supplier;
-    private final long initalMs;
-    private final long maxMs;
-    private final double exp;
 
-    @SneakyThrows
+    private final Duration initalBackoff;
+    private final Duration maxBackoff;
+    private final double exponent;
+
+    @SneakyThrows(InterruptedException.class)
     @Override
     public T get() {
-        long backoff = initalMs;
+        double backoffNs = initalBackoff.toNanos();
+
         for (; ; ) {
             try {
                 return supplier.get();
@@ -31,9 +37,9 @@ public class ExponentialBackoffSupplier<T> implements Supplier<T> {
                 LOGGER.error("Error running supplier", e);
             }
 
-            Thread.sleep(backoff);
+            Thread.sleep(Duration.ofNanos((long) backoffNs).toMillis());
 
-            backoff = Math.min(maxMs, (long) Math.pow(backoff, exp));
+            backoffNs = min(maxBackoff.toNanos(), pow(backoffNs, exponent));
         }
     }
 

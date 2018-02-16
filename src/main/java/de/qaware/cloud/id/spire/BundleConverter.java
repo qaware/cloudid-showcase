@@ -1,6 +1,5 @@
-package de.qaware.cloud.id.spire.impl;
+package de.qaware.cloud.id.spire;
 
-import de.qaware.cloud.id.spire.SVIDBundle;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;

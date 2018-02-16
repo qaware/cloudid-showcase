@@ -1,4 +1,4 @@
-package de.qaware.cloud.id.spire.impl;
+package de.qaware.cloud.id.spire;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -7,10 +7,13 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactorySpi;
 import java.security.KeyStore;
 
-import static de.qaware.cloud.id.spire.impl.BundleSupplierFactory.getBundleSupplier;
+import static de.qaware.cloud.id.spire.BundleSupplierFactory.getBundleSupplier;
 
+/**
+ * SPIRE Trust manager factory.
+ */
 @Slf4j
-public class SpiffeTrustManagerFactory extends TrustManagerFactorySpi {
+public class SPIRETrustManagerFactory extends TrustManagerFactorySpi {
 
     @Override
     protected void engineInit(KeyStore keyStore) {
@@ -24,6 +27,6 @@ public class SpiffeTrustManagerFactory extends TrustManagerFactorySpi {
 
     @Override
     protected TrustManager[] engineGetTrustManagers() {
-        return new TrustManager[]{new SpiffeTrustManager(getBundleSupplier())};
+        return new TrustManager[]{new SPIRETrustManager(getBundleSupplier())};
     }
 }

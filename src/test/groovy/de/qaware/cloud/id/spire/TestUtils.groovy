@@ -1,4 +1,4 @@
-package de.qaware.cloud.id.spire.impl
+package de.qaware.cloud.id.spire
 
 import java.time.Duration
 import java.time.Instant

@@ -1,7 +1,5 @@
-package de.qaware.cloud.id.spire.impl;
+package de.qaware.cloud.id.spire;
 
-import de.qaware.cloud.id.spire.Bundles;
-import de.qaware.cloud.id.spire.SVIDBundle;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -15,7 +13,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
-import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.time.Instant.now;
 import static java.util.Optional.empty;
@@ -30,22 +27,14 @@ import static java.util.Optional.empty;
 @RequiredArgsConstructor
 public class BundleSupplier implements Supplier<SVIDBundle> {
 
-    /**
-     * Minimum backoff for polling bundles.
-     */
-    private static final Duration MIN_BACKOFF = Duration.ofSeconds(30);
-
-    private static final String THREAD_NAME = "spiffe-bundle-updater";
+    private static final String THREAD_NAME = "spiffe-updater";
 
     private final Supplier<Bundles> bundlesSupplier;
-    private final Duration forceUpdateAfter;
-    private final Duration updateAhead;
 
     private final AtomicReference<Optional<Bundles>> bundlesRef = new AtomicReference<>(empty());
     private final AtomicBoolean running = new AtomicBoolean();
 
     private Thread updaterThread;
-
 
     /**
      * Get the bundle.
@@ -111,14 +100,10 @@ public class BundleSupplier implements Supplier<SVIDBundle> {
                             LocalDateTime.ofInstant(bundleExpiry, ZoneId.systemDefault()));
                 }
 
-                // Backoff until the newest bundle expires minus a safety period
-                // Use a minimum backoff to prevent swamping the supplier if the supplier
-                // does not provide bundles that live long enough.
-                Thread.sleep(max(
-                        min(
-                                Duration.between(now, bundleExpiry.minus(updateAhead)).toMillis(),
-                                forceUpdateAfter.toMillis()),
-                        MIN_BACKOFF.toMillis()));
+                // Backoff until the newest bundle expires.
+                Thread.sleep(min(
+                        Duration.between(now, bundleExpiry.minus(Config.UPDATE_AHEAD.get())).toMillis(),
+                        Config.FORCE_UPDATE_AFTER.get().toMillis()));
             }
         } catch (InterruptedException e) {
             interrupt(e);

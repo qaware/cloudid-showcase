@@ -1,4 +1,4 @@
-package de.qaware.cloud.id.spire.impl;
+package de.qaware.cloud.id.spire;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -7,25 +7,28 @@ import javax.net.ssl.KeyManagerFactorySpi;
 import javax.net.ssl.ManagerFactoryParameters;
 import java.security.KeyStore;
 
-import static de.qaware.cloud.id.spire.impl.BundleSupplierFactory.getBundleSupplier;
+import static de.qaware.cloud.id.spire.BundleSupplierFactory.getBundleSupplier;
 
+/**
+ * SPIRE key manager factory
+ */
 @Slf4j
-public class SpiffeKeyManagerFactory extends KeyManagerFactorySpi {
+public class SPIREKeyManagerFactory extends KeyManagerFactorySpi {
 
     private KeyManager keyManager;
 
     @Override
     protected void engineInit(KeyStore keyStore, char[] chars) {
-        LOGGER.error("Delegating to a keystore backed key manager is not supported yet");
+        SPIREKeyManagerFactory.LOGGER.error("Delegating to a keystore backed key manager is not supported yet");
     }
 
     @Override
     protected void engineInit(ManagerFactoryParameters managerFactoryParameters) {
-        LOGGER.error("Delegating to a keystore backed key manager is not supported yet");
+        SPIREKeyManagerFactory.LOGGER.error("Delegating to a keystore backed key manager is not supported yet");
     }
 
     private void init() {
-        keyManager = new SpiffeKeyManager(getBundleSupplier());
+        keyManager = new SPIREKeyManager(getBundleSupplier());
     }
 
     @Override

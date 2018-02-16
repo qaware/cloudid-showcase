@@ -1,7 +1,6 @@
-package de.qaware.cloud.id.spire.impl
+package de.qaware.cloud.id.spire
 
 import de.qaware.cloud.id.TestResources
-import de.qaware.cloud.id.spire.SVIDBundle
 import spock.lang.Specification
 
 class BundleConverterSpec extends Specification {

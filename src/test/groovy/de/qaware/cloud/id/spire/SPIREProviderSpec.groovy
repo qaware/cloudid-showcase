@@ -1,38 +1,42 @@
-package de.qaware.cloud.id.spire.impl
+package de.qaware.cloud.id.spire
 
 import com.github.tomakehurst.wiremock.WireMockServer
 import groovy.util.logging.Slf4j
 import spock.lang.Specification
+import spock.util.environment.RestoreSystemProperties
 
 import javax.net.ssl.KeyManagerFactory
 import javax.net.ssl.SSLSocketFactory
 import java.time.Duration
 
+import static TestUtils.waitUntilBundleIsAvailable
 import static com.github.tomakehurst.wiremock.client.WireMock.get
 import static com.github.tomakehurst.wiremock.client.WireMock.ok
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options
-import static de.qaware.cloud.id.spire.impl.TestUtils.waitUntilBundleIsAvailable
 
 @Slf4j
-class SpiffeProviderSpec extends Specification {
+@RestoreSystemProperties
+class SPIREProviderSpec extends Specification {
 
     void setupSpec() {
-        new SpiffeProvider().install(true)
+        System.setProperty('spire.bundlesSupplierClass', TestBundlesSupplier.class.getName())
+
+        new SPIREProvider().installAsDefault()
 
         waitUntilBundleIsAvailable(Duration.ofSeconds(5))
     }
 
     void cleanupSpec() {
-        new SpiffeProvider().uninstall()
+        new SPIREProvider().uninstall()
     }
 
     def 'get key manager'() {
         when:
-        def keyManagerFactory = KeyManagerFactory.getInstance(SpiffeProvider.ALGORITHM)
+        def keyManagerFactory = KeyManagerFactory.getInstance('SPIRE')
 
         then:
         keyManagerFactory.keyManagers.length == 1
-        keyManagerFactory.keyManagers[0] instanceof SpiffeKeyManager
+        keyManagerFactory.keyManagers[0] instanceof SPIREKeyManager
     }
 
     def 'get default SSLSocketFactory'() {

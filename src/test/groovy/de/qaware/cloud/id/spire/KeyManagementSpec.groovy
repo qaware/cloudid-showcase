@@ -1,21 +1,26 @@
-package de.qaware.cloud.id.spire.impl
+package de.qaware.cloud.id.spire
 
 import spock.lang.Specification
+import spock.util.environment.RestoreSystemProperties
 
 import javax.net.ssl.X509KeyManager
 import java.security.Principal
 import java.time.Duration
 
-import static de.qaware.cloud.id.spire.impl.TestUtils.waitUntilBundleIsAvailable
+import static TestUtils.waitUntilBundleIsAvailable
 
 /**
  * Specification testing key management with SPIFFE.
  */
+@RestoreSystemProperties
 class KeyManagementSpec extends Specification {
-    SpiffeKeyManagerFactory keyManagerFactory
 
-    void setup() {
-        keyManagerFactory = new SpiffeKeyManagerFactory()
+    static SPIREKeyManagerFactory keyManagerFactory
+
+    def setupSpec() {
+        System.setProperty('spire.bundlesSupplierClass', TestBundlesSupplier.class.getName())
+
+        keyManagerFactory = new SPIREKeyManagerFactory()
     }
 
     def 'get key managers'() {

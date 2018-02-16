@@ -1,7 +1,5 @@
-package de.qaware.cloud.id.spire.impl;
+package de.qaware.cloud.id.spire;
 
-import de.qaware.cloud.id.spire.Bundles;
-import de.qaware.cloud.id.spire.SVIDBundle;
 import io.grpc.Channel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

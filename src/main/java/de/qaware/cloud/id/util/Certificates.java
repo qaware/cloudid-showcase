@@ -1,6 +1,6 @@
 package de.qaware.cloud.id.util;
 
-import lombok.NoArgsConstructor;
+import lombok.experimental.UtilityClass;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
@@ -9,15 +9,12 @@ import java.time.Instant;
 import java.util.Date;
 
 import static java.util.Collections.singleton;
-import static lombok.AccessLevel.PRIVATE;
 
 /**
  * Utilities for certificates.
  */
-@SuppressWarnings("squid:S1118") // Sonar rule is not Lombok aware
-@NoArgsConstructor(access = PRIVATE)
-public final class Certificates {
-
+@UtilityClass
+public class Certificates {
 
     /**
      * Get the notAfter instant of a X.509 certificate.
