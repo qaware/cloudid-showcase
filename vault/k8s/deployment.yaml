@@ -1,0 +1,46 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: vault
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: vault
+        instance: vault
+    spec:
+      containers:
+        - name: vault
+          image: "vault:0.9.3"
+#          resources:
+#            requests:
+#              cpu: 300m
+#              memory: 1000Mi
+#            limits:
+#              cpu: 300m
+#              memory: 1500Mi
+          ports:
+          - containerPort: 8200
+            name: main-port
+          env:
+          - name: VAULT_LOCAL_CONFIG
+          # TODO: Review
+            value:
+                 listener "tcp" {
+                  address = "0.0.0.0:9000"
+                  tls_disable = 1
+                }
+          readinessProbe:
+            httpGet:
+              # TODO: Review
+              path: /v1/sys/leader
+              port: 9000
+            initialDelaySeconds: 30
+            timeoutSeconds: 1
+          volumeMounts:
+              - name: log-storage
+                mountPath: /vault/logs
+      volumes:
+        - name: log-storage
+          emptyDir: {}
