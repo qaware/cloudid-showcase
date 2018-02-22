@@ -1,0 +1,3 @@
+[submodule "demo-server"]
+	path = demo-server
+	url = https://gitlab.qaware.de/qaware/qalabs/cloud-id/demo-server.git
