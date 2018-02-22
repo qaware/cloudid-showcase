@@ -2,11 +2,11 @@ PROJECT_NAME = spire-agent
 DEPLOYMENTS =  $(wildcard k8s/*.yaml)
 
 .PHONY:
-deploy: containerize
+deploy: container-build
 	$(foreach f, $(DEPLOYMENTS), kubectl apply -f $f;)
 
 .PHONY:
-containerize:
+container-build:
 	docker build -t $(PROJECT_NAME) .
 
 .PHONY:

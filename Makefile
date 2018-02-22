@@ -2,12 +2,12 @@ CONTAINERS = spire-agent spire-server demo-server
 DEPLOYMENTS = spire-agent spire-server vault demo-server
 
 .PHONY:
-deploy: containerize
+deploy: container-build
 	$(foreach c, $(DEPLOYMENTS), $(MAKE) -C $c deploy;)
 
 .PHONY:
-containerize: build
-	$(foreach c, $(CONTAINERS), $(MAKE) -C $c containerize;)
+container-build: build
+	$(foreach c, $(CONTAINERS), $(MAKE) -C $c container-build;)
 
 .PHONY:
 build:
@@ -18,8 +18,8 @@ delete:
 	-$(foreach c, $(DEPLOYMENTS), $(MAKE) -C $c delete;)
 
 .ONESHELL:
-containerize-minikube:
-	@eval $$(minikube docker-env); $(MAKE) containerize
+container-build-minikube:
+	@eval $$(minikube docker-env); $(MAKE) container-build
 
 .ONESHELL:
 deploy-minikube:
