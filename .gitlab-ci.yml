@@ -21,7 +21,7 @@ gradle-build:
     expire_in: 1 day
     paths:
       - build/docker/*
-  script: "./gradlew --build-cache assemble dockerPrepare --stacktrace"
+  script: "./gradlew --build-cache assemble --stacktrace"
 
 
 sonarqube:
@@ -41,5 +41,5 @@ docker-build:
   script:
     - if [ "$CI_COMMIT_REF_NAME" == "master" ]; then DOCKER_TAG_NAME="latest"; else DOCKER_TAG_NAME="${CI_COMMIT_REF_NAME}"; fi
     - docker login -u "$DOCKER_REGISTRY_USER" -p "$DOCKER_REGISTRY_PASS" $DOCKER_REGISTRY_URL
-    - docker build --pull -t "$DOCKER_REGISTRY_URL/$DOCKER_REGISTRY_REPO/$DOCKER_IMAGE_NAME:$DOCKER_TAG_NAME" build/docker
+    - docker build --pull -t "$DOCKER_REGISTRY_URL/$DOCKER_REGISTRY_REPO/$DOCKER_IMAGE_NAME:$DOCKER_TAG_NAME" .
     - docker push "$DOCKER_REGISTRY_URL/$DOCKER_REGISTRY_REPO/$DOCKER_IMAGE_NAME:$DOCKER_TAG_NAME"
