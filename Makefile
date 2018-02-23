@@ -19,9 +19,6 @@ ifneq ($(BRANCH), master)
 SONAR_BRANCH_NAME = -Dsonar.branch.name=$(BRANCH)
 endif
 
-test:
-	echo $(X)
-
 .PHONY: deploy
 deploy: container-build
 	$(foreach f, $(DEPLOYMENTS), kubectl apply -f $f;)
