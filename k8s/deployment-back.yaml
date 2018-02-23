@@ -1,24 +1,24 @@
 apiVersion: apps/v1beta2 # for versions before 1.9.0 use apps/v1beta2
 kind: Deployment
 metadata:
-  name: demo-server
+  name: demo-server-back
   labels:
-    app: demo-server
+    app: demo-server-back
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: demo-server
+      app: demo-server-back
   template:
     metadata:
       labels:
-        app: demo-server
+        app: demo-server-back
     spec:
       containers:
       - name: demo-server
         # Depends on QAware-internal Artifactory
         image: artifactory.qaware.de/qaware-internal-docker/demo-server:latest
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         volumeMounts:
           - name: application-config
             mountPath: /demo-server/config

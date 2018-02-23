@@ -1,0 +1,57 @@
+apiVersion: apps/v1beta2 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: demo-server-front
+  labels:
+    app: demo-server-front
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: demo-server-front
+  template:
+    metadata:
+      labels:
+        app: demo-server-front
+    spec:
+      containers:
+      - name: demo-server
+        # Depends on QAware-internal Artifactory
+        image: artifactory.qaware.de/qaware-internal-docker/demo-server:latest
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+          - name: application-config
+            mountPath: /demo-server/config
+            readOnly: true
+        ports:
+        - name: http
+          containerPort: 8080
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /health
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /health
+            port: 8080
+            scheme: HTTP
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+      imagePullSecrets:
+        # Needs to be definied for this deployment to work
+        - name: qaware-artifactory
+      volumes:
+        - name: application-config
+          configMap:
+            name: demo-server-config
+            items:
+            - key: application.properties
+              path: application.properties
