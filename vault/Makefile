@@ -1,10 +1,10 @@
 PROJECT_NAME = vault
 DEPLOYMENTS =  $(wildcard k8s/*.yaml)
 
-.PHONY:
+.PHONY: deploy
 deploy:
 	$(foreach f, $(DEPLOYMENTS), kubectl apply -f $f;)
 
-.PHONY:
+.PHONY: delete
 delete:
 	-$(foreach f, $(DEPLOYMENTS), kubectl delete -f $f;)

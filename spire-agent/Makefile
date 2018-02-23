@@ -1,14 +1,14 @@
 PROJECT_NAME = spire-agent
 DEPLOYMENTS =  $(wildcard k8s/*.yaml)
 
-.PHONY:
+.PHONY: deploy
 deploy: container-build
 	$(foreach f, $(DEPLOYMENTS), kubectl apply -f $f;)
 
-.PHONY:
+.PHONY: container-build
 container-build:
 	docker build -t $(PROJECT_NAME) .
 
-.PHONY:
+.PHONY: delete
 delete:
 	-$(foreach f, $(DEPLOYMENTS), kubectl delete -f $f;)
