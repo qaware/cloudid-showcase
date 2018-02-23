@@ -19,9 +19,9 @@ delete:
 	-$(foreach c, $(DEPLOYMENTS), $(MAKE) -C $c delete;)
 
 .PHONY: container-build-minikube
-container-build-minikube: start-minikube
+container-build-minikube:
 	@eval $$(minikube docker-env); $(MAKE) container-build
 
 .PHONY: deploy-minikube
-deploy-minikube: start-minikube
+deploy-minikube:
 	@eval $$(minikube docker-env); $(MAKE) deploy
