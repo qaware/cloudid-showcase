@@ -9,6 +9,7 @@ import java.util.function.Supplier;
 
 import static java.lang.Math.min;
 import static java.lang.Math.pow;
+import static java.lang.String.format;
 
 /**
  * Exponential backoff supply strategy.
@@ -34,7 +35,8 @@ public class ExponentialBackoffSupplier<T> implements Supplier<T> {
             try {
                 return supplier.get();
             } catch (RuntimeException e) {
-                LOGGER.error("Error running supplier", e);
+                long backoffS = Duration.ofNanos((long) backoffNs).getSeconds();
+                LOGGER.error(format("Error running supplier, backing off for %ds", backoffS), e);
             }
 
             Thread.sleep(Duration.ofNanos((long) backoffNs).toMillis());
