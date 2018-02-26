@@ -1,7 +1,6 @@
 package de.qaware.cloud.id.spire;
 
 import de.qaware.cloud.id.util.ExponentialBackoffSupplier;
-import io.grpc.Channel;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,7 +25,7 @@ class BundleSupplierFactory {
     public static synchronized BundleSupplier getBundleSupplier() {
         if (bundleSupplier == null) {
             bundleSupplier = new BundleSupplier(BUNDLES_SUPPLIER_CLASS.get()
-                    .orElseGet(() -> new BundlesSupplier(createChannelSupplier())));
+                    .orElseGet(BundleSupplierFactory::createBundlesSupplier));
             start();
         }
 
@@ -47,9 +46,9 @@ class BundleSupplierFactory {
         bundleSupplier.stop();
     }
 
-    private static Supplier<Channel> createChannelSupplier() {
-        return new ExponentialBackoffSupplier<>(
-                new UDSChannelSupplier(AGENT_SOCKET.get()),
+    private static Supplier<Bundles> createBundlesSupplier() {
+        return new ExponentialBackoffSupplier<>(new BundlesSupplier(
+                new UDSChannelSupplier(AGENT_SOCKET.get())),
                 INITIAL_BACKOFF.get(),
                 MAX_BACKOFF.get(),
                 BACKOFF_EXPONENT.get());
