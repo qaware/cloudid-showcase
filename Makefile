@@ -35,7 +35,7 @@ deploy: container-build
 		| kubectl apply -f -;)
 
 .PHONY: container-build
-container-build: assemble
+container-build: build
 	docker build -t "$(DOCKER_QUALIFIED_NAME)" .
 
 .PHONY: container-push
@@ -45,8 +45,7 @@ container-push: container-build
 	docker push "$(DOCKER_QUALIFIED_NAME)"
 
 .PHONY: build
-build:
-	./gradlew $(GRADLE_ARGS) build
+build: assemble
 
 .PHONY: assemble
 assemble:

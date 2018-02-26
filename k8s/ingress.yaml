@@ -2,13 +2,14 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: demo-server-ingress
-  annotations:
-    ingress.kubernetes.io/rewrite-target: /
+  #annotations:
+   # ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
    - http:
       paths:
-      - path: /demo-server
+#      - path: /demo-server
+      - path: /
         backend:
           serviceName: demo-server-service-front
           servicePort: 80
