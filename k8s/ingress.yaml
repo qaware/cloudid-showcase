@@ -5,12 +5,8 @@ metadata:
   annotations:
     ingress.kubernetes.io/rewrite-target: /
 spec:
-  backend:
-    serviceName: default-http-backend
-    servicePort: 80
   rules:
-  - host: cloudid-demo
-    http:
+   - http:
       paths:
       - path: /demo-server
         backend:
