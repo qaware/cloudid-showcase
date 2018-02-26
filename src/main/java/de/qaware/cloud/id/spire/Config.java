@@ -31,7 +31,7 @@ class Config {
     /**
      * Backoff exponent for polling the agent socket.
      */
-    static final Supplier<Double> BACKOFF_EXPONENT = doubleOf("spire.agent.socket.backoffExponent", 1.2);
+    static final Supplier<Double> BACKOFF_EXPONENT = doubleOf("spire.agent.socket.backoffExponent", 1.03);
 
     /**
      * Duration after which to force an update.
