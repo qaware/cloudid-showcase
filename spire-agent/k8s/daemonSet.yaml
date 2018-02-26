@@ -34,7 +34,7 @@ spec:
             - name: spire-config
               mountPath: /spire/config
               readOnly: true
-            - name: spire-socket
+            - name: spire-agent-socket
               mountPath: /spire/socket
               readOnly: false
           ports:
@@ -73,6 +73,6 @@ spec:
                 path: plugin/wla_secret_file.conf
               - key: plugin-wla_unix.conf
                 path: plugin/wla_unix.conf
-        - name: spire-socket
-          hostPath:
-            path: /Volumes/Cloud-ID/codebase/spire-k8s/socket
+        - name: spire-agent-socket
+          persistentVolumeClaim:
+           claimName: agent-socket-pv-claim
