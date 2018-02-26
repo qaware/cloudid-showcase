@@ -23,6 +23,8 @@ spec:
           - name: application-config
             mountPath: /demo-server/config
             readOnly: true
+          - name: spire-agent-socket
+            mountPath: "/spire/socket"
         ports:
         - name: http
           containerPort: 8080
@@ -56,3 +58,6 @@ spec:
             items:
             - key: application.properties
               path: application.properties
+        - name: spire-agent-socket
+          persistentVolumeClaim:
+           claimName: agent-socket-pv-claim
