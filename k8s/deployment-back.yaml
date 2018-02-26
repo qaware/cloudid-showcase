@@ -51,7 +51,7 @@ spec:
       volumes:
         - name: application-config
           configMap:
-            name: demo-server-config
+            name: demo-server-config-back
             items:
             - key: application.properties
               path: application.properties

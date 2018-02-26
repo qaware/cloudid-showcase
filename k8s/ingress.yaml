@@ -14,5 +14,5 @@ spec:
       paths:
       - path: /demo-server
         backend:
-          serviceName: demo-server-service
+          serviceName: demo-server-service-front
           servicePort: 80

@@ -1,8 +1,8 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: demo-server-config
+  name: demo-server-config-front
 data:
   application.properties: |
     logging.level.org.springframework.web=INFO
-    de.qaware.cloud.id.demoserver.backend=https://xkcd.com/
+    de.qaware.cloud.id.demoserver.backend=https://demo-server-service-back:81/
