@@ -18,7 +18,7 @@ class Config {
     /**
      * UNIX domain socket used to connect to the SPIRE agent.
      */
-    static final Supplier<String> AGENT_SOCKET = stringOf("spire.agentSocket", "/Volumes/Cloud-ID/codebase/spire-k8s/socket/agent.sock");
+    static final Supplier<String> AGENT_SOCKET = stringOf("spire.agentSocket", "/spire/socket/agent.sock");
 
     /**
      * initial backoff for polling the agent socket.
