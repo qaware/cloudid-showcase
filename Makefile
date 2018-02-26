@@ -5,7 +5,9 @@ DEPLOYMENTS =  $(wildcard k8s/*.yaml)
 # Branch name from Git
 BRANCH_NAME = $(shell git rev-parse --abbrev-ref HEAD)
 # Tag name from Git, if the current commit is tagged, stripping a leading "v" from v1.0-style commits
-TAG_NAME = $(shell git describe --exact-match HEAD | grep '^v[0-9][0-9a-zA-Z_\.]*$' | sed 's/^v//' 2> /dev/null || echo "")
+TAG_NAME = $(shell git describe --exact-match HEAD 2> /dev/null\
+	| grep '^v[0-9][0-9a-zA-Z_\.]*$$' | sed 's/^v//' \
+	|| echo '' )
 
 # Docker tag name
 # if the current branch is "master" and the current commit is a tag -> tag name
@@ -25,15 +27,15 @@ ifneq ($(BRANCH_NAME), master)
 SONAR_BRANCH_NAME = -Dsonar.branch.name=$(BRANCH_NAME)
 endif
 
+
 .PHONY: deploy
 deploy: container-build
-	# Replace all instances of the image name
 	$(foreach f, $(DEPLOYMENTS), \
-		sed "s/$(DOCKER_IMAGE_NAME):latest/$(DOCKER_IMAGE_NAME):$(DOCKER_TAG_NAME)/" $f \
+		sed 's/$(DOCKER_IMAGE_NAME):latest/$(DOCKER_IMAGE_NAME):$(DOCKER_TAG_NAME)/' $f \
 		| kubectl apply -f -;)
 
 .PHONY: container-build
-container-build: build
+container-build: assemble
 	docker build -t "$(DOCKER_QUALIFIED_NAME)" .
 
 .PHONY: container-push
