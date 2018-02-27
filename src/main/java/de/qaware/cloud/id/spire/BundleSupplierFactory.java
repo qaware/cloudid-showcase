@@ -47,11 +47,11 @@ class BundleSupplierFactory {
     }
 
     private static Supplier<Bundles> createBundlesSupplier() {
-        return new ExponentialBackoffSupplier<>(new BundlesSupplier(
-                new UDSChannelSupplier(AGENT_SOCKET.get())),
-                INITIAL_BACKOFF.get(),
-                MAX_BACKOFF.get(),
-                BACKOFF_EXPONENT.get());
+        return new ExponentialBackoffSupplier<>(
+                new BundlesSupplier(new UDSChannelSupplier(AGENT_SOCKET.get())),
+                EXP_BACKOFF_BASE.get(),
+                EXP_BACKOFF_STEP.get(),
+                EXP_BACKOFF_RETRIES_CAP.get());
     }
 
 }

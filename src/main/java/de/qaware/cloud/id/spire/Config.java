@@ -21,17 +21,23 @@ class Config {
     static final Supplier<String> AGENT_SOCKET = stringOf("spire.agentSocket", "/spire/socket/agent.sock");
 
     /**
-     * initial backoff for polling the agent socket.
+     * Step duration for the exponential backoff.
+     *
+     * Exponential backoff is calculated as such: {@code random(step * base^max(retriesm retriesCap))}.
      */
-    static final Supplier<Duration> INITIAL_BACKOFF = durationOf("spire.agent.socket.initialBackoff", Duration.ofSeconds(2));
+    static final Supplier<Duration> EXP_BACKOFF_STEP = durationOf("spire.agent.socket.expBackoff.step", Duration.ofSeconds(1));
     /**
-     * Max. backoff for polling the agent socket.
+     * Base for the exponential backoff.
+     *
+     * Exponential backoff is calculated as such: {@code random(step * base^max(retriesm retriesCap))}.
      */
-    static final Supplier<Duration> MAX_BACKOFF = durationOf("spire.agent.socket.maxBackoff", Duration.ofSeconds(60));
+    static final Supplier<Double> EXP_BACKOFF_BASE = doubleOf("spire.agent.socket.expBackoff.base", 2.);
     /**
-     * Backoff exponent for polling the agent socket.
+     * Number of retries after which exponential backoff growth is capped.
+     *
+     * Exponential backoff is calculated as such: {@code random(step * base^max(retriesm retriesCap))}.
      */
-    static final Supplier<Double> BACKOFF_EXPONENT = doubleOf("spire.agent.socket.backoffExponent", 1.03);
+    static final Supplier<Integer> EXP_BACKOFF_RETRIES_CAP = intOf("spire.agent.socket.expBackoff.retriesCap", 6);
 
     /**
      * Duration after which to force an update.
@@ -62,6 +68,10 @@ class Config {
 
     private static Supplier<Double> doubleOf(String name, Double defaultValue) {
         return () -> get(name, Double::valueOf).orElse(defaultValue);
+    }
+
+    private static Supplier<Integer> intOf(String name, Integer defaultValue) {
+        return () -> get(name, Integer::valueOf).orElse(defaultValue);
     }
 
     @SuppressWarnings({"unchecked", "squid:S2658"})

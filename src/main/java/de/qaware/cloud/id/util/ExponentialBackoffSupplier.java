@@ -5,10 +5,11 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Duration;
+import java.util.Random;
 import java.util.function.Supplier;
 
-import static java.lang.Math.min;
 import static java.lang.Math.pow;
+import static java.lang.Math.round;
 import static java.lang.String.format;
 
 /**
@@ -20,28 +21,33 @@ import static java.lang.String.format;
 @RequiredArgsConstructor
 public class ExponentialBackoffSupplier<T> implements Supplier<T> {
 
-    private final Supplier<T> supplier;
+    private final Random random = new Random();
 
-    private final Duration initalBackoff;
-    private final Duration maxBackoff;
-    private final double exponent;
+    private final Supplier<T> supplier;
+    private final double base;
+    private final Duration step;
+    private final int retriesCap;
+
 
     @SneakyThrows(InterruptedException.class)
     @Override
     public T get() {
-        double backoffNs = initalBackoff.toNanos();
+        int retries = 1;
 
         for (; ; ) {
             try {
                 return supplier.get();
             } catch (RuntimeException e) {
-                long backoffS = Duration.ofNanos((long) backoffNs).getSeconds();
-                LOGGER.error(format("Error running supplier, backing off for %ds", backoffS), e);
+                long backoffMs = round(random.nextDouble() * step.toMillis() * pow(base, retries));
+
+                LOGGER.error(format("Error running supplier, backing off for %ds after %d retries",
+                        Duration.ofMillis(backoffMs).getSeconds(), retries), e);
+                Thread.sleep(backoffMs);
             }
 
-            Thread.sleep(Duration.ofNanos((long) backoffNs).toMillis());
-
-            backoffNs = min(maxBackoff.toNanos(), pow(backoffNs, exponent));
+            if (retries < retriesCap) {
+                ++retries;
+            }
         }
     }
 
