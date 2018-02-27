@@ -51,11 +51,11 @@ class Config {
     /**
      * Get an overridden bundles supplier if set.
      */
-    static final Supplier<Optional<Supplier<Bundles>>> BUNDLES_SUPPLIER_CLASS = () -> instanceOf("spire.bundlesSupplierClass");
+    static final Supplier<Optional<Supplier<Bundles>>> BUNDLES_SUPPLIER_CLASS = instanceOf("spire.bundlesSupplierClass");
 
 
-    private static <T> Optional<T> instanceOf(String name) {
-        return get(name, Config::instantiate);
+    private static <T> Supplier<Optional<T>> instanceOf(String name) {
+        return () -> get(name, Config::instantiate);
     }
 
     private static Supplier<String> stringOf(String name, String defaultValue) {
