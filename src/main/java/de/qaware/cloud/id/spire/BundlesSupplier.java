@@ -1,9 +1,12 @@
 package de.qaware.cloud.id.spire;
 
-import io.grpc.Channel;
+import de.qaware.cloud.id.util.NettySocket;
+import io.grpc.ManagedChannel;
+import io.grpc.netty.NettyChannelBuilder;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.unix.DomainSocketAddress;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import spire.api.workload.WorkloadGrpc.WorkloadBlockingStub;
 import spire.api.workload.WorkloadOuterClass;
 import spire.api.workload.WorkloadOuterClass.WorkloadEntry;
 
@@ -26,7 +29,9 @@ class BundlesSupplier implements Supplier<Bundles> {
 
     private static final Function<WorkloadEntry, SVIDBundle> BUNDLE_CONVERTER = new BundleConverter();
 
-    private final Supplier<Channel> channelSupplier;
+    private final EventLoopGroup eventLoopGroup = NettySocket.CURRENT.createEventLoopGroup();
+
+    private final String socketFile;
 
     private static Instant getExpiry(WorkloadOuterClass.Bundles bundles) {
         // TODO: Verifiy that the TTL is indeed provided in seconds
@@ -37,6 +42,9 @@ class BundlesSupplier implements Supplier<Bundles> {
         List<SVIDBundle> bundlesList = bundles.getBundlesList().stream()
                 .map(BUNDLE_CONVERTER)
                 .collect(toList());
+
+        verify(!bundlesList.isEmpty(),
+                "Received 0 bundles. Is your workload registered with SPIRE?");
 
         // Verify the assumption that this workload has exactly one SPIFFE Id
         verify(bundlesList.stream()
@@ -59,18 +67,25 @@ class BundlesSupplier implements Supplier<Bundles> {
      */
     @Override
     public Bundles get() {
-        WorkloadOuterClass.Bundles bundles = getStub().fetchAllBundles(newRequest());
+        WorkloadOuterClass.Bundles bundles = fetchBundles();
 
         LOGGER.debug("Received {} bundles with a TTL of {}s", bundles.getBundlesList().size(), bundles.getTtl());
 
-        return new Bundles(
-                sort(convert(bundles)),
-                getExpiry(bundles));
+        return new Bundles(sort(convert(bundles)), getExpiry(bundles));
 
     }
 
-    private WorkloadBlockingStub getStub() {
-        return newBlockingStub(channelSupplier.get());
+    private WorkloadOuterClass.Bundles fetchBundles() {
+        ManagedChannel channel = NettyChannelBuilder.forAddress(new DomainSocketAddress(socketFile))
+                .eventLoopGroup(eventLoopGroup)
+                .channelType(NettySocket.CURRENT.getDomainSocketChannelClass())
+                .usePlaintext(true)
+                .build();
+        try {
+            return newBlockingStub(channel).fetchAllBundles(newRequest());
+        } finally {
+            channel.shutdown();
+        }
     }
 
     private static WorkloadOuterClass.Empty newRequest() {

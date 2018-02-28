@@ -20,14 +20,20 @@ spec:
         image: artifactory.qaware.de/qaware-internal-docker/demo-server:latest
         imagePullPolicy: IfNotPresent
         volumeMounts:
-          - name: application-config
-            mountPath: /demo-server/config
-            readOnly: true
-          - name: spire-agent-socket
-            mountPath: "/spire/socket"
+        - name: application-config
+          mountPath: /demo-server/config
+          readOnly: true
+        - name: spire-agent-socket
+          mountPath: /spire/socket
+          readOnly: false
+        env:
+        - name: JAVA_TOOL_OPTIONS
+          value: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005"
         ports:
         - name: http
           containerPort: 8080
+        - name: jvm-debug
+          containerPort: 5005
         livenessProbe:
           failureThreshold: 3
           httpGet:
@@ -59,5 +65,5 @@ spec:
             - key: application.properties
               path: application.properties
         - name: spire-agent-socket
-          persistentVolumeClaim:
-           claimName: agent-socket-pv-claim
+          hostPath:
+           path: /mnt/spire/agent/socket

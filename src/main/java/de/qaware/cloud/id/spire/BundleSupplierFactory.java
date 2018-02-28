@@ -1,6 +1,7 @@
 package de.qaware.cloud.id.spire;
 
 import de.qaware.cloud.id.util.ExponentialBackoffSupplier;
+import de.qaware.cloud.id.util.NettySocket;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
@@ -24,6 +25,12 @@ class BundleSupplierFactory {
      */
     public static synchronized BundleSupplier getBundleSupplier() {
         if (bundleSupplier == null) {
+            LOGGER.debug("Socket type: {}", NettySocket.CURRENT);
+
+            if (!NettySocket.CURRENT.domainSocketsSupported()) {
+                LOGGER.error("No domain socket support on this system. Connecting to the SPIRE agent will not work.");
+            }
+
             bundleSupplier = new BundleSupplier(BUNDLES_SUPPLIER_CLASS.get()
                     .orElseGet(BundleSupplierFactory::createBundlesSupplier));
             start();
@@ -48,7 +55,7 @@ class BundleSupplierFactory {
 
     private static Supplier<Bundles> createBundlesSupplier() {
         return new ExponentialBackoffSupplier<>(
-                new BundlesSupplier(new UDSChannelSupplier(AGENT_SOCKET.get())),
+                new BundlesSupplier(AGENT_SOCKET.get()),
                 EXP_BACKOFF_BASE.get(),
                 EXP_BACKOFF_STEP.get(),
                 EXP_BACKOFF_RETRIES_CAP.get());
