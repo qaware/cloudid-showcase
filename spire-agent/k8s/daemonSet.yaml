@@ -74,5 +74,5 @@ spec:
               - key: plugin-wla_unix.conf
                 path: plugin/wla_unix.conf
         - name: spire-agent-socket
-          persistentVolumeClaim:
-           claimName: agent-socket-pv-claim
+          hostPath:
+           path: /mnt/spire/agent/socket
