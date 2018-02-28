@@ -22,22 +22,16 @@ class Config {
 
     /**
      * Step duration for the exponential backoff.
-     *
-     * Exponential backoff is calculated as such: {@code random(step * base^max(retries, retriesCap))}.
      */
     static final Supplier<Duration> EXP_BACKOFF_STEP = durationOf("spire.agent.socket.expBackoff.step", Duration.ofSeconds(1));
     /**
      * Base for the exponential backoff.
-     *
-     * Exponential backoff is calculated as such: {@code random(step * base^max(retries, retriesCap))}.
      */
     static final Supplier<Double> EXP_BACKOFF_BASE = doubleOf("spire.agent.socket.expBackoff.base", 2.);
     /**
      * Number of retries after which exponential backoff growth is capped.
-     *
-     * Exponential backoff is calculated as such: {@code random(step * base^max(retries, retriesCap))}.
      */
-    static final Supplier<Integer> EXP_BACKOFF_RETRIES_CAP = intOf("spire.agent.socket.expBackoff.retriesCap", 6);
+    static final Supplier<Integer> EXP_BACKOFF_RETRIES_CAP = intOf("spire.agent.socket.expBackoff.retriesCap", 5);
 
     /**
      * Duration after which to force an update.
