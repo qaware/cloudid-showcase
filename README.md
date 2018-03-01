@@ -15,12 +15,12 @@ Additionally it requires a [Secret](spire-server/k8s/secrets.yaml) to store the 
 
 ### Register the workload
 ```bash
-kubectl exec $(kubectl get pod | grep -o 'spire-server-[a-z0-9\]*') -- /opt/spire/spire-server register -parentID spiffe://example.org/k8s/node/minikube -spiffeID spiffe://example.org/host/workload -selector k8s:ns:default
+kubectl exec $(kubectl get pod -o name | grep -o 'spire-server.*$') -- /opt/spire/spire-server register -parentID spiffe://example.org/k8s/node/minikube -spiffeID spiffe://example.org/host/workload -selector k8s:ns:default
 ```
 
 ### Fetches the certificates within the workload 
 ```bash
-kubectl exec $(kubectl get pod | grep -o 'spire-agent-[a-z0-9\]*') -- /opt/spire/spire-agent api fetch -socketPath /spire/socket/agent.sock -write /root
+kubectl exec $(kubectl get pod -o name | grep -o 'spire-server.*$') -- /opt/spire/spire-agent api fetch -socketPath /spire/socket/agent.sock -write /root
 ```
 
 
