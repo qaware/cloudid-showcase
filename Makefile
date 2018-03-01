@@ -25,3 +25,4 @@ minikube-container-build:
 .PHONY: minikube-deploy
 minikube-deploy:
 	@eval $$(minikube docker-env); $(MAKE) deploy
+	kubectl exec $$(kubectl get pod -o name | grep -o 'spire-server.*$$') -- /opt/spire/spire-server register -parentID spiffe://salm.qaware.de/k8s/node/minikube -spiffeID spiffe://salm.qaware.de/host/workload -selector k8s:ns:default
