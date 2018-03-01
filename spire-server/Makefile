@@ -1,9 +1,12 @@
 PROJECT_NAME = spire-server
-DEPLOYMENTS =  $(wildcard k8s/*.yaml)
+DEPLOYMENTS =  k8s/configmap.yaml k8s/deployment.yaml k8s/service.yaml
 
 .PHONY: deploy
 deploy: container-build
-	$(foreach f, $(DEPLOYMENTS), kubectl apply -f $f;)
+	sed "s/{{TLS.KEY}}/$$(base64 -e ca/tls.key | tr -d '\r\n')/; \
+		 s/{{TLS.CRT}}/$$(base64 -e ca/tls.crt | tr -d '\r\n')/" \
+		 k8s/secrets.yaml | kubectl apply -f -
+	echo $(foreach f, $(DEPLOYMENTS), kubectl apply -f $f;)
 
 .PHONY: container-build
 container-build:
@@ -13,3 +16,5 @@ container-build:
 delete:
 	-$(foreach f, $(DEPLOYMENTS), kubectl delete -f $f;)
 
+clean:
+	rm -rf build
