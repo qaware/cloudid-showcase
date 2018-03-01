@@ -34,7 +34,7 @@ class KeyManagementSpec extends Specification {
 
     def 'use key manager'() {
         given:
-        def svId = 'spiffe://example.org/host/workload'
+        def svId = 'spiffe://salm.qaware.de/host/workload'
 
         when:
         def keyManager = (X509KeyManager) keyManagerFactory.engineGetKeyManagers()[0]
