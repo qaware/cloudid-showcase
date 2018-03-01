@@ -15,7 +15,7 @@ Additionally it requires a [Secret](spire-server/k8s/secrets.yaml) to store the 
 
 ### Register the workload
 ```bash
-kubectl exec $(kubectl get pod -o name | grep -o 'spire-server.*$') -- /opt/spire/spire-server register -parentID spiffe://example.org/k8s/node/minikube -spiffeID spiffe://example.org/host/workload -selector k8s:ns:default
+kubectl exec $(kubectl get pod -o name | grep -o 'spire-server.*$') -- /opt/spire/spire-server register -parentID spiffe://salm.qaware.de/k8s/node/minikube -spiffeID spiffe://salm.qaware.de/host/workload -selector k8s:ns:default
 ```
 
 ### Fetches the certificates within the workload 

@@ -7,7 +7,7 @@ data:
     BindAddress = "0.0.0.0"
     BindPort = "8081"
     BindHTTPPort = "8080"
-    TrustDomain = "example.org"
+    TrustDomain = "salm.qaware.de"
     PluginDir = "/spire/config/plugin"
     LogLevel = "DEBUG"
     BaseSVIDTtl = 999999
@@ -21,7 +21,7 @@ data:
     enabled = true
     pluginType = "ControlPlaneCA"
     pluginData {
-      trust_domain = "example.org",
+      trust_domain = "salm.qaware.de",
       key_size = 2048,
       backdate_seconds = 1,
       cert_subject = {
@@ -47,7 +47,7 @@ data:
     enabled = true
     pluginType = "NodeAttestor" //needs to match the handshake
     pluginData {
-    	trust_domain = "example.org"
+    	trust_domain = "salm.qaware.de"
     }
   plugin-noop.conf: |
     pluginName = "noop"
@@ -64,7 +64,7 @@ data:
     enabled = true
     pluginType = "UpstreamCA"
     pluginData {
-      trust_domain = "example.org"
+      trust_domain = "salm.qaware.de"
       ttl = "1h"
       key_file_path = "/spire/tls/tls.key"
       cert_file_path = "/spire/tls/tls.crt"

@@ -13,7 +13,7 @@ data:
     ServerPort = "8081"
     SocketPath ="/spire/socket/agent.sock"
     TrustBundlePath = "/spire/config/ca.crt"
-    TrustDomain = "example.org"
+    TrustDomain = "salm.qaware.de"
     Umask = ""
     JoinToken = ""
   ca.crt: |
@@ -38,7 +38,7 @@ data:
     enabled = true
     pluginType = "NodeAttestor" //needs to match the handshake
     pluginData {
-    	trust_domain = "example.org"
+    	trust_domain = "salm.qaware.de"
     }
   plugin-km_memory.conf: |
     pluginName = "km_memory"
