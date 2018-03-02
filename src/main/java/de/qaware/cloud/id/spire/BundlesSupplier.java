@@ -34,7 +34,6 @@ class BundlesSupplier implements Supplier<Bundles> {
     private final String socketFile;
 
     private static Instant getExpiry(WorkloadOuterClass.Bundles bundles) {
-        // TODO: Verifiy that the TTL is indeed provided in seconds
         return Instant.now().plusSeconds(bundles.getTtl());
     }
 
@@ -69,9 +68,11 @@ class BundlesSupplier implements Supplier<Bundles> {
     public Bundles get() {
         WorkloadOuterClass.Bundles bundles = fetchBundles();
 
-        LOGGER.debug("Received {} bundles with a TTL of {}s", bundles.getBundlesList().size(), bundles.getTtl());
+        Bundles result = new Bundles(sort(convert(bundles)), getExpiry(bundles));
 
-        return new Bundles(sort(convert(bundles)), getExpiry(bundles));
+        LOGGER.debug("Received {} bundles with a TTL of {}s: {}", bundles.getBundlesList().size(), bundles.getTtl(), result);
+
+        return result;
 
     }
 
