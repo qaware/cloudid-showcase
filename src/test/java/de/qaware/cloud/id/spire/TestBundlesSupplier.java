@@ -14,7 +14,8 @@ public class TestBundlesSupplier implements Supplier<Bundles> {
                 TestResources.getTestBundles().getBundlesList().stream()
                         .map(new BundleConverter())
                         .collect(Collectors.toList()),
-                Instant.MAX);
+                // Do not use Instant.Max as this will lead to a long overflow if converting to milliseconds
+                Instant.ofEpochMilli(Long.MAX_VALUE));
     }
 
 }
