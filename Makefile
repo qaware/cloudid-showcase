@@ -2,6 +2,11 @@ PROJECT_NAME = demo-server
 
 DEPLOYMENTS =  $(wildcard k8s/*.yaml)
 
+# Deployments in the default namespace
+DEPLOYMENTS_DEFAULT = $(wildcard k8s/default/*.yaml)
+# Deployments in the back namespace
+DEPLOYMENTS_BACK = $(wildcard k8s/back/*.yaml)
+
 # Branch name from Git
 BRANCH_NAME = $(shell git rev-parse --abbrev-ref HEAD)
 # Tag name from Git, if the current commit is tagged, stripping a leading "v" from v1.0-style commits
@@ -27,12 +32,22 @@ ifneq ($(BRANCH_NAME), master)
 SONAR_BRANCH_NAME = -Dsonar.branch.name=$(BRANCH_NAME)
 endif
 
-
 .PHONY: deploy
 deploy: container-build
-	$(foreach f, $(DEPLOYMENTS), \
+	# Create back namespace
+	kubectl apply -f k8s/namespace-back.yaml
+
+	# Deploy in back namespace
+	$(foreach f, $(DEPLOYMENTS_BACK), \
+		sed 's/$(DOCKER_IMAGE_NAME):latest/$(DOCKER_IMAGE_NAME):$(DOCKER_TAG_NAME)/' $f \
+		| kubectl apply --namespace=back -f -;)
+
+	# Deploy in default namespace
+	# Update versioned references to the docker image to the current tag / branch
+	$(foreach f, $(DEPLOYMENTS_DEFAULT), \
 		sed 's/$(DOCKER_IMAGE_NAME):latest/$(DOCKER_IMAGE_NAME):$(DOCKER_TAG_NAME)/' $f \
 		| kubectl apply -f -;)
+
 
 .PHONY: container-build
 container-build: build
@@ -57,4 +72,6 @@ sonar:
 
 .PHONY: delete
 delete:
-	-$(foreach f, $(DEPLOYMENTS), kubectl delete -f $f;)
+	-$(foreach f, $(DEPLOYMENTS_DEFAULT), kubectl delete -f $f;)
+	-$(foreach f, $(DEPLOYMENTS_BACK), kubectl delete -f $f;)
+	-kubectl delete -f k8s/namespace-back.yaml
