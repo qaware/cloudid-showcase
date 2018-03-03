@@ -6,7 +6,7 @@ deploy: container-build
 	sed "s/{{TLS.KEY}}/$$(base64 -e ca/tls.key | tr -d '\r\n')/; \
 		 s/{{TLS.CRT}}/$$(base64 -e ca/tls.crt | tr -d '\r\n')/" \
 		 k8s/secrets.yaml | kubectl apply -f -
-	echo $(foreach f, $(DEPLOYMENTS), kubectl apply -f $f;)
+	$(foreach f, $(DEPLOYMENTS), kubectl apply -f $f;)
 
 .PHONY: container-build
 container-build:

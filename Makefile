@@ -18,6 +18,25 @@ build:
 delete:
 	-$(foreach c, $(DEPLOYMENTS), $(MAKE) -C $c delete;)
 
+.PHONY: spire-register
+spire-register:
+	# Wait for the SPIRE server to become "Running"
+	while ! kubectl get pod  | grep 'spire-server.*Running' > /dev/null; do sleep 1; done
+
+	# Front demo server
+	kubectl exec $$(kubectl get pod | grep -Eo 'spire-server\S*') -- \
+		/opt/spire/spire-server register \
+		-parentID spiffe://salm.qaware.de/k8s/node/minikube \
+		-spiffeID spiffe://salm.qaware.de/demo-server \
+		-selector k8s:ns:default
+
+	# Back demo server
+	kubectl exec $$(kubectl get pod | grep -Eo 'spire-server\S*') -- \
+		/opt/spire/spire-server register \
+		-parentID spiffe://salm.qaware.de/k8s/node/minikube \
+		-spiffeID spiffe://salm.qaware.de/demo-server \
+		-selector k8s:ns:back
+
 .PHONY: minikube-container-build
 minikube-container-build:
 	@eval $$(minikube docker-env); $(MAKE) container-build
@@ -25,4 +44,6 @@ minikube-container-build:
 .PHONY: minikube-deploy
 minikube-deploy:
 	@eval $$(minikube docker-env); $(MAKE) deploy
-	kubectl exec $$(kubectl get pod -o name | grep -o 'spire-server.*$$') -- /opt/spire/spire-server register -parentID spiffe://salm.qaware.de/k8s/node/minikube -spiffeID spiffe://salm.qaware.de/host/workload -selector k8s:ns:default
+
+.PHONY: minikube-deploy-and-register
+minikube-deploy-and-register: minikube-deploy spire-register
