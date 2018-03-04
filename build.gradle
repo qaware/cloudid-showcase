@@ -140,7 +140,13 @@ sourceSets {
 
 sonarqube {
     properties {
-        property "sonar.exclusions", "**/*Generated.java, build/generated/**"
-        property "sonar.projectName", "Cloud ID SPIRE Demo-Server"
+        property 'sonar.exclusions', '**/*Generated.java, build/generated/**'
+        property 'sonar.projectName', 'Cloud ID SPIRE Demo-Server'
+
+        property 'sonar.issue.ignore.multicriteria', 'e1'
+
+        // Rule attempts to enforce consistent logger field names, but is broken as it also triggers on variables.
+        property 'sonar.issue.ignore.multicriteria.e1.ruleKey', 'squid:S1312'
+        property 'sonar.issue.ignore.multicriteria.e1.resourceKey', '**'
     }
 }
