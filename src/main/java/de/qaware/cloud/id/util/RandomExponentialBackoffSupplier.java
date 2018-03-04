@@ -20,11 +20,13 @@ import static java.lang.String.format;
  * step * random[1, 2] * base^min(retries, retriesCap)
  * </pre>
  *
+ * If interrupted, the supplier sneakily throws an {@link InterruptedException}
+ *
  * @param <T> value type
  */
 @Slf4j
 @RequiredArgsConstructor
-public class ExponentialBackoffSupplier<T> implements Supplier<T> {
+public class RandomExponentialBackoffSupplier<T> implements Supplier<T> {
 
     private final Random random = new Random();
 
@@ -48,7 +50,6 @@ public class ExponentialBackoffSupplier<T> implements Supplier<T> {
                         Duration.ofMillis(backoffMs).getSeconds(), retries), e);
                 Thread.sleep(backoffMs);
             }
-
         }
     }
 

@@ -14,4 +14,12 @@ public class Bundles {
     private final List<SVIDBundle> bundleList;
     private final Instant expiry;
 
+    /**
+     * Tells whether this bundle is empty.
+     * @return whether this bundle is empty
+     */
+    public boolean isEmpty() {
+        return bundleList.isEmpty();
+    }
+
 }

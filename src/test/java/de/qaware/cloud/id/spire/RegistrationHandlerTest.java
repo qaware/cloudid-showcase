@@ -62,7 +62,7 @@ public class RegistrationHandlerTest {
                 .usePlaintext(true)
                 .build();
 
-        BundleSupplier bundleSupplier = BundleSupplierFactory.getBundleSupplier();
+        Supplier<SVIDBundle> bundleSupplier = StaticLauncher.getBundleSupplier();
 
         assertThat(bundleSupplier.get(), is(notNullValue()));
     }

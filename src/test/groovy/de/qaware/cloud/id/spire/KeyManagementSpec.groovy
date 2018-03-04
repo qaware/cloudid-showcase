@@ -8,6 +8,7 @@ import java.security.Principal
 import java.time.Duration
 
 import static TestUtils.waitUntilBundleIsAvailable
+import static de.qaware.cloud.id.spire.Config.BUNDLE_SUPPLIER_FACTORY_CLASS
 
 /**
  * Specification testing key management with SPIFFE.
@@ -18,7 +19,7 @@ class KeyManagementSpec extends Specification {
     static SPIREKeyManagerFactory keyManagerFactory
 
     def setupSpec() {
-        System.setProperty('spire.bundlesSupplierClass', TestBundlesSupplier.class.getName())
+        System.setProperty(BUNDLE_SUPPLIER_FACTORY_CLASS.getSysProp(), TestBundleSupplierFactory.class.getName())
 
         keyManagerFactory = new SPIREKeyManagerFactory()
     }
@@ -34,7 +35,7 @@ class KeyManagementSpec extends Specification {
 
     def 'use key manager'() {
         given:
-        def svId = 'spiffe://salm.qaware.de/host/workload'
+        def svId = 'spiffe://example.org/host/workload'
 
         when:
         def keyManager = (X509KeyManager) keyManagerFactory.engineGetKeyManagers()[0]

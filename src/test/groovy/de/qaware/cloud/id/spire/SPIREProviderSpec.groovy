@@ -19,7 +19,7 @@ import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options
 class SPIREProviderSpec extends Specification {
 
     void setupSpec() {
-        System.setProperty('spire.bundlesSupplierClass', TestBundlesSupplier.class.getName())
+        System.setProperty('spire.bundlesSupplierClass', TestBundleSupplierFactory.class.getName())
 
         new SPIREProvider().installAsDefault()
 

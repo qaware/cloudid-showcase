@@ -7,8 +7,6 @@ import javax.net.ssl.KeyManagerFactorySpi;
 import javax.net.ssl.ManagerFactoryParameters;
 import java.security.KeyStore;
 
-import static de.qaware.cloud.id.spire.BundleSupplierFactory.getBundleSupplier;
-
 /**
  * SPIRE key manager factory
  */
@@ -28,7 +26,7 @@ public class SPIREKeyManagerFactory extends KeyManagerFactorySpi {
     }
 
     private void init() {
-        keyManager = new SPIREKeyManager(getBundleSupplier());
+        keyManager = new SPIREKeyManager(StaticLauncher.getBundleSupplier());
     }
 
     @Override

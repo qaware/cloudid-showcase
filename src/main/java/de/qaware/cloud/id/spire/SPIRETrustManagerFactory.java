@@ -7,8 +7,6 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactorySpi;
 import java.security.KeyStore;
 
-import static de.qaware.cloud.id.spire.BundleSupplierFactory.getBundleSupplier;
-
 /**
  * SPIRE Trust manager factory.
  */
@@ -27,6 +25,6 @@ public class SPIRETrustManagerFactory extends TrustManagerFactorySpi {
 
     @Override
     protected TrustManager[] engineGetTrustManagers() {
-        return new TrustManager[]{new SPIRETrustManager(getBundleSupplier())};
+        return new TrustManager[]{new SPIRETrustManager(StaticLauncher.getBundleSupplier())};
     }
 }
