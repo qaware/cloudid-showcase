@@ -1,6 +1,6 @@
 package de.qaware.cloud.id.demoserver;
 
-import de.qaware.cloud.id.spire.SPIREProvider;
+import de.qaware.cloud.id.spire.jsa.SPIREProvider;
 import org.apache.catalina.filters.RequestDumperFilter;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;

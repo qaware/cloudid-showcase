@@ -17,7 +17,7 @@ import static java.time.Instant.now;
 @SuppressWarnings("squid:S2142" /* Rule is broken as it cannot handle interrupt handling in methods */)
 @Slf4j
 @RequiredArgsConstructor
-class BundleSupplier implements Supplier<SVIDBundle> {
+class BundleSupplier implements Supplier<Bundle> {
     private final Supplier<Bundles> bundlesSupplier;
 
     /**
@@ -26,7 +26,7 @@ class BundleSupplier implements Supplier<SVIDBundle> {
      * @return bundle
      */
     @Override
-    public SVIDBundle get() {
+    public Bundle get() {
         // This selects the first tuple with that is valid, preferring tuples with longer validity.
         // Bundles are sorted descending by notAfter.
         Instant now = now();

@@ -11,7 +11,7 @@ class BundleConverterSpec extends Specification {
         BundleConverter bundleConverter = new BundleConverter()
 
         when:
-        SVIDBundle bundle = bundleConverter.convert(bundles.getBundles(0))
+        Bundle bundle = bundleConverter.convert(bundles.getBundles(0))
 
         then:
         bundle.svId == 'spiffe://example.org/host/workload'

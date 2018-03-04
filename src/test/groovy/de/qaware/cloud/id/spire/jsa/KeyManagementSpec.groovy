@@ -1,5 +1,6 @@
-package de.qaware.cloud.id.spire
+package de.qaware.cloud.id.spire.jsa
 
+import de.qaware.cloud.id.spire.TestBundleSupplierFactory
 import spock.lang.Specification
 import spock.util.environment.RestoreSystemProperties
 

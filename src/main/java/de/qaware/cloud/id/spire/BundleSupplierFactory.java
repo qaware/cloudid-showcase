@@ -11,7 +11,7 @@ public interface BundleSupplierFactory {
      * Get a bundle supplier.
      * @return bundle supplier
      */
-    Supplier<SVIDBundle> get();
+    Supplier<Bundle> get();
 
     /**
      * Lifecycle of the bundle supplier begins.

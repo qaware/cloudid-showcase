@@ -13,11 +13,11 @@ import static de.qaware.cloud.id.util.Functions.compose;
  */
 class DefaultBundleSupplierFactory implements BundleSupplierFactory {
 
-    private static Supplier<SVIDBundle> bundleSupplier;
+    private static Supplier<Bundle> bundleSupplier;
     private static BundlesUpdater bundlesUpdater;
 
     @Override
-    public Supplier<SVIDBundle> get() {
+    public Supplier<Bundle> get() {
         return doGet();
     }
 
@@ -31,7 +31,7 @@ class DefaultBundleSupplierFactory implements BundleSupplierFactory {
         bundlesUpdater.stop();
     }
 
-    private static synchronized Supplier<SVIDBundle> doGet() {
+    private static synchronized Supplier<Bundle> doGet() {
         if (bundleSupplier == null) {
             bundleSupplier = new BundleSupplier(compose(new BundlesConverter(), withUpdate(withBackoff(fromUds()))));
         }

@@ -1,6 +1,10 @@
-package de.qaware.cloud.id.spire
+package de.qaware.cloud.id.spire.jsa
 
 import com.github.tomakehurst.wiremock.WireMockServer
+import de.qaware.cloud.id.spire.TestBundleSupplierFactory
+import de.qaware.cloud.id.spire.TestUtils
+import de.qaware.cloud.id.spire.jsa.SPIREKeyManager
+import de.qaware.cloud.id.spire.jsa.SPIREProvider
 import groovy.util.logging.Slf4j
 import spock.lang.Specification
 import spock.util.environment.RestoreSystemProperties

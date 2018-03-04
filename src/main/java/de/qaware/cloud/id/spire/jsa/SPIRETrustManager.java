@@ -1,5 +1,6 @@
-package de.qaware.cloud.id.spire;
+package de.qaware.cloud.id.spire.jsa;
 
+import de.qaware.cloud.id.spire.Bundle;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -20,7 +21,7 @@ import static java.util.Arrays.asList;
 @RequiredArgsConstructor
 public class SPIRETrustManager extends X509ExtendedTrustManager {
 
-    private final Supplier<SVIDBundle> bundleSupplier;
+    private final Supplier<Bundle> bundleSupplier;
 
     @Override
     public X509Certificate[] getAcceptedIssuers() {

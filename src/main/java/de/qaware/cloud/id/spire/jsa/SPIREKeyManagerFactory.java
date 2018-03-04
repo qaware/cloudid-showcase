@@ -1,5 +1,6 @@
-package de.qaware.cloud.id.spire;
+package de.qaware.cloud.id.spire.jsa;
 
+import de.qaware.cloud.id.spire.StaticLauncher;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.net.ssl.KeyManager;

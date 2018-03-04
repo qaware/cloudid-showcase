@@ -27,7 +27,7 @@ import static java.util.stream.Collectors.toList;
  * Converts a workload entry to a SVID bundle.
  */
 @Slf4j
-class BundleConverter implements Function<WorkloadEntry, SVIDBundle> {
+class BundleConverter implements Function<WorkloadEntry, Bundle> {
 
     private final CertificateFactory certFactory;
 
@@ -43,7 +43,7 @@ class BundleConverter implements Function<WorkloadEntry, SVIDBundle> {
     }
 
     @Override
-    public SVIDBundle apply(WorkloadEntry workloadEntry) {
+    public Bundle apply(WorkloadEntry workloadEntry) {
         try {
             return convert(workloadEntry);
         } catch (GeneralSecurityException | IOException e) {
@@ -60,8 +60,8 @@ class BundleConverter implements Function<WorkloadEntry, SVIDBundle> {
      * @throws IOException          something claiming to be a certificate is not
      * @throws CertificateException one of the certificates is invalid
      */
-    public SVIDBundle convert(WorkloadEntry workloadEntry) throws IOException, CertificateException {
-        return new SVIDBundle(
+    public Bundle convert(WorkloadEntry workloadEntry) throws IOException, CertificateException {
+        return new Bundle(
                 workloadEntry.getSpiffeId(),
                 getSvidCertificate(workloadEntry),
                 getKeyPair(workloadEntry),

@@ -20,7 +20,7 @@ public class StaticLauncher {
      *
      * @return bundle supplier
      */
-    public static Supplier<SVIDBundle> getBundleSupplier() {
+    public static Supplier<Bundle> getBundleSupplier() {
         // Log the configuration on DEBUG
         Props.debugLog(Config.class);
 

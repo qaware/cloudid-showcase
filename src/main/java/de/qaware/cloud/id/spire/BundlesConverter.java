@@ -13,12 +13,12 @@ import static java.util.stream.Collectors.toList;
  */
 class BundlesConverter implements Function<WorkloadOuterClass.Bundles, Bundles> {
 
-    private static final Function<WorkloadOuterClass.WorkloadEntry, SVIDBundle> BUNDLE_CONVERTER = new BundleConverter();
+    private static final Function<WorkloadOuterClass.WorkloadEntry, Bundle> BUNDLE_CONVERTER = new BundleConverter();
 
     @Override
     public Bundles apply(WorkloadOuterClass.Bundles bundles) {
         // Bundles are sorted descending by their expiry (newest first).
-        List<SVIDBundle> bundlesList = bundles.getBundlesList().stream()
+        List<Bundle> bundlesList = bundles.getBundlesList().stream()
                 .map(BUNDLE_CONVERTER)
                 .sorted((a, b) -> b.getNotAfter().compareTo(a.getNotAfter()))
                 .collect(toList());

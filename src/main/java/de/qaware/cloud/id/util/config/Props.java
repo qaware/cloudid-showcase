@@ -17,6 +17,7 @@ import static java.util.Arrays.stream;
 @UtilityClass
 public class Props {
 
+
     public static <T> Prop<Class<T>> classOf(String name, Class<T> defaultValue) {
         return new Prop<>(name, Reflection::loadClass, defaultValue);
     }

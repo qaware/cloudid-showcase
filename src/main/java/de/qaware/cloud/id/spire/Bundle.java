@@ -12,7 +12,7 @@ import java.util.List;
  * A data transfer object that contains the parsed informations about a spiffe workload id.
  */
 @Data
-public class SVIDBundle {
+public class Bundle {
 
     private final String svId;
     private final X509Certificate certificate;

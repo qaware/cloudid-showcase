@@ -1,5 +1,6 @@
-package de.qaware.cloud.id.spire;
+package de.qaware.cloud.id.spire.jsa;
 
+import de.qaware.cloud.id.spire.Bundle;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -23,14 +24,14 @@ import static java.util.Collections.singleton;
 @RequiredArgsConstructor
 public class SPIREKeyManager extends X509ExtendedKeyManager {
 
-    private final Supplier<SVIDBundle> bundleSupplier;
+    private final Supplier<Bundle> bundleSupplier;
 
     @Override
     public PrivateKey getPrivateKey(String alias) {
-        SVIDBundle svidBundle = bundleSupplier.get();
+        Bundle bundle = bundleSupplier.get();
 
-        PrivateKey privateKey = Objects.equals(alias, svidBundle.getSvId())
-                ? svidBundle.getKeyPair().getPrivate()
+        PrivateKey privateKey = Objects.equals(alias, bundle.getSvId())
+                ? bundle.getKeyPair().getPrivate()
                 : null;
 
         LOGGER.debug("getPrivateKey({}) = {}", alias, privateKey);
@@ -39,10 +40,10 @@ public class SPIREKeyManager extends X509ExtendedKeyManager {
 
     @Override
     public X509Certificate[] getCertificateChain(String alias) {
-        SVIDBundle svidBundle = bundleSupplier.get();
+        Bundle bundle = bundleSupplier.get();
 
-        X509Certificate[] certChain = Objects.equals(alias, svidBundle.getSvId())
-                ? Stream.of(singleton(svidBundle.getCertificate()), svidBundle.getCaCertChain())
+        X509Certificate[] certChain = Objects.equals(alias, bundle.getSvId())
+                ? Stream.of(singleton(bundle.getCertificate()), bundle.getCaCertChain())
                 .flatMap(Collection::stream)
                 .toArray(X509Certificate[]::new)
                 : null;
@@ -85,10 +86,10 @@ public class SPIREKeyManager extends X509ExtendedKeyManager {
     }
 
     private String chooseServerAlias(String keyType, Principal[] issuers) {
-        SVIDBundle svidBundle = bundleSupplier.get();
+        Bundle bundle = bundleSupplier.get();
 
-        String serverAlias = Objects.equals(keyType, svidBundle.getKeyType())
-                ? svidBundle.getSvId()
+        String serverAlias = Objects.equals(keyType, bundle.getKeyType())
+                ? bundle.getSvId()
                 : null;
 
         LOGGER.debug("chooseServerAlias({}, {}) = {}", keyType, issuers, serverAlias);

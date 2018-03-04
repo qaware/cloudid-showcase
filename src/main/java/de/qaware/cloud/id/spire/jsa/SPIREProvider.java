@@ -1,4 +1,4 @@
-package de.qaware.cloud.id.spire;
+package de.qaware.cloud.id.spire.jsa;
 
 import lombok.EqualsAndHashCode;
 
