@@ -12,6 +12,7 @@ import javax.net.ssl.SSLException;
 import java.time.Duration;
 import java.util.function.Supplier;
 
+import static de.qaware.cloud.id.spire.TestUtils.waitUntilBundleIsAvailable;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -41,7 +42,7 @@ public class RegistrationHandlerTest {
         };
         handler = new RegistrationHandler(channelSupplier);
 
-        TestUtils.waitUntilBundleIsAvailable(Duration.ofSeconds(5));
+        waitUntilBundleIsAvailable(Duration.ofSeconds(5));
     }
 
     @Test

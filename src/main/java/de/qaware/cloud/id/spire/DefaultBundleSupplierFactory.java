@@ -1,7 +1,6 @@
 package de.qaware.cloud.id.spire;
 
 import de.qaware.cloud.id.util.RandomExponentialBackoffSupplier;
-import spire.api.workload.WorkloadOuterClass;
 
 import java.util.function.Supplier;
 
@@ -23,36 +22,40 @@ class DefaultBundleSupplierFactory implements BundleSupplierFactory {
 
     @Override
     public void start() {
-        bundlesUpdater.start();
+        doStart();
     }
 
     @Override
     public void stop() {
+        doStop();
+    }
+
+    private static synchronized void doStop() {
+        init();
         bundlesUpdater.stop();
     }
 
-    private static synchronized Supplier<Bundle> doGet() {
-        if (bundleSupplier == null) {
-            bundleSupplier = new BundleSupplier(compose(new BundlesConverter(), withUpdate(withBackoff(fromUds()))));
-        }
+    private static synchronized void doStart() {
+        init();
+        bundlesUpdater.start();
+    }
 
+    private static synchronized Supplier<Bundle> doGet() {
+        init();
         return bundleSupplier;
     }
 
-    private static UdsBundlesSupplier fromUds() {
-        return new UdsBundlesSupplier(AGENT_SOCKET.get());
-    }
+    private static void init() {
+        if (bundleSupplier == null) {
+            bundlesUpdater = new BundlesUpdater(
+                    new RandomExponentialBackoffSupplier<>(
+                            new UdsBundlesSupplier(AGENT_SOCKET.get()),
+                            EXP_BACKOFF_BASE.get(),
+                            EXP_BACKOFF_STEP.get(),
+                            EXP_BACKOFF_RETRIES_CAP.get()));
 
-    private static Supplier<WorkloadOuterClass.Bundles> withUpdate(Supplier<WorkloadOuterClass.Bundles> supplier) {
-        bundlesUpdater = new BundlesUpdater(supplier);
-        return bundlesUpdater;
-    }
-
-    private static <T> Supplier<T> withBackoff(Supplier<T> supplier) {
-        return new RandomExponentialBackoffSupplier<>(supplier,
-                EXP_BACKOFF_BASE.get(),
-                EXP_BACKOFF_STEP.get(),
-                EXP_BACKOFF_RETRIES_CAP.get());
+            bundleSupplier = new BundleSupplier(compose(new BundlesConverter(), bundlesUpdater));
+        }
     }
 
 }

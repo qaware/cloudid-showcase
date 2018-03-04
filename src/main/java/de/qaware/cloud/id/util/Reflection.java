@@ -12,7 +12,7 @@ import java.lang.reflect.Field;
 public class Reflection {
 
     /**
-     * Load a class without type checks using the default class loader.
+     * Load a class without type checks using the current thread's context class loader.
      *
      * @param name class name
      * @param <T>  class type
@@ -21,7 +21,7 @@ public class Reflection {
     @SuppressWarnings("unchecked")
     public static <T> Class<T> loadClass(String name) {
         try {
-            return (Class<T>) Class.forName(name);
+            return (Class<T>) getContextClassLoader().loadClass(name);
         } catch (ClassNotFoundException e) {
             throw new IllegalArgumentException(e);
         }
@@ -42,11 +42,28 @@ public class Reflection {
         }
     }
 
-    public static Prop getValue(Field f, Object o) {
+    /**
+     * Get a field's value.
+     *
+     * @param field  field
+     * @param holder field holder (instance or class)
+     * @return value
+     */
+    public static Prop getValue(Field field, Object holder) {
         try {
-            return  (Prop) f.get(o);
+            return (Prop) field.get(holder);
         } catch (IllegalAccessException e) {
             throw new IllegalStateException(e);
         }
     }
+
+    /**
+     * Get the current thread's context class loader.
+     *
+     * @return current thread's context class loader
+     */
+    public static ClassLoader getContextClassLoader() {
+        return Thread.currentThread().getContextClassLoader();
+    }
+
 }

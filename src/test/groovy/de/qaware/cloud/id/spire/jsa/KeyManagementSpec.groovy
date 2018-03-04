@@ -8,8 +8,8 @@ import javax.net.ssl.X509KeyManager
 import java.security.Principal
 import java.time.Duration
 
-import static TestUtils.waitUntilBundleIsAvailable
 import static de.qaware.cloud.id.spire.Config.BUNDLE_SUPPLIER_FACTORY_CLASS
+import static de.qaware.cloud.id.spire.TestUtils.waitUntilBundleIsAvailable
 
 /**
  * Specification testing key management with SPIFFE.

@@ -15,18 +15,23 @@ import java.util.function.Supplier;
 @UtilityClass
 public class StaticLauncher {
 
+    private static BundleSupplierFactory bundleSupplierFactory;
+
     /**
      * Get the bundle supplier, starting the SPIRE Agent connection if necessary.
      *
      * @return bundle supplier
      */
-    public static Supplier<Bundle> getBundleSupplier() {
-        // Log the configuration on DEBUG
-        Props.debugLog(Config.class);
+    public static synchronized Supplier<Bundle> getBundleSupplier() {
+        if (bundleSupplierFactory == null) {
+            // Log the configuration on DEBUG
+            Props.debugLog(Config.class);
 
-        BundleSupplierFactory factory = Reflection.instantiate(Config.BUNDLE_SUPPLIER_FACTORY_CLASS.get());
-        factory.start();
-        return factory.get();
+            bundleSupplierFactory = Reflection.instantiate(Config.BUNDLE_SUPPLIER_FACTORY_CLASS.get());
+            bundleSupplierFactory.start();
+        }
+
+        return bundleSupplierFactory.get();
     }
 
 }

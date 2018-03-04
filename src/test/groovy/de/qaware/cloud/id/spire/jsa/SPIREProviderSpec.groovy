@@ -2,9 +2,6 @@ package de.qaware.cloud.id.spire.jsa
 
 import com.github.tomakehurst.wiremock.WireMockServer
 import de.qaware.cloud.id.spire.TestBundleSupplierFactory
-import de.qaware.cloud.id.spire.TestUtils
-import de.qaware.cloud.id.spire.jsa.SPIREKeyManager
-import de.qaware.cloud.id.spire.jsa.SPIREProvider
 import groovy.util.logging.Slf4j
 import spock.lang.Specification
 import spock.util.environment.RestoreSystemProperties
@@ -13,17 +10,18 @@ import javax.net.ssl.KeyManagerFactory
 import javax.net.ssl.SSLSocketFactory
 import java.time.Duration
 
-import static TestUtils.waitUntilBundleIsAvailable
 import static com.github.tomakehurst.wiremock.client.WireMock.get
 import static com.github.tomakehurst.wiremock.client.WireMock.ok
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options
+import static de.qaware.cloud.id.spire.Config.BUNDLE_SUPPLIER_FACTORY_CLASS
+import static de.qaware.cloud.id.spire.TestUtils.waitUntilBundleIsAvailable
 
 @Slf4j
 @RestoreSystemProperties
 class SPIREProviderSpec extends Specification {
 
     void setupSpec() {
-        System.setProperty('spire.bundlesSupplierClass', TestBundleSupplierFactory.class.getName())
+        System.setProperty(BUNDLE_SUPPLIER_FACTORY_CLASS.getSysProp(), TestBundleSupplierFactory.class.getName())
 
         new SPIREProvider().installAsDefault()
 
