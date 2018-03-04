@@ -1,3 +1,5 @@
+SHELL = /bin/bash
+
 PROJECT_NAME = demo-server
 
 DEPLOYMENTS =  $(wildcard k8s/*.yaml)
@@ -7,12 +9,19 @@ DEPLOYMENTS_DEFAULT = $(wildcard k8s/default/*.yaml)
 # Deployments in the back namespace
 DEPLOYMENTS_BACK = $(wildcard k8s/back/*.yaml)
 
+ifdef CI
+# Branch and tag names from GitLab
+BRANCH_NAME=$(CI_COMMIT_REF_NAME)
+TAG_NAME=$(CI_COMMIT_TAG)
+else
 # Branch name from Git
 BRANCH_NAME = $(shell git rev-parse --abbrev-ref HEAD)
 # Tag name from Git, if the current commit is tagged, stripping a leading "v" from v1.0-style commits
 TAG_NAME = $(shell git describe --exact-match HEAD 2> /dev/null\
 	| grep '^v[0-9][0-9a-zA-Z_\.]*$$' | sed 's/^v//' \
 	|| echo '' )
+endif
+
 
 # Docker tag name
 # if the current branch is "master" and the current commit is a tag -> tag name
@@ -28,9 +37,11 @@ DOCKER_REGISTRY_REPO = qaware-internal-docker
 DOCKER_IMAGE_NAME = $(PROJECT_NAME)
 DOCKER_QUALIFIED_NAME = $(DOCKER_REGISTRY_URL)/$(DOCKER_REGISTRY_REPO)/$(DOCKER_IMAGE_NAME):$(DOCKER_TAG_NAME)
 
+# Sonar branch name, empty on master
 ifneq ($(BRANCH_NAME), master)
 SONAR_BRANCH_NAME = -Dsonar.branch.name=$(BRANCH_NAME)
 endif
+
 
 .PHONY: deploy
 deploy: container-build
