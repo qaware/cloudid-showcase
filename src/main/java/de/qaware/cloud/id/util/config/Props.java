@@ -17,7 +17,14 @@ import static java.util.Arrays.stream;
 @UtilityClass
 public class Props {
 
-
+    /**
+     * Create a class property
+     *
+     * @param name         system property name
+     * @param defaultValue default value
+     * @param <T>          class type
+     * @return property
+     */
     public static <T> Prop<Class<T>> classOf(String name, Class<T> defaultValue) {
         return new Prop<>(name, Reflection::loadClass, defaultValue);
     }
