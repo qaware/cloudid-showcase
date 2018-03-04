@@ -19,7 +19,7 @@ TAG_NAME = $(shell git describe --exact-match HEAD 2> /dev/null\
 # if the current branch is "master" -> "latest"
 # any other branch -> branch name
 DOCKER_TAG_NAME = $(shell \
-	[[ "$(BRANCH_NAME)" == "master" ]] \
+	[ "$(BRANCH_NAME)" = "master" ] \
 	&& ( [ -n "$(TAG_NAME)" ] && echo "$(TAG_NAME)" || echo "latest" ) \
 	|| echo "$(BRANCH_NAME)")
 
