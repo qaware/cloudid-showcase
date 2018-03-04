@@ -79,7 +79,7 @@ assemble:
 
 .PHONY: sonar
 sonar:
-	./gradlew $(GRADLE_ARGS) sonarqube "$(SONAR_BRANCH_NAME)" "-Dsonar.host.url=$(SONAR_URL)" "-Dsonar.login=$(SONAR_TOKEN)"
+	./gradlew $(GRADLE_ARGS) sonarqube $(SONAR_BRANCH_NAME) "-Dsonar.host.url=$(SONAR_URL)" "-Dsonar.login=$(SONAR_TOKEN)"
 
 .PHONY: delete
 delete:
