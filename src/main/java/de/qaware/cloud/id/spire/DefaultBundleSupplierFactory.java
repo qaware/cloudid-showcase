@@ -45,7 +45,7 @@ class DefaultBundleSupplierFactory implements BundleSupplierFactory {
         return bundleSupplier;
     }
 
-    private static void init() {
+    private static synchronized void init() {
         if (bundleSupplier == null) {
             bundlesUpdater = new BundlesUpdater(
                     new RandomExponentialBackoffSupplier<>(
