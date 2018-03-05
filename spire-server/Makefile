@@ -3,8 +3,8 @@ DEPLOYMENTS =  k8s/configmap.yaml k8s/deployment.yaml k8s/service.yaml
 
 .PHONY: deploy
 deploy: container-build
-	sed "s/{{TLS.KEY}}/$$(base64 -e ca/tls.key | tr -d '\r\n')/; \
-		 s/{{TLS.CRT}}/$$(base64 -e ca/tls.crt | tr -d '\r\n')/" \
+	sed "s/{{TLS.KEY}}/$$(base64 ca/tls.key | tr -d '\r\n')/; \
+		 s/{{TLS.CRT}}/$$(base64 ca/tls.crt | tr -d '\r\n')/" \
 		 k8s/secrets.yaml | kubectl apply -f -
 	$(foreach f, $(DEPLOYMENTS), kubectl apply -f $f;)
 
