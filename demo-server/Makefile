@@ -9,6 +9,12 @@ DEPLOYMENTS_DEFAULT = $(wildcard k8s/default/*.yaml)
 # Deployments in the back namespace
 DEPLOYMENTS_BACK = $(wildcard k8s/back/*.yaml)
 
+ifdef CYGWIN_VERSION
+GRADLEW=./gradlew.bat
+else
+GRADLEW=./gradlew
+endif
+
 ifdef CI
 # Branch and tag names from GitLab
 BRANCH_NAME=$(CI_COMMIT_REF_NAME)
@@ -75,11 +81,11 @@ build: assemble
 
 .PHONY: assemble
 assemble:
-	./gradlew $(GRADLE_ARGS) assemble
+	$(GRADLEW) $(GRADLE_ARGS) assemble
 
 .PHONY: sonar
 sonar:
-	./gradlew $(GRADLE_ARGS) sonarqube $(SONAR_BRANCH_NAME) "-Dsonar.host.url=$(SONAR_URL)" "-Dsonar.login=$(SONAR_TOKEN)"
+	$(GRADLEW) $(GRADLE_ARGS) sonarqube $(SONAR_BRANCH_NAME) "-Dsonar.host.url=$(SONAR_URL)" "-Dsonar.login=$(SONAR_TOKEN)"
 
 .PHONY: delete
 delete:
