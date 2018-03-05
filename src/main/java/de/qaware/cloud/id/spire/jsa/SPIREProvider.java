@@ -1,6 +1,7 @@
 package de.qaware.cloud.id.spire.jsa;
 
 import lombok.EqualsAndHashCode;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.net.ssl.KeyManagerFactory;
 import java.security.Provider;
@@ -9,6 +10,7 @@ import java.security.Security;
 /**
  * Java Security API provider backed by SPIRE.
  */
+@Slf4j
 @EqualsAndHashCode(doNotUseGetters = true, callSuper = true, exclude = "defaultAlgorithm")
 public class SPIREProvider extends Provider {
 
@@ -45,6 +47,7 @@ public class SPIREProvider extends Provider {
      */
     public void install() {
         if (Security.getProvider(NAME) == null) {
+            LOGGER.info("Installing SPIRE provider at the first position");
             // TODO: Review whether inserting at the first position is a good idea
             Security.insertProviderAt(new SPIREProvider(), 1);
         }

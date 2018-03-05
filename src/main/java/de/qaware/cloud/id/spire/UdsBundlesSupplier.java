@@ -45,6 +45,7 @@ class UdsBundlesSupplier implements Supplier<WorkloadOuterClass.Bundles> {
      */
     @Override
     public WorkloadOuterClass.Bundles get() {
+        LOGGER.debug("Fetching bundles");
         WorkloadOuterClass.Bundles bundles = fetchBundles();
 
         verify(!bundles.getBundlesList().isEmpty(),

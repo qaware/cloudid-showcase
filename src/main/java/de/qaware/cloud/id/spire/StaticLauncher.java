@@ -3,6 +3,7 @@ package de.qaware.cloud.id.spire;
 import de.qaware.cloud.id.util.Reflection;
 import de.qaware.cloud.id.util.config.Props;
 import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.function.Supplier;
 
@@ -12,6 +13,7 @@ import java.util.function.Supplier;
  * Instantiates the bundle supplier factory defined by {@link Config#BUNDLE_SUPPLIER_FACTORY_CLASS}
  * and starts the life cycle.
  */
+@Slf4j
 @UtilityClass
 public class StaticLauncher {
 
@@ -27,7 +29,14 @@ public class StaticLauncher {
             // Log the configuration on DEBUG
             Props.debugLog(Config.class);
 
-            bundleSupplierFactory = Reflection.instantiate(Config.BUNDLE_SUPPLIER_FACTORY_CLASS.get());
+            try {
+                bundleSupplierFactory = Reflection.instantiate(Config.BUNDLE_SUPPLIER_FACTORY_CLASS.get());
+            } catch (IllegalArgumentException e) {
+                // Log the exception here as it might get dropped later on by JSA
+                LOGGER.error("Error instantiating the bundle supplier factory", e);
+                throw e;
+            }
+
             bundleSupplierFactory.start();
         }
 

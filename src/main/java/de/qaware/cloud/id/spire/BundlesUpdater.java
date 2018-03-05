@@ -42,6 +42,8 @@ class BundlesUpdater implements Supplier<WorkloadOuterClass.Bundles> {
      * Start the updater.
      */
     public synchronized void start() {
+        LOGGER.info("Starting bundles updater");
+
         if (!running.compareAndSet(false, true)) {
             throw new IllegalStateException("Already running");
         }
@@ -54,6 +56,8 @@ class BundlesUpdater implements Supplier<WorkloadOuterClass.Bundles> {
      * Stop the updater
      */
     public synchronized void stop() {
+        LOGGER.info("Stopping bundles updater");
+
         if (!running.compareAndSet(true, false)) {
             throw new IllegalStateException("Not running");
         }
