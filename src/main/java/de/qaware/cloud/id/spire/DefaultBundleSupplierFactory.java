@@ -10,7 +10,8 @@ import static de.qaware.cloud.id.util.Functions.compose;
 /**
  * Factory for bundle suppliers.
  */
-class DefaultBundleSupplierFactory implements BundleSupplierFactory {
+// Needs to be public as it is to be instantiated via reflection
+public class DefaultBundleSupplierFactory implements BundleSupplierFactory {
 
     private static Supplier<Bundle> bundleSupplier;
     private static BundlesUpdater bundlesUpdater;
