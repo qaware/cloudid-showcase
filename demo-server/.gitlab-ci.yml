@@ -1,0 +1,46 @@
+image: artifactory.qaware.de/qaware-docker/cloud-id-build:latest
+
+
+variables:
+  GIT_STRATEGY: fetch
+  DOCKER_IMAGE_NAME: $CI_PROJECT_NAME
+  CACHE_KEY: $CI_COMMIT_REF_SLUG
+  GRADLE_ARGS: -Dorg.gradle.daemon=false --stacktrace --build-cache
+
+
+before_script:
+    - export GRADLE_USER_HOME=`pwd`/.gradle
+
+
+cache:
+  key: $CACHE_KEY
+  paths:
+    - .gradle/
+    - build/
+
+
+stages:
+  - assemble
+  - analyze-and-container-build
+  - container-push
+
+
+assemble:
+  stage: assemble
+  script: make assemble
+
+
+analyze:
+  stage: analyze-and-container-build
+  script: make sonar
+
+
+container-build:
+  stage: analyze-and-container-build
+  script: make container-build
+
+
+container-push:
+  stage: container-push
+  script: make container-push
+
