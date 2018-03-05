@@ -43,6 +43,8 @@ minikube-container-build:
 
 .PHONY: minikube-deploy
 minikube-deploy:
+	# Enable ingress addon as it is not enabled by default
+	minikube addons enable ingress
 	@eval $$(minikube docker-env); $(MAKE) deploy
 
 .PHONY: minikube-deploy-and-register
