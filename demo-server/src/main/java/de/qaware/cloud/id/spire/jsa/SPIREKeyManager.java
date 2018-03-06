@@ -30,7 +30,7 @@ public class SPIREKeyManager extends X509ExtendedKeyManager {
     public PrivateKey getPrivateKey(String alias) {
         Bundle bundle = bundleSupplier.get();
 
-        PrivateKey privateKey = Objects.equals(alias, bundle.getSvId())
+        PrivateKey privateKey = Objects.equals(alias, bundle.getSpiffeId())
                 ? bundle.getKeyPair().getPrivate()
                 : null;
 
@@ -42,7 +42,7 @@ public class SPIREKeyManager extends X509ExtendedKeyManager {
     public X509Certificate[] getCertificateChain(String alias) {
         Bundle bundle = bundleSupplier.get();
 
-        X509Certificate[] certChain = Objects.equals(alias, bundle.getSvId())
+        X509Certificate[] certChain = Objects.equals(alias, bundle.getSpiffeId())
                 ? Stream.of(singleton(bundle.getCertificate()), bundle.getCaCertChain())
                 .flatMap(Collection::stream)
                 .toArray(X509Certificate[]::new)
@@ -55,19 +55,19 @@ public class SPIREKeyManager extends X509ExtendedKeyManager {
     @Override
     public String[] getClientAliases(String keyType, Principal[] issuers) {
         LOGGER.info("Get client aliases for {}, {}", keyType, issuers);
-        return new String[]{this.bundleSupplier.get().getSvId()};
+        return new String[]{this.bundleSupplier.get().getSpiffeId()};
     }
 
     @Override
     public String chooseClientAlias(String[] keyTypes, Principal[] issuers, Socket socket) {
         LOGGER.info("Choose client alias for {}, {}, {}", keyTypes, issuers, socket);
-        return this.bundleSupplier.get().getSvId();
+        return this.bundleSupplier.get().getSpiffeId();
     }
 
     @Override
     public String chooseEngineClientAlias(String[] keyTypes, Principal[] issuers, SSLEngine sslEngine) {
         LOGGER.info("Choose client alias for {}, {}, {}", keyTypes, issuers, sslEngine);
-        return this.bundleSupplier.get().getSvId();
+        return this.bundleSupplier.get().getSpiffeId();
     }
 
     @Override
@@ -89,7 +89,7 @@ public class SPIREKeyManager extends X509ExtendedKeyManager {
         Bundle bundle = bundleSupplier.get();
 
         String serverAlias = Objects.equals(keyType, bundle.getKeyType())
-                ? bundle.getSvId()
+                ? bundle.getSpiffeId()
                 : null;
 
         LOGGER.debug("chooseServerAlias({}, {}) = {}", keyType, issuers, serverAlias);

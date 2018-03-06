@@ -14,7 +14,7 @@ class BundleConverterSpec extends Specification {
         Bundle bundle = bundleConverter.convert(bundles.getBundles(0))
 
         then:
-        bundle.svId == 'spiffe://example.org/host/workload'
+        bundle.spiffeId == 'spiffe://example.org/host/workload'
         bundle.certificate.subjectAlternativeNames.size() == 1
         bundle.keyPair.private != null
         // Sun JCE = EC

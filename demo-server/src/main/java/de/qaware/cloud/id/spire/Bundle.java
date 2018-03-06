@@ -14,7 +14,7 @@ import java.util.List;
 @Data
 public class Bundle {
 
-    private final String svId;
+    private final String spiffeId;
     private final X509Certificate certificate;
     private final KeyPair keyPair;
     private final List<X509Certificate> caCertChain;
