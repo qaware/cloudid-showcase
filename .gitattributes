@@ -1,0 +1,15 @@
+# Default behaviour
+* text=auto
+
+# UNIX file types
+*.sh text eol=lf
+gradlew text eol=lf
+Makefile text eol=lf
+
+# Windows file types
+*.bat text eol=crlf
+
+# Binary files
+*.jar binary
+*.jks binary
+*.grpc binary
