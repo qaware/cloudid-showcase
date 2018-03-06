@@ -38,3 +38,29 @@ When changing the trust domain it is necessary to adjust them at the following p
  1. Spire-Server ConfigMap
  2. Spire-Agent ConfigMap
  3. Spire-Agent DaemonSet Startup Command
+ 
+ 
+## Build & Development
+
+### Prerequisites
+- LINUX or macOS is recommended
+    - Windows does not support Domain Sockets. Build & development is possible on Windows with limited local testability.
+    - [Homebrew](https://brew.sh/) is recommended on macOS for installing the prerequisites
+- [JDK 8 or 9](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
+- BASH shell ([Babun](https://babun.github.io/) is recommended on Windows. pre-installed on macOS) for the Makefiles
+- GNU make (Pre-installed with Babun on Windows, pre-installed on macOS)
+- [Docker CLI](https://docs.docker.com/docker-cloud/installing-cli/)
+- [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
+- [minikube](https://kubernetes.io/docs/tasks/tools/install-minikube/)
+- [VirtualBox](https://www.virtualbox.org/) (or another Hypervisor supported by minikube)
+- ZSH with [oh-my-zsh](https://github.com/robbyrussell/oh-my-zsh) and the kubectl and Docker plugins is recommended as development shell
+- [IntelliJ IDEA](https://www.jetbrains.com/idea/) is recommended as IDE    
+    - Recommended plugins:
+        - Kubernetes and Openshift Resource Support Plugin
+        - Makefile Support
+        - .ignore
+        - Lombok Plugin
+        - Spock Framework Enhancements
+        - Protobuf Support
+    - Don't forget to activate annotation processing to make Lombok work in IntelliJ IDEA
+
