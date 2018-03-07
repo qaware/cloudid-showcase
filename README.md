@@ -62,5 +62,6 @@ When changing the trust domain it is necessary to adjust them at the following p
         - Lombok Plugin
         - Spock Framework Enhancements
         - Protobuf Support
+        - Bash Support
     - Don't forget to activate annotation processing to make Lombok work in IntelliJ IDEA
 
