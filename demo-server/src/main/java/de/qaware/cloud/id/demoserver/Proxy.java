@@ -19,7 +19,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Collections;
+
+import static java.util.Collections.list;
+import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 
 /**
  * Simple proxy controller. Performs some requests against a configurable backend.
@@ -63,11 +65,11 @@ public class Proxy {
     private HttpUriRequest buildBackendRequest(String path, HttpServletRequest request) throws IOException {
         RequestBuilder requestBuilder = RequestBuilder.create(request.getMethod());
 
-        for (String name : Collections.list(request.getHeaderNames())) {
-            if (name.equalsIgnoreCase("host")) {
+        for (String name : list(request.getHeaderNames())) {
+            if (equalsIgnoreCase(name, "host")) {
                 continue;
             }
-            for (String value : Collections.list(request.getHeaders(name))) {
+            for (String value : list(request.getHeaders(name))) {
                 requestBuilder.addHeader(name, value);
             }
         }
