@@ -10,8 +10,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
-import static de.qaware.cloud.id.spire.Config.FORCE_UPDATE_AFTER;
-import static de.qaware.cloud.id.spire.Config.UPDATE_AHEAD;
+import static de.qaware.cloud.id.spire.Config.*;
+import static de.qaware.cloud.id.util.Time.max;
 import static de.qaware.cloud.id.util.Time.min;
 import static java.util.Optional.empty;
 
@@ -79,7 +79,7 @@ class BundlesUpdater implements Supplier<WorkloadOuterClass.Bundles> {
                 bundlesRef.set(Optional.of(bundles));
 
                 Duration backoff = min(
-                        Duration.ofSeconds(bundles.getTtl()).minus(UPDATE_AHEAD.get()),
+                        max(Duration.ofSeconds(bundles.getTtl()).minus(UPDATE_AHEAD.get()), MIN_UPDATE_INTERVAL.get()),
                         FORCE_UPDATE_AFTER.get());
 
                 LOGGER.debug("Backing off for {}", backoff);
