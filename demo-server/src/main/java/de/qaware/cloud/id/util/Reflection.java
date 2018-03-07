@@ -18,7 +18,7 @@ public class Reflection {
      * @param <T>  class type
      * @return class
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "squid:S2658"})
     public static <T> Class<T> loadClass(String name) {
         try {
             return (Class<T>) getContextClassLoader().loadClass(name);
