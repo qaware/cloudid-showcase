@@ -143,10 +143,13 @@ sonarqube {
         property 'sonar.exclusions', '**/*Generated.java, build/generated/**'
         property 'sonar.projectName', 'Cloud ID SPIRE Demo-Server'
 
-        property 'sonar.issue.ignore.multicriteria', 'e1'
+        property 'sonar.issue.ignore.multicriteria', 'e1,e2'
 
         // Rule attempts to enforce consistent logger field names, but is broken as it also triggers on variables.
         property 'sonar.issue.ignore.multicriteria.e1.ruleKey', 'squid:S1312'
         property 'sonar.issue.ignore.multicriteria.e1.resourceKey', '**'
-    }
+
+        // Rule disallows wildcard import, which clashes with IntelliJ presets
+        property 'sonar.issue.ignore.multicriteria.e2.ruleKey', 'squid:S2208'
+        property 'sonar.issue.ignore.multicriteria.e2.resourceKey', '**'    }
 }
