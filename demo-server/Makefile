@@ -38,9 +38,19 @@ DOCKER_TAG_NAME = $(shell \
 	&& ( [ -n "$(TAG_NAME)" ] && echo "$(TAG_NAME)" || echo "latest" ) \
 	|| echo "$(BRANCH_NAME)")
 
+
+ifndef DOCKER_REGISTRY_URL
 DOCKER_REGISTRY_URL = artifactory.qaware.de
-DOCKER_REGISTRY_REPO = qaware-internal-docker
+endif
+
+ifndef DOCKER_REGISTRY_REPO
+DOCKER_REGISTRY_REPO = qaware-qalabs-docker
+endif
+
+ifndef DOCKER_IMAGE_NAME
 DOCKER_IMAGE_NAME = $(PROJECT_NAME)
+endif
+
 DOCKER_QUALIFIED_NAME = $(DOCKER_REGISTRY_URL)/$(DOCKER_REGISTRY_REPO)/$(DOCKER_IMAGE_NAME):$(DOCKER_TAG_NAME)
 
 # Sonar branch name, empty on master
