@@ -28,6 +28,8 @@ import static java.lang.String.format;
 @RequiredArgsConstructor
 public class RandomExponentialBackoffSupplier<T> implements Supplier<T> {
 
+    // We don't need cryptographically sound random numbers
+    @SuppressWarnings("squid:S2245")
     private final Random random = new Random();
 
     private final Supplier<T> supplier;
