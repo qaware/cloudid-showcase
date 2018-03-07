@@ -6,8 +6,6 @@ import lombok.experimental.UtilityClass;
 
 import java.time.Duration;
 
-import static java.util.Arrays.stream;
-
 /**
  * Utilities for dealing with system properties.
  */
@@ -40,6 +38,10 @@ public class Config {
      * Duration an update should be done before the bundles expire.
      */
     public static final Prop<Duration> UPDATE_AHEAD = Props.durationOf("spire.updateAhead", Duration.ofMinutes(1));
+    /**
+     * Minimum update interval as a safety measure if the TTLs are too short.
+     */
+    public static final Prop<Duration> MIN_UPDATE_INTERVAL = Props.durationOf("spire.updateAhead", Duration.ofSeconds(30));
 
     /**
      * Get the bundle supplier factory class.

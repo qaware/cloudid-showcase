@@ -25,4 +25,19 @@ public class Time {
         }
     }
 
+    /**
+     * Get the maximum of two durations.
+     *
+     * @param a duration a
+     * @param b duration b
+     * @return a if a is greater or equal than b, b otherwise
+     */
+    public static Duration max(Duration a, Duration b) {
+        if (a.compareTo(b) >= 0) {
+            return a;
+        } else {
+            return b;
+        }
+    }
+
 }
