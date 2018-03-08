@@ -66,13 +66,12 @@ deploy: container-build
 
 	# Deploy in back namespace
 	$(foreach f, $(DEPLOYMENTS_BACK), \
-		sed 's/$(DOCKER_IMAGE_NAME):latest/$(DOCKER_IMAGE_NAME):$(DOCKER_TAG_NAME)/' $f \
+		sed 's|{{DOCKER_QUALIFIED_NAME}}|$(DOCKER_QUALIFIED_NAME)|' $f \
 		| kubectl apply --namespace=back -f -;)
 
 	# Deploy in default namespace
-	# Update versioned references to the docker image to the current tag / branch
 	$(foreach f, $(DEPLOYMENTS_DEFAULT), \
-		sed 's/$(DOCKER_IMAGE_NAME):latest/$(DOCKER_IMAGE_NAME):$(DOCKER_TAG_NAME)/' $f \
+		sed 's|{{DOCKER_QUALIFIED_NAME}}|$(DOCKER_QUALIFIED_NAME)|' $f \
 		| kubectl apply -f -;)
 
 

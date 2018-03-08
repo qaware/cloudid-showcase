@@ -16,8 +16,7 @@ spec:
     spec:
       containers:
       - name: demo-server
-        # Depends on QAware-internal Artifactory
-        image: artifactory.qaware.de/qaware-internal-docker/demo-server:latest
+        image: {{DOCKER_QUALIFIED_NAME}}
         imagePullPolicy: IfNotPresent
         volumeMounts:
         - name: application-config
