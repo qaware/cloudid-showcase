@@ -10,6 +10,7 @@ import java.time.Duration
 
 import static de.qaware.cloud.id.spire.Config.BUNDLE_SUPPLIER_FACTORY_CLASS
 import static de.qaware.cloud.id.spire.TestUtils.waitUntilBundleIsAvailable
+import static de.qaware.cloud.id.spire.jsa.SPIREProvider.ALIAS
 
 /**
  * Specification testing key management with SPIFFE.
@@ -35,17 +36,14 @@ class KeyManagementSpec extends Specification {
     }
 
     def 'use key manager'() {
-        given:
-        def svId = 'spiffe://example.org/host/workload'
-
         when:
         def keyManager = (X509KeyManager) keyManagerFactory.engineGetKeyManagers()[0]
         waitUntilBundleIsAvailable(Duration.ofSeconds(5))
 
         then:
-        keyManager.getPrivateKey(svId) != null
-        keyManager.getCertificateChain(svId).length > 0
-        keyManager.getClientAliases('', [] as Principal[]).toList() == [svId]
+        keyManager.getPrivateKey(ALIAS) != null
+        keyManager.getCertificateChain(ALIAS).length > 0
+        keyManager.getClientAliases('', [] as Principal[]).toList() == [ALIAS]
     }
 
 }

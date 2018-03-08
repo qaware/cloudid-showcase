@@ -19,6 +19,11 @@ public class SPIREProvider extends Provider {
      */
     public static final String ALGORITHM = "SPIRE";
 
+    /**
+     * Fixed alias to allow static initialization.
+     */
+    public static final String ALIAS = "spiffe";
+
     private static final String NAME = "spiffe-provider";
     private static final double VERSION = 0.1;
     private static final String DESCRIPTION = "";
@@ -26,6 +31,7 @@ public class SPIREProvider extends Provider {
     private static final String KEY_MANAGER_FACTORY_PREFIX = "KeyManagerFactory.";
     private static final String TRUST_MANAGER_FACTORY_PREFIX = "TrustManagerFactory.";
     private static final String KEY_MANAGER_ALGORITHM_PROPERTY = "ssl.KeyManagerFactory.algorithm";
+    private static final String KEY_STORE_PREFIX = "KeyStore.";
 
     private static final long serialVersionUID = 0L;
 
@@ -40,6 +46,9 @@ public class SPIREProvider extends Provider {
         super.put(KEY_MANAGER_FACTORY_PREFIX + ALGORITHM, SPIREKeyManagerFactory.class.getName());
         super.put(TRUST_MANAGER_FACTORY_PREFIX + ALGORITHM, SPIRETrustManagerFactory.class.getName());
         super.put(TRUST_MANAGER_FACTORY_PREFIX + "PKIX", SPIRETrustManagerFactory.class.getName());
+
+        // For Spring Boot / Embedded Tomcat which does not use the key manager factory
+        super.put(KEY_STORE_PREFIX + ALGORITHM, SPIREKeyStore.class.getName());
     }
 
     /**
@@ -77,6 +86,14 @@ public class SPIREProvider extends Provider {
         if (defaultAlgorithm != null && ALGORITHM.equals(Security.getProperty(KEY_MANAGER_ALGORITHM_PROPERTY))) {
             Security.setProperty(KEY_MANAGER_ALGORITHM_PROPERTY, defaultAlgorithm);
         }
+    }
+
+    @Override
+    public synchronized Service getService(String type, String algorithm) {
+        // Trace service lookups
+        Service service = super.getService(type, algorithm);
+        LOGGER.trace("getService {}.{} = {} (bc = {})", type, algorithm, service);
+        return service;
     }
 
 }
