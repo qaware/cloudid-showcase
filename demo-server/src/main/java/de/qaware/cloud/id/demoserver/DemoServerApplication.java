@@ -4,8 +4,9 @@ import de.qaware.cloud.id.spire.jsa.SPIREProvider;
 import org.apache.catalina.filters.RequestDumperFilter;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.springframework.boot.SpringApplication;
+import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 
@@ -25,7 +26,9 @@ public class DemoServerApplication {
     public static void main(String[] args) {
         new SPIREProvider().installAsDefault();
 
-        SpringApplication.run(DemoServerApplication.class, args);
+        new SpringApplicationBuilder(DemoServerApplication.class)
+                .web(WebApplicationType.SERVLET)
+                .run(args);
     }
 
     /**

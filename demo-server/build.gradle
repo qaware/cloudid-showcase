@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        springBootVersion = '1.5.10.RELEASE'
+        springBootVersion = '2.0.0.RELEASE'
     }
     repositories {
         mavenCentral()
@@ -30,18 +30,11 @@ repositories {
 }
 
 ext {
-    springCloudVersion = 'Edgware.SR1'
     grpcVersion = '1.5.0'
     nettyVersion = '4.1.12.Final'
     nettyTcnativeVersion = '2.0.5.Final'
     bouncyCastleVersion = '1.59'
     lombokVersion = '1.16.20'
-}
-
-dependencyManagement {
-    imports {
-        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-    }
 }
 
 dependencies {
@@ -149,7 +142,7 @@ sonarqube {
         property 'sonar.issue.ignore.multicriteria.e1.ruleKey', 'squid:S1312'
         property 'sonar.issue.ignore.multicriteria.e1.resourceKey', '**'
 
-        // Rule disallows wildcard import, which clashes with IntelliJ presets
+        // Rule disallows wildcard import which clashes with IntelliJ presets
         property 'sonar.issue.ignore.multicriteria.e2.ruleKey', 'squid:S2208'
         property 'sonar.issue.ignore.multicriteria.e2.resourceKey', '**'    }
 }
