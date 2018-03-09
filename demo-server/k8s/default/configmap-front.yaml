@@ -5,4 +5,4 @@ metadata:
 data:
   application.properties: |
     logging.level.org.springframework.web=INFO
-    de.qaware.cloud.id.demoserver.backend=https://demo-server-service-back:81/
+    de.qaware.cloud.id.demoserver.backend=https://demo-server-service-back:444/

@@ -26,8 +26,8 @@ spec:
           mountPath: /spire/socket
           readOnly: false
         ports:
-        - name: http
-          containerPort: 8080
+        - name: https
+          containerPort: 8443
         livenessProbe:
           failureThreshold: 3
           httpGet:

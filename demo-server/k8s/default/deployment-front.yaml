@@ -29,8 +29,8 @@ spec:
         - name: JAVA_TOOL_OPTIONS
           value: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005"
         ports:
-        - name: http
-          containerPort: 8080
+        - name: https
+          containerPort: 8443
         - name: jvm-debug
           containerPort: 5005
         livenessProbe:
