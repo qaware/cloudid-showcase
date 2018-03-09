@@ -32,7 +32,7 @@ spec:
           failureThreshold: 3
           httpGet:
             path: /health
-            port: 8080
+            port: 8081
             scheme: HTTP
           initialDelaySeconds: 40
           periodSeconds: 30
@@ -42,7 +42,7 @@ spec:
           failureThreshold: 3
           httpGet:
             path: /health
-            port: 8080
+            port: 8081
             scheme: HTTP
           initialDelaySeconds: 40
           periodSeconds: 30
