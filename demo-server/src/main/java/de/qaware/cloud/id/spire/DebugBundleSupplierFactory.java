@@ -1,6 +1,7 @@
 package de.qaware.cloud.id.spire;
 
 import de.qaware.cloud.id.util.config.Prop;
+import de.qaware.cloud.id.util.config.Props;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.FileInputStream;
@@ -57,6 +58,13 @@ public class DebugBundleSupplierFactory implements BundleSupplierFactory {
     private static final int SAN_VALUE_I = 1;
 
     private static final String SPIFFE_URI_PREFIX = "spiffe://";
+
+    /**
+     * Constructor.
+     */
+    public DebugBundleSupplierFactory() {
+        Props.debugLog(getClass());
+    }
 
     @Override
     public Supplier<Bundle> get() {
