@@ -20,6 +20,7 @@ import static org.apache.commons.lang3.StringUtils.startsWith;
 /**
  * Bundle supplier factory for debugging backed by a local key store.
  */
+@SuppressWarnings("unused" /* Referenced by system properties */)
 @Slf4j
 public class DebugBundleSupplierFactory implements BundleSupplierFactory {
 
