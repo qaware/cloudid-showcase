@@ -11,8 +11,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 import static de.qaware.cloud.id.spire.Config.*;
-import static de.qaware.cloud.id.util.Time.max;
-import static de.qaware.cloud.id.util.Time.min;
+import static de.qaware.cloud.id.util.Comparables.max;
+import static de.qaware.cloud.id.util.Comparables.min;
 import static java.util.Optional.empty;
 
 /**

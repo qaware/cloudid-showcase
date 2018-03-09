@@ -2,13 +2,11 @@ package de.qaware.cloud.id.util;
 
 import lombok.experimental.UtilityClass;
 
-import java.time.Duration;
-
 /**
- * Utilities for dealing with dates/times.
+ * Utilities for dealing with comparables.
  */
 @UtilityClass
-public class Time {
+public class Comparables {
 
     /**
      * Get the minimum of two durations.
@@ -17,7 +15,7 @@ public class Time {
      * @param b duration b
      * @return a if a is less than b, b otherwise
      */
-    public static Duration min(Duration a, Duration b) {
+    public static <T extends Comparable<? super T>> T min(T a, T b) {
         if (a.compareTo(b) < 0) {
             return a;
         } else {
@@ -32,7 +30,7 @@ public class Time {
      * @param b duration b
      * @return a if a is greater or equal than b, b otherwise
      */
-    public static Duration max(Duration a, Duration b) {
+    public static <T extends Comparable<? super T>> T max(T a, T b) {
         if (a.compareTo(b) >= 0) {
             return a;
         } else {
