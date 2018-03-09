@@ -2,6 +2,7 @@ package de.qaware.cloud.id.spire.jsa;
 
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import javax.net.ssl.KeyManagerFactory;
 import java.security.Provider;
@@ -44,11 +45,12 @@ public class SPIREProvider extends Provider {
         super(NAME, VERSION, DESCRIPTION);
 
         super.put(KEY_MANAGER_FACTORY_PREFIX + ALGORITHM, SPIREKeyManagerFactory.class.getName());
-        super.put(TRUST_MANAGER_FACTORY_PREFIX + ALGORITHM, SPIRETrustManagerFactory.class.getName());
-        super.put(TRUST_MANAGER_FACTORY_PREFIX + "PKIX", SPIRETrustManagerFactory.class.getName());
+        //super.put(TRUST_MANAGER_FACTORY_PREFIX + ALGORITHM, SPIRETrustManagerFactory.class.getName());
+        //super.put(TRUST_MANAGER_FACTORY_PREFIX + "PKIX", SPIRETrustManagerFactory.class.getName());
 
         // For Spring Boot / Embedded Tomcat which does not use the key manager factory
         super.put(KEY_STORE_PREFIX + ALGORITHM, SPIREKeyStore.class.getName());
+
     }
 
     /**
@@ -56,9 +58,13 @@ public class SPIREProvider extends Provider {
      */
     public void install() {
         if (Security.getProvider(NAME) == null) {
-            LOGGER.info("Installing SPIRE provider at the first position");
+            // LOGGER.info("Installing SPIRE provider at the first position");
             // TODO: Review whether inserting at the first position is a good idea
-            Security.insertProviderAt(new SPIREProvider(), 1);
+            //Security.insertProviderAt(new SPIREProvider(), 1);
+            Security.addProvider(new BouncyCastleProvider());
+            Security.addProvider(new SPIREProvider());
+
+            // Security.insertProviderAt(new BouncyCastleProvider(), 2);
         }
 
     }
