@@ -92,7 +92,7 @@ public class SPIREProvider extends Provider {
     public synchronized Service getService(String type, String algorithm) {
         // Trace service lookups
         Service service = super.getService(type, algorithm);
-        LOGGER.trace("getService {}.{} = {} (bc = {})", type, algorithm, service);
+        LOGGER.trace("getService {}.{} = {}", type, algorithm, service);
         return service;
     }
 
