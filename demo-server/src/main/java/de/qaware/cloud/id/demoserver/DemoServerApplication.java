@@ -1,6 +1,7 @@
 package de.qaware.cloud.id.demoserver;
 
 import de.qaware.cloud.id.spire.jsa.SPIREProvider;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.filters.RequestDumperFilter;
 import org.apache.coyote.http11.Http11NioProtocol;
 import org.apache.http.client.HttpClient;
@@ -19,6 +20,7 @@ import javax.servlet.Filter;
 /**
  * Demo server Spring Boot application.
  */
+@Slf4j
 @SpringBootApplication
 public class DemoServerApplication {
 
@@ -68,6 +70,13 @@ public class DemoServerApplication {
      */
     @Bean
     public WebServerFactoryCustomizer<ConfigurableTomcatWebServerFactory> webServerFactoryCustomizer() {
+        if (Boolean.getBoolean("test.http")) {
+            LOGGER.warn("Starting HTTP connector");
+            return f -> {
+            };
+        }
+
+        LOGGER.info("Starting HTTPs connector");
         return factory -> factory.addConnectorCustomizers((TomcatConnectorCustomizer) connector -> {
             connector.setPort(HTTPS_PORT);
             connector.setSecure(true);
