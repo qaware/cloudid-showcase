@@ -2,11 +2,12 @@ package de.qaware.cloud.id.spire.jsa;
 
 import de.qaware.cloud.id.spire.Bundle;
 import de.qaware.cloud.id.spire.StaticLauncher;
-import de.qaware.cloud.id.util.ReadOnlyKeyStore;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.security.Key;
+import java.security.KeyStoreSpi;
 import java.security.cert.Certificate;
 import java.time.Instant;
 import java.util.Date;
@@ -24,7 +25,7 @@ import static java.util.Collections.singleton;
  * Uses a fixed alias.
  */
 @Slf4j
-public class SPIREKeyStore extends ReadOnlyKeyStore {
+public class SPIREKeyStore extends KeyStoreSpi {
 
     private final Supplier<Bundle> bundleSupplier;
 
@@ -37,7 +38,7 @@ public class SPIREKeyStore extends ReadOnlyKeyStore {
 
     @Override
     public Key engineGetKey(String alias, char[] password) {
-        LOGGER.trace("engineGetKey({}, {})", alias, password);
+        LOGGER.trace("engineGetKey({}, ...)", alias);
         return bundleSupplier.get().getKeyPair().getPrivate();
     }
 
@@ -101,4 +102,28 @@ public class SPIREKeyStore extends ReadOnlyKeyStore {
         LOGGER.trace("engineLoad({}, ...)", stream);
     }
 
+    @Override
+    public void engineSetKeyEntry(String alias, Key key, char[] password, Certificate[] chain) {
+        LOGGER.warn("engineSetKeyEntry({}, {}, ..., {})", alias, key, chain);
+    }
+
+    @Override
+    public void engineSetKeyEntry(String alias, byte[] key, Certificate[] chain) {
+        LOGGER.warn("engineSetKeyEntry({}, {}, {})", alias, key, chain);
+    }
+
+    @Override
+    public void engineSetCertificateEntry(String alias, Certificate cert) {
+        LOGGER.warn("engineSetCertificateEntry({}, {})", alias, cert);
+    }
+
+    @Override
+    public void engineDeleteEntry(String alias) {
+        LOGGER.warn("engineDeleteEntry({}, {})", alias);
+    }
+
+    @Override
+    public void engineStore(OutputStream stream, char[] password) {
+        LOGGER.warn("engineStore({}, ...)", stream);
+    }
 }
