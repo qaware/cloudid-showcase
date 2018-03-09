@@ -6,16 +6,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
+import java.util.regex.Pattern;
 
 import static java.lang.reflect.Modifier.isPublic;
 import static java.lang.reflect.Modifier.isStatic;
 import static java.util.Arrays.stream;
+import static java.util.regex.Pattern.CASE_INSENSITIVE;
 
 /**
  * Utilities for configuration properties.
  */
 @UtilityClass
 public class Props {
+
+    private static final Pattern PWD_PATTERN = Pattern.compile("pwd|password", CASE_INSENSITIVE);
+    private static final String PWD_REPLACEMENT = "...";
 
     /**
      * Create a class property
@@ -87,9 +92,13 @@ public class Props {
                     .map(f -> Reflection.getValue(f, clazz))
                     .forEach(p -> logger.debug("{}={} ({})",
                             p.getSysProp(),
-                            p.get(),
+                            maskPasswords(p),
                             p.isOverridden() ? "override" : "default"));
         }
+    }
+
+    private static Object maskPasswords(Prop p) {
+        return PWD_PATTERN.matcher(p.getSysProp()).find()? PWD_REPLACEMENT : p.get();
     }
 
 }
