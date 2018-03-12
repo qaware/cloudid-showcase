@@ -2,11 +2,14 @@ package de.qaware.cloud.id.spire.jsa;
 
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
-import javax.net.ssl.KeyManagerFactory;
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
 import java.security.Provider;
 import java.security.Security;
+import java.util.stream.Collectors;
+
+import static java.util.Arrays.stream;
 
 /**
  * Java Security API provider backed by SPIRE.
@@ -41,15 +44,18 @@ public class SPIREProvider extends Provider {
     /**
      * Constructor.
      */
+    @SuppressWarnings("deprecation" /* Required for Java 8 compatibility */)
     public SPIREProvider() {
         super(NAME, VERSION, DESCRIPTION);
 
-        super.put(KEY_MANAGER_FACTORY_PREFIX + ALGORITHM, SPIREKeyManagerFactory.class.getName());
+        //super.put(KEY_MANAGER_FACTORY_PREFIX + ALGORITHM, SPIREKeyManagerFactory.class.getName());
         //super.put(TRUST_MANAGER_FACTORY_PREFIX + ALGORITHM, SPIRETrustManagerFactory.class.getName());
-        //super.put(TRUST_MANAGER_FACTORY_PREFIX + "PKIX", SPIRETrustManagerFactory.class.getName());
+        super.put(TRUST_MANAGER_FACTORY_PREFIX + "PKIX", SPIRETrustManagerFactory.class.getName());
 
-        // For Spring Boot / Embedded Tomcat which does not use the key manager factory
+        // SunX095 is the default algorithm
+
         super.put(KEY_STORE_PREFIX + ALGORITHM, SPIREKeyStore.class.getName());
+        super.put(KEY_STORE_PREFIX + "SunX509", SPIREKeyStore.class.getName());
 
     }
 
@@ -58,27 +64,13 @@ public class SPIREProvider extends Provider {
      */
     public void install() {
         if (Security.getProvider(NAME) == null) {
-            // LOGGER.info("Installing SPIRE provider at the first position");
-            // TODO: Review whether inserting at the first position is a good idea
-            //Security.insertProviderAt(new SPIREProvider(), 1);
-            Security.addProvider(new BouncyCastleProvider());
-            Security.addProvider(new SPIREProvider());
+            // Install the provider at the first position
+            Security.insertProviderAt(new SPIREProvider(), 1);
 
-            // Security.insertProviderAt(new BouncyCastleProvider(), 2);
+            logJVM();
+            logProviders();
         }
 
-    }
-
-    /**
-     * Install this provider as default.
-     * <p>
-     * Replace the default key manager algorithm with {@link #ALGORITHM}.
-     */
-    public void installAsDefault() {
-        install();
-
-        defaultAlgorithm = KeyManagerFactory.getDefaultAlgorithm();
-        Security.setProperty(KEY_MANAGER_ALGORITHM_PROPERTY, ALGORITHM);
     }
 
     /**
@@ -88,10 +80,6 @@ public class SPIREProvider extends Provider {
         if (Security.getProvider(NAME) != null) {
             Security.removeProvider(NAME);
         }
-
-        if (defaultAlgorithm != null && ALGORITHM.equals(Security.getProperty(KEY_MANAGER_ALGORITHM_PROPERTY))) {
-            Security.setProperty(KEY_MANAGER_ALGORITHM_PROPERTY, defaultAlgorithm);
-        }
     }
 
     @Override
@@ -100,6 +88,26 @@ public class SPIREProvider extends Provider {
         Service service = super.getService(type, algorithm);
         LOGGER.trace("getService {}.{} = {}", type, algorithm, service);
         return service;
+    }
+
+
+    private static void logJVM() {
+        if (LOGGER.isDebugEnabled()) {
+            RuntimeMXBean mxBean = ManagementFactory.getRuntimeMXBean();
+            LOGGER.debug("{} {} {}",
+                    mxBean.getVmVendor(),
+                    mxBean.getVmName(),
+                    mxBean.getVmVersion()
+            );
+        }
+    }
+
+    private static void logProviders() {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Java Security Providers: {}", stream(Security.getProviders())
+                    .map(Provider::getName)
+                    .collect(Collectors.joining(", ")));
+        }
     }
 
 }

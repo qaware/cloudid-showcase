@@ -32,7 +32,7 @@ public class DemoServerApplication {
      * @param args command line arguments
      */
     public static void main(String[] args) {
-        new SPIREProvider().installAsDefault();
+        new SPIREProvider().install();
 
         new SpringApplicationBuilder(DemoServerApplication.class)
                 .web(WebApplicationType.SERVLET)
@@ -84,10 +84,12 @@ public class DemoServerApplication {
 
             Http11NioProtocol proto = (Http11NioProtocol) connector.getProtocolHandler();
             proto.setSSLEnabled(true);
-            proto.setClientAuth("true");
+            //proto.setClientAuth("true");
 
             proto.setKeystoreFile("");
             proto.setKeystorePass("");
+            // TODO: Review
+            //proto.setKeystoreType("SunX509");
             proto.setKeystoreType("SPIRE");
         });
     }
