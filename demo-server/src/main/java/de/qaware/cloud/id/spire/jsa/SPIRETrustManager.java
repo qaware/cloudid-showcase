@@ -9,6 +9,7 @@ import javax.net.ssl.X509ExtendedTrustManager;
 import java.net.Socket;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.cert.*;
+import java.util.List;
 import java.util.function.Supplier;
 
 import static de.qaware.cloud.id.util.Certificates.*;
@@ -25,8 +26,8 @@ public class SPIRETrustManager extends X509ExtendedTrustManager {
 
     @Override
     public X509Certificate[] getAcceptedIssuers() {
-        LOGGER.debug("No accepted issuers");
-        return new X509Certificate[0];
+        LOGGER.trace("getAcceptedIssuers()");
+        return new X509Certificate[]{getRootCA()};
     }
 
     @Override
@@ -78,4 +79,10 @@ public class SPIRETrustManager extends X509ExtendedTrustManager {
         }
     }
 
+
+    private X509Certificate getRootCA() {
+        List<X509Certificate> caCertChain = bundleSupplier.get().getCaCertChain();
+
+        return caCertChain.get(caCertChain.size() - 1);
+    }
 }
