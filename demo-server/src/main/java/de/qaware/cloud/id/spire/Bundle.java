@@ -64,4 +64,13 @@ public class Bundle {
         return result;
     }
 
+    /**
+     * Get a copy of the certificate chain as an array.
+     *
+     * @return certificate chain as an array
+     */
+    public X509Certificate[] getCaCertChainArray() {
+        return caCertChain.toArray(new X509Certificate[caCertChain.size()]);
+    }
+
 }

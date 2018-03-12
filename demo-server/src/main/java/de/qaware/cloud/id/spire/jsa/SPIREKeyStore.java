@@ -15,7 +15,6 @@ import java.util.Enumeration;
 import java.util.Objects;
 import java.util.function.Supplier;
 
-import static de.qaware.cloud.id.spire.jsa.SPIREJSAUtils.getCertChain;
 import static java.util.Collections.enumeration;
 import static java.util.Collections.singleton;
 
@@ -46,7 +45,7 @@ public class SPIREKeyStore extends KeyStoreSpi {
     public Certificate[] engineGetCertificateChain(String alias) {
         LOGGER.trace("engineGetCertificateChain({})", alias);
 
-        return getCertChain(bundleSupplier.get());
+        return bundleSupplier.get().getCaCertChainArray();
     }
 
     @Override

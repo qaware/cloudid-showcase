@@ -13,7 +13,6 @@ import java.security.cert.X509Certificate;
 import java.util.Objects;
 import java.util.function.Supplier;
 
-import static de.qaware.cloud.id.spire.jsa.SPIREJSAUtils.getCertChain;
 import static de.qaware.cloud.id.spire.jsa.SPIREProvider.ALIAS;
 
 /**
@@ -45,7 +44,7 @@ public class SPIREKeyManager extends X509ExtendedKeyManager {
             return null;
         }
 
-        return getCertChain(bundleSupplier.get());
+        return bundleSupplier.get().getCaCertChainArray();
     }
 
     @Override
