@@ -33,7 +33,7 @@ public class Config {
     /**
      * Duration after which to force an update.
      */
-    public static final Prop<Duration> FORCE_UPDATE_AFTER = Props.durationOf("spire.forceUpdateAfter", Duration.ofMinutes(15));
+    public static final Prop<Duration> FORCE_UPDATE_AFTER = Props.durationOf("spire.forceUpdateAfter", Duration.ofDays(1));
     /**
      * Duration an update should be done before the bundles expire.
      */
