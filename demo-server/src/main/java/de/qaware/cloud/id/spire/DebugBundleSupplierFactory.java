@@ -114,7 +114,7 @@ public class DebugBundleSupplierFactory implements BundleSupplierFactory {
     @SuppressWarnings("unchecked")
     private static List<X509Certificate> getCaCertChain(KeyStore keystore, String alias) throws KeyStoreException {
         Certificate[] certificateChain = keystore.getCertificateChain(alias);
-        return (List<X509Certificate>) (List) asList(certificateChain).subList(1, certificateChain.length - 1);
+        return (List<X509Certificate>) (List) asList(certificateChain).subList(1, certificateChain.length);
     }
 
     private static KeyStore loadKeyStore() throws IOException, GeneralSecurityException {
