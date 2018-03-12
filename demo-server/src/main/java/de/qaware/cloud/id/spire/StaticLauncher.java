@@ -26,21 +26,24 @@ public class StaticLauncher {
      */
     public static synchronized Supplier<Bundle> getBundleSupplier() {
         if (bundleSupplierFactory == null) {
-            // Log the configuration on DEBUG
-            Props.debugLog(Config.class);
-
-            try {
-                bundleSupplierFactory = Reflection.instantiate(Config.BUNDLE_SUPPLIER_FACTORY_CLASS.get());
-            } catch (IllegalArgumentException e) {
-                // Log the exception here as it might get dropped later on by JSA
-                LOGGER.error("Error instantiating the bundle supplier factory", e);
-                throw e;
-            }
-
-            bundleSupplierFactory.start();
+            bundleSupplierFactory = createBundleSupplierFactory();
         }
 
         return bundleSupplierFactory.get();
+    }
+
+    private static BundleSupplierFactory createBundleSupplierFactory() {
+        // Log the configuration on DEBUG
+        Props.debugLog(Config.class);
+
+        try {
+            return Reflection.instantiate(Config.BUNDLE_SUPPLIER_FACTORY_CLASS.get());
+        } catch (IllegalArgumentException e) {
+            // Log the exception here as it has been observed to be dropped when called from Java Security API
+            // implementations.
+            LOGGER.error("Error instantiating the bundle supplier factory", e);
+            throw e;
+        }
     }
 
 }

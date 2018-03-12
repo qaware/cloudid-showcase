@@ -1,13 +1,13 @@
-package de.qaware.cloud.id.util;
+package de.qaware.cloud.id.util.concurrent;
 
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Duration;
 import java.util.Random;
 import java.util.function.Supplier;
 
+import static de.qaware.cloud.id.util.concurrent.Concurrent.sleep;
 import static java.lang.Math.*;
 import static java.lang.String.format;
 
@@ -19,7 +19,7 @@ import static java.lang.String.format;
  * <pre>
  * step * random[1, 2] * base^min(retries, retriesCap)
  * </pre>
- *
+ * <p>
  * If interrupted, the supplier sneakily throws an {@link InterruptedException}
  *
  * @param <T> value type
@@ -37,7 +37,6 @@ public class RandomExponentialBackoffSupplier<T> implements Supplier<T> {
     private final Duration step;
     private final int retriesCap;
 
-    @SneakyThrows(InterruptedException.class)
     @Override
     public T get() {
         for (long retries = 0; ; ++retries) {
@@ -50,7 +49,8 @@ public class RandomExponentialBackoffSupplier<T> implements Supplier<T> {
 
                 LOGGER.error(format("Error running supplier, backing off for %ds after %d retries",
                         Duration.ofMillis(backoffMs).getSeconds(), retries), e);
-                Thread.sleep(backoffMs);
+
+                sleep(backoffMs);
             }
         }
     }

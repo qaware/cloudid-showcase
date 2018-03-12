@@ -1,99 +1,79 @@
 package de.qaware.cloud.id.spire;
 
-import lombok.RequiredArgsConstructor;
+import de.qaware.cloud.id.util.Reference;
+import de.qaware.cloud.id.util.concurrent.BlockingReference;
 import lombok.extern.slf4j.Slf4j;
 import spire.api.workload.WorkloadOuterClass;
 
 import java.time.Duration;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 import static de.qaware.cloud.id.spire.Config.*;
 import static de.qaware.cloud.id.util.Comparables.max;
 import static de.qaware.cloud.id.util.Comparables.min;
-import static java.util.Optional.empty;
+import static de.qaware.cloud.id.util.concurrent.Concurrent.repeat;
+import static de.qaware.cloud.id.util.concurrent.Concurrent.sleep;
 
 /**
  * Updates bundles.
  */
-@SuppressWarnings("squid:S2142" /* Rule is broken as it cannot handle interrupt handling in methods */)
 @Slf4j
-@RequiredArgsConstructor
 class BundlesUpdater implements Supplier<WorkloadOuterClass.Bundles> {
 
     private static final String THREAD_NAME = "spire-updater";
 
-    private final AtomicReference<Optional<WorkloadOuterClass.Bundles>> bundlesRef = new AtomicReference<>(empty());
-    private final AtomicBoolean running = new AtomicBoolean();
-
+    private final Reference<WorkloadOuterClass.Bundles> bundlesRef = new BlockingReference<>();
     private final Supplier<WorkloadOuterClass.Bundles> bundlesSupplier;
+    private Thread updater;
 
-    private Thread updaterThread;
+    /**
+     * Constructor.
+     *
+     * @param bundlesSupplier bundles supplier.
+     */
+    BundlesUpdater(Supplier<WorkloadOuterClass.Bundles> bundlesSupplier) {
+        this.bundlesSupplier = bundlesSupplier;
+    }
 
     @Override
     public WorkloadOuterClass.Bundles get() {
-        return bundlesRef.get()
-                .orElseThrow(() -> new IllegalStateException("No bundles available (yet)"));
+        return bundlesRef.get();
     }
 
     /**
-     * Start the updater.
+     * Start the bundles updater.
      */
     public synchronized void start() {
-        LOGGER.info("Starting bundles updater");
-
-        if (!running.compareAndSet(false, true)) {
-            throw new IllegalStateException("Already running");
+        if (updater != null) {
+            throw new IllegalStateException("Already running.");
         }
 
-        updaterThread = new Thread(this::updater, THREAD_NAME);
-        updaterThread.start();
+        updater = new Thread(() -> repeat(this::update), THREAD_NAME);
+        updater.start();
     }
 
     /**
-     * Stop the updater
+     * Stop the bundles updater.
      */
     public synchronized void stop() {
-        LOGGER.info("Stopping bundles updater");
-
-        if (!running.compareAndSet(true, false)) {
-            throw new IllegalStateException("Not running");
+        if (updater == null) {
+            throw new IllegalStateException("Not running.");
         }
 
-        updaterThread.interrupt();
-        try {
-            updaterThread.join();
-        } catch (InterruptedException e) {
-            interrupt(e);
-        }
-        updaterThread = null;
+        updater.interrupt();
     }
 
-    private void updater() {
-        try {
-            while (running.get()) {
-                WorkloadOuterClass.Bundles bundles = bundlesSupplier.get();
+    private void update() {
+        WorkloadOuterClass.Bundles bundles = bundlesSupplier.get();
 
-                bundlesRef.set(Optional.of(bundles));
+        bundlesRef.set(bundles);
 
-                Duration backoff = min(
-                        max(Duration.ofSeconds(bundles.getTtl()).minus(UPDATE_AHEAD.get()), MIN_UPDATE_INTERVAL.get()),
-                        FORCE_UPDATE_AFTER.get());
+        Duration backoff = min(
+                max(Duration.ofSeconds(bundles.getTtl()).minus(UPDATE_AHEAD.get()), MIN_UPDATE_INTERVAL.get()),
+                FORCE_UPDATE_AFTER.get());
 
-                LOGGER.debug("Backing off for {}", backoff);
-                Thread.sleep(backoff.toMillis());
-            }
-        } catch (InterruptedException e) {
-            interrupt(e);
-        } catch (Exception e) {
-            LOGGER.error("Updater died unexpectedly", e);
-        }
+        LOGGER.debug("Backing off for {}", backoff);
+        sleep(backoff);
     }
 
-    private static void interrupt(InterruptedException e) {
-        LOGGER.info("Interrupted", e);
-        Thread.currentThread().interrupt();
-    }
 }

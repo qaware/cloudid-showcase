@@ -9,20 +9,9 @@ public interface BundleSupplierFactory {
 
     /**
      * Get a bundle supplier.
+     *
      * @return bundle supplier
      */
     Supplier<Bundle> get();
-
-    /**
-     * Lifecycle of the bundle supplier begins.
-     */
-    default void start() {
-    }
-
-    /**
-     * Lifecycle of the bundle supplier ends.
-     */
-    default void stop() {
-    }
 
 }

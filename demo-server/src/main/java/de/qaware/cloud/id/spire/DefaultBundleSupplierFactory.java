@@ -1,6 +1,6 @@
 package de.qaware.cloud.id.spire;
 
-import de.qaware.cloud.id.util.RandomExponentialBackoffSupplier;
+import de.qaware.cloud.id.util.concurrent.RandomExponentialBackoffSupplier;
 
 import java.util.function.Supplier;
 
@@ -14,49 +14,30 @@ import static de.qaware.cloud.id.util.Functions.compose;
 public class DefaultBundleSupplierFactory implements BundleSupplierFactory {
 
     private static Supplier<Bundle> bundleSupplier;
-    private static BundlesUpdater bundlesUpdater;
 
     @Override
     public Supplier<Bundle> get() {
         return doGet();
     }
 
-    @Override
-    public void start() {
-        doStart();
-    }
-
-    @Override
-    public void stop() {
-        doStop();
-    }
-
-    private static synchronized void doStop() {
-        init();
-        bundlesUpdater.stop();
-    }
-
-    private static synchronized void doStart() {
-        init();
-        bundlesUpdater.start();
-    }
-
     private static synchronized Supplier<Bundle> doGet() {
-        init();
+        if (bundleSupplier == null) {
+            bundleSupplier = createBundleSupplier();
+        }
+
         return bundleSupplier;
     }
 
-    private static synchronized void init() {
-        if (bundleSupplier == null) {
-            bundlesUpdater = new BundlesUpdater(
-                    new RandomExponentialBackoffSupplier<>(
-                            new UdsBundlesSupplier(AGENT_SOCKET.get()),
-                            EXP_BACKOFF_BASE.get(),
-                            EXP_BACKOFF_STEP.get(),
-                            EXP_BACKOFF_RETRIES_CAP.get()));
+    private static Supplier<Bundle> createBundleSupplier() {
+        BundlesUpdater bundlesUpdater = new BundlesUpdater(
+                new RandomExponentialBackoffSupplier<>(
+                        new UdsBundlesSupplier(AGENT_SOCKET.get()),
+                        EXP_BACKOFF_BASE.get(),
+                        EXP_BACKOFF_STEP.get(),
+                        EXP_BACKOFF_RETRIES_CAP.get()));
+        bundlesUpdater.start();
 
-            bundleSupplier = new BundleSupplier(compose(new BundlesConverter(), bundlesUpdater));
-        }
+        return new BundleSupplier(compose(new BundlesConverter(), bundlesUpdater));
     }
 
 }
