@@ -7,14 +7,14 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.security.*;
-import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.function.Supplier;
 
 import static de.qaware.cloud.id.util.config.Props.stringOf;
 import static java.lang.String.format;
-import static java.util.Arrays.asList;
+import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.startsWith;
 
 /**
@@ -113,8 +113,9 @@ public class DebugBundleSupplierFactory implements BundleSupplierFactory {
 
     @SuppressWarnings("unchecked")
     private static List<X509Certificate> getCaCertChain(KeyStore keystore, String alias) throws KeyStoreException {
-        Certificate[] certificateChain = keystore.getCertificateChain(alias);
-        return (List<X509Certificate>) (List) asList(certificateChain).subList(1, certificateChain.length);
+        return stream(keystore.getCertificateChain(alias))
+                .map(c -> (X509Certificate) c)
+                .collect(toList());
     }
 
     private static KeyStore loadKeyStore() throws IOException, GeneralSecurityException {
