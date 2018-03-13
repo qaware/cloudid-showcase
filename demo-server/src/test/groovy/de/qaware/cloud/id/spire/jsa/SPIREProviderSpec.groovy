@@ -1,14 +1,17 @@
 package de.qaware.cloud.id.spire.jsa
 
 import com.github.tomakehurst.wiremock.WireMockServer
-import de.qaware.cloud.id.spire.TestBundleSupplierFactory
+import de.qaware.cloud.id.spire.DebugBundleSupplierFactory
 import groovy.util.logging.Slf4j
 import spock.lang.Ignore
 import spock.lang.Specification
 import spock.util.environment.RestoreSystemProperties
 
+import javax.net.ssl.HttpsURLConnection
 import javax.net.ssl.KeyManagerFactory
+import javax.net.ssl.SSLContext
 import javax.net.ssl.SSLSocketFactory
+import java.security.SecureRandom
 import java.time.Duration
 
 import static com.github.tomakehurst.wiremock.client.WireMock.get
@@ -22,11 +25,12 @@ import static de.qaware.cloud.id.spire.TestUtils.waitUntilBundleIsAvailable
 class SPIREProviderSpec extends Specification {
 
     void setupSpec() {
-        System.setProperty(BUNDLE_SUPPLIER_FACTORY_CLASS.getSysProp(), TestBundleSupplierFactory.class.getName())
+        System.setProperty(BUNDLE_SUPPLIER_FACTORY_CLASS.getSysProp(), DebugBundleSupplierFactory.class.getName())
+        System.setProperty(DebugBundleSupplierFactory.KEYSTORE_LOCATION.getSysProp(), "src/test/resources/spire_test_keystore.jks")
 
         new SPIREProvider().install()
 
-        waitUntilBundleIsAvailable(Duration.ofSeconds(5))
+        waitUntilBundleIsAvailable(Duration.ofSeconds(30))
     }
 
     void cleanupSpec() {
@@ -57,10 +61,8 @@ class SPIREProviderSpec extends Specification {
         WireMockServer server = new WireMockServer(options()
                 .bindAddress('localhost')
                 .dynamicHttpsPort()
-                //.needClientAuth(true)
-                //.keystorePath(TestResources.wmKeystorePath)
-                //.keystorePassword('useless-jetty')
-                //.keystoreType('JKS'))
+                .needClientAuth(true)
+                .keystoreType("SPIRE")
         )
         server.start()
 
@@ -69,7 +71,12 @@ class SPIREProviderSpec extends Specification {
         server.stubFor(get('/').willReturn(ok(body)))
 
         and:
-        def connection = new URL("https://localhost:${server.httpsPort()}/").openConnection()
+        SSLContext sslContext = SSLContext.getInstance('TLS')
+        sslContext.init(new SPIREKeyManagerFactory().engineGetKeyManagers(), new SPIRETrustManagerFactory().engineGetTrustManagers(), SecureRandom.getInstanceStrong())
+
+        def connection = (HttpsURLConnection) new URL("https://localhost:${server.httpsPort()}/").openConnection()
+        connection.setSSLSocketFactory(sslContext.getSocketFactory())
+
         def responseBody = connection.inputStream.getText()
 
         then:

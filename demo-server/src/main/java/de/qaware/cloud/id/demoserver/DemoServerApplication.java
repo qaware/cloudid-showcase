@@ -84,7 +84,7 @@ public class DemoServerApplication {
 
             Http11NioProtocol proto = (Http11NioProtocol) connector.getProtocolHandler();
             proto.setSSLEnabled(true);
-            //proto.setClientAuth("true");
+            proto.setClientAuth("true");
 
             proto.setKeystoreFile("");
             proto.setKeystorePass("");
