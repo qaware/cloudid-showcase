@@ -20,6 +20,7 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 
@@ -61,21 +62,22 @@ class BundleConverter implements Function<WorkloadEntry, Bundle> {
      * @throws CertificateException one of the certificates is invalid
      */
     public Bundle convert(WorkloadEntry workloadEntry) throws IOException, CertificateException {
+        List<X509Certificate> certPath = getCertPath2(workloadEntry);
+
         return new Bundle(
                 workloadEntry.getSpiffeId(),
-                getSvidCertificate(workloadEntry),
+                certPath.get(0),
                 getKeyPair(workloadEntry),
-                getCertPath(workloadEntry));
+                certPath);
     }
 
-    private X509Certificate getSvidCertificate(WorkloadEntry workloadEntry) throws CertificateException {
-        return (X509Certificate) certFactory.generateCertificate(workloadEntry.getSvid().newInput());
-    }
 
-    private List<X509Certificate> getCertPath(WorkloadEntry workloadEntry) throws IOException, CertificateException {
-        try (InputStream inputStream = workloadEntry.getSvidBundle().newInput()) {
-            // Assume the cert path to be all X.509 certificates as anything else doesn't make sense here
-            return certFactory.generateCertificates(inputStream).stream()
+    private List<X509Certificate> getCertPath2(WorkloadEntry workloadEntry) throws IOException, CertificateException {
+        try (InputStream bundleInputStream = workloadEntry.getSvidBundle().newInput();
+             InputStream svidInputStream = workloadEntry.getSvid().newInput()) {
+            return Stream.concat(
+                    Stream.of(certFactory.generateCertificate(svidInputStream)),
+                    certFactory.generateCertificates(bundleInputStream).stream())
                     .map(c -> (X509Certificate) c)
                     .collect(toList());
         }
