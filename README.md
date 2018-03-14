@@ -20,7 +20,7 @@ kubectl exec $(kubectl get pod -o name | grep -o 'spire-server.*$') -- /opt/spir
 
 ### Fetches the certificates within the workload 
 ```bash
-kubectl exec $(kubectl get pod -o name | grep -o 'spire-server.*$') -- /opt/spire/spire-agent api fetch -socketPath /spire/socket/agent.sock -write /root
+kubectl exec $(kubectl get pod -o name | grep -o 'spire-agent.*$') -- /opt/spire/spire-agent api fetch -socketPath /spire/socket/agent.sock -write /root
 ```
 
 
