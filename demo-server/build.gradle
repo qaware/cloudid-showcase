@@ -3,10 +3,12 @@ buildscript {
         springBootVersion = '2.0.0.RELEASE'
     }
     repositories {
+        maven { url 'http://repo.spring.io/plugins-release' }
         mavenCentral()
         gradlePluginPortal()
     }
     dependencies {
+        classpath 'io.spring.gradle:propdeps-plugin:0.0.9.RELEASE'
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
         classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.3'
         classpath 'com.google.gradle:osdetector-gradle-plugin:1.4.0'
@@ -16,7 +18,7 @@ plugins {
     id 'org.sonarqube' version '2.6.2'
 }
 
-
+apply plugin: 'propdeps'
 apply plugin: 'groovy'
 apply plugin: 'jacoco'
 apply plugin: 'org.springframework.boot'
@@ -42,6 +44,7 @@ dependencies {
     compile "org.springframework.boot:spring-boot-starter-actuator:${springBootVersion}"
     compile "org.springframework.boot:spring-boot-starter-web:${springBootVersion}"
     testCompile "org.springframework.boot:spring-boot-starter-test:${springBootVersion}"
+    optional "org.springframework.boot:spring-boot-configuration-processor:${springBootVersion}"
     // Spring Restdocs
     testCompile 'org.springframework.restdocs:spring-restdocs-mockmvc:2.0.0.RELEASE'
 
@@ -76,6 +79,8 @@ dependencies {
     // WireMock
     // Use standalone as WireMock depends on an outdated version of Jetty that clashes with Spring Boot
     testCompile "com.github.tomakehurst:wiremock-standalone:2.14.0"
+
+
 }
 
 
@@ -152,5 +157,6 @@ sonarqube {
         property 'sonar.issue.ignore.multicriteria.e3.ruleKey', 'squid:S2068'
         property 'sonar.issue.ignore.multicriteria.e3.resourceKey', '**'
     }
-
 }
+
+compileJava.dependsOn(processResources)
