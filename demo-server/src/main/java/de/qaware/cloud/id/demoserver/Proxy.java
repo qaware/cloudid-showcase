@@ -83,7 +83,7 @@ public class Proxy {
             }
         }
 
-        requestBuilder.setUri(appProperties.getBackend() + path + '?' + request.getQueryString())
+        requestBuilder.setUri(appProperties.getBackend() + '/' + path + '?' + request.getQueryString())
                 .setEntity(new InputStreamEntity(request.getInputStream()));
 
         return requestBuilder.build();
