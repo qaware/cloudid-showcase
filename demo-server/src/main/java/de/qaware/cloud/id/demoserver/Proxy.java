@@ -9,7 +9,7 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.entity.InputStreamEntity;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -28,13 +28,22 @@ import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
  */
 @Slf4j
 @Controller
+@ConfigurationProperties
 public class Proxy {
 
-    @Value("${de.qaware.cloud.id.demoserver.backend}")
-    private String backend;
+    private final AppProperties appProperties;
+    private final HttpClient httpClient;
 
+    /**
+     * Constructor.
+     * @param appProperties application properties
+     * @param httpClient HTTP client
+     */
     @Autowired
-    private HttpClient httpClient;
+    public Proxy(AppProperties appProperties, HttpClient httpClient) {
+        this.appProperties = appProperties;
+        this.httpClient = httpClient;
+    }
 
     /**
      * Forwards a request 1:1 to the target defined in {@code de.qaware.cloud.id.demoserver.backend}.
@@ -74,7 +83,7 @@ public class Proxy {
             }
         }
 
-        requestBuilder.setUri(backend + path + '?' + request.getQueryString())
+        requestBuilder.setUri(appProperties.getBackend() + path + '?' + request.getQueryString())
                 .setEntity(new InputStreamEntity(request.getInputStream()));
 
         return requestBuilder.build();

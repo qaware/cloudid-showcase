@@ -20,7 +20,7 @@ spec:
         imagePullPolicy: IfNotPresent
         volumeMounts:
         - name: application-config
-          mountPath: /demo-server/config
+          mountPath: /deployment/config
           readOnly: true
         - name: spire-agent-socket
           mountPath: /spire/socket
