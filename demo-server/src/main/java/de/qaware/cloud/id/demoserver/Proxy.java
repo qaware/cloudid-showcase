@@ -1,5 +1,6 @@
 package de.qaware.cloud.id.demoserver;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.Header;
 import org.apache.http.HeaderElement;
@@ -8,7 +9,6 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.entity.InputStreamEntity;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -29,21 +29,11 @@ import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 @Slf4j
 @Controller
 @ConfigurationProperties
+@RequiredArgsConstructor
 public class Proxy {
 
     private final AppProperties appProperties;
     private final HttpClient httpClient;
-
-    /**
-     * Constructor.
-     * @param appProperties application properties
-     * @param httpClient HTTP client
-     */
-    @Autowired
-    public Proxy(AppProperties appProperties, HttpClient httpClient) {
-        this.appProperties = appProperties;
-        this.httpClient = httpClient;
-    }
 
     /**
      * Forwards a request 1:1 to the target defined in {@code de.qaware.cloud.id.demoserver.backend}.
