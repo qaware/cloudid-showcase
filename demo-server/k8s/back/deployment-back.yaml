@@ -25,6 +25,9 @@ spec:
         - name: spire-agent-socket
           mountPath: /spire/socket
           readOnly: false
+        env:
+        - name: JAVA_TOOL_OPTIONS
+          value: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005 -Djavax.net.debug=all"
         ports:
         - name: https
           containerPort: 8443
@@ -49,7 +52,7 @@ spec:
           successThreshold: 1
           timeoutSeconds: 1
       imagePullSecrets:
-        # Needs to be definied for this deployment to work
+        # Needs to be defined for this deployment to work
         - name: qaware-artifactory
       volumes:
         - name: application-config

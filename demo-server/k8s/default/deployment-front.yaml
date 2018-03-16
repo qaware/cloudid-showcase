@@ -27,7 +27,7 @@ spec:
           readOnly: false
         env:
         - name: JAVA_TOOL_OPTIONS
-          value: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005"
+          value: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005 -Djavax.net.debug=all"
         ports:
         - name: https
           containerPort: 8443
