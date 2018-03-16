@@ -1,14 +1,17 @@
 package de.qaware.cloud.id.demoserver;
 
 import de.qaware.cloud.id.spire.jsa.SPIREProvider;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.filters.RequestDumperFilter;
 import org.apache.coyote.http11.Http11NioProtocol;
 import org.apache.http.client.HttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.impl.client.HttpClients;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.web.embedded.tomcat.ConfigurableTomcatWebServerFactory;
 import org.springframework.boot.web.embedded.tomcat.TomcatConnectorCustomizer;
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;
@@ -22,9 +25,12 @@ import javax.servlet.Filter;
  */
 @Slf4j
 @SpringBootApplication
+@ConfigurationProperties
+@RequiredArgsConstructor
 public class DemoServerApplication {
 
     private static final int HTTPS_PORT = 8443;
+    private final AppProperties appProperties;
 
     /**
      * Application entry point
@@ -46,7 +52,21 @@ public class DemoServerApplication {
      */
     @Bean
     public HttpClient getHttpClient() {
-        return HttpClientBuilder.create().build();
+        /*
+        HttpClientBuilder builder;
+        try {
+            builder = HttpClientBuilder.create();
+            SSLContext sslContext = SSLContext.getInstance("TLS");
+            sslContext.init(new SPIREKeyManagerFactory().engineGetKeyManagers(), new SPIRETrustManagerFactory().engineGetTrustManagers(), SecureRandom.getInstanceStrong());
+            SSLConnectionSocketFactory connectionSocketFactory = new SSLConnectionSocketFactory(sslContext);
+            builder.setSSLSocketFactory(connectionSocketFactory);
+        } catch (NoSuchAlgorithmException | KeyManagementException e) {
+            e.printStackTrace();
+            throw new RuntimeException("HTTP client refuses to work", e);
+        }
+        return builder.build();
+        */
+        return HttpClients.custom().setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE).build();
     }
 
     /**
@@ -84,13 +104,16 @@ public class DemoServerApplication {
 
             Http11NioProtocol proto = (Http11NioProtocol) connector.getProtocolHandler();
             proto.setSSLEnabled(true);
-            proto.setClientAuth("true");
+            proto.setClientAuth(appProperties.getClientAuth());
 
             proto.setKeystoreFile("");
             proto.setKeystorePass("");
             // TODO: Review
             //proto.setKeystoreType("SunX509");
             proto.setKeystoreType("SPIRE");
+            //proto.setTruststoreFile("");
+            //proto.setTruststorePass("");
+            //proto.setTruststoreType("SPIRE");
         });
     }
 

@@ -6,4 +6,5 @@ data:
   application.properties: |
     management.server.port=8081
     logging.level.org.springframework.web=INFO
-    app.backend=https://xkcd.com/
+    app.backend=https://xkcd.com
+    app.clientAuth=false

@@ -20,9 +20,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import static java.util.Collections.list;
-import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
-
 /**
  * Simple proxy controller. Performs some requests against a configurable backend.
  */
@@ -43,7 +40,7 @@ public class Proxy {
      * @return response entity
      * @throws IOException if a transmission error occurs
      */
-    @RequestMapping("/proxy/{path}")
+    @RequestMapping("/{path}")
     public ResponseEntity forwardRequest(@PathVariable String path, HttpServletRequest request) throws IOException {
         HttpUriRequest backendRequest = buildBackendRequest(path, request);
         LOGGER.info("Proxy request {} to {}", path, backendRequest);
@@ -64,6 +61,7 @@ public class Proxy {
     private HttpUriRequest buildBackendRequest(String path, HttpServletRequest request) throws IOException {
         RequestBuilder requestBuilder = RequestBuilder.create(request.getMethod());
 
+        /*
         for (String name : list(request.getHeaderNames())) {
             if (equalsIgnoreCase(name, "host")) {
                 continue;
@@ -72,8 +70,9 @@ public class Proxy {
                 requestBuilder.addHeader(name, value);
             }
         }
+        */
 
-        requestBuilder.setUri(appProperties.getBackend() + '/' + path + '?' + request.getQueryString())
+        requestBuilder.setUri(appProperties.getBackend() + '/' + path)
                 .setEntity(new InputStreamEntity(request.getInputStream()));
 
         return requestBuilder.build();

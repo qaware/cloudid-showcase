@@ -7,3 +7,4 @@ data:
     management.server.port=8081
     logging.level.org.springframework.web=INFO
     app.backend=https://demo-server-service-back.back:444
+    app.clientAuth=false

@@ -22,12 +22,16 @@ public class AppProperties {
     @NotBlank
     private String backend;
 
+    @NotBlank
+    private String clientAuth;
+
     /**
      * Log the config values on debug.
      */
     @PostConstruct
     public void debugLog() {
         LOGGER.debug("Backend: {}", backend);
+        LOGGER.debug("Client Auth: {}", clientAuth);
     }
 
 }

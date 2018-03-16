@@ -49,7 +49,7 @@ public class SPIREProvider extends Provider {
         super(NAME, VERSION, DESCRIPTION);
 
         //super.put(KEY_MANAGER_FACTORY_PREFIX + ALGORITHM, SPIREKeyManagerFactory.class.getName());
-        //super.put(TRUST_MANAGER_FACTORY_PREFIX + ALGORITHM, SPIRETrustManagerFactory.class.getName());
+        super.put(TRUST_MANAGER_FACTORY_PREFIX + ALGORITHM, SPIRETrustManagerFactory.class.getName());
         super.put(TRUST_MANAGER_FACTORY_PREFIX + "PKIX", SPIRETrustManagerFactory.class.getName());
 
         // SunX095 is the default algorithm
