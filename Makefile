@@ -49,5 +49,14 @@ minikube-deploy:
 minikube-deploy-and-register: minikube-deploy spire-register
 
 .PHONY: minikube-show-service
-minikube-service:
+minikube-show-service:
 	minikube service --url --https demo-server-service-front
+
+.PHONY: minikube-test-service
+minikube-test-service:
+	curl -k $$(minikube service --url --https demo-server-service-front)/123
+
+.PHONY: delete-demo-server-pods
+delete-demo-server-pods:
+	kubectl -n back delete pod $$(kubectl -n back get pod -o name | grep -o 'demo-server.*$$')
+	kubectl delete pod $$(kubectl get pod -o name | grep -o 'demo-server.*$$')
