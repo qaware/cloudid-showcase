@@ -19,9 +19,6 @@ kubectl exec $(kubectl get pod -o name | grep -o 'spire-server.*$') -- /opt/spir
 ```
 
 ### Fetches the certificates within the workload 
-```bash
-kubectl exec $(kubectl get pod -o name | grep -o 'spire-agent.*$') -- /opt/spire/spire-agent api fetch -socketPath /spire/socket/agent.sock -write /root
-```
 
 
 ## Spire-Agent
@@ -64,4 +61,9 @@ When changing the trust domain it is necessary to adjust them at the following p
         - Protobuf Support
         - Bash Support
     - Don't forget to activate annotation processing to make Lombok work in IntelliJ IDEA
+
+### Fetch certificates from the SPIRE agent
+```bash
+kubectl exec $(kubectl get pod -o name | grep -o 'spire-agent.*$') -- /opt/spire/spire-agent api fetch -socketPath /spire/socket/agent.sock -write /root && kubectl cp $(kubectl get pod -o name | grep -o 'spire-agent.*$'):/root .
+```
 
