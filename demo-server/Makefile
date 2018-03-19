@@ -102,5 +102,4 @@ delete:
 	-kubectl delete deployment demo-server-front
 	-kubectl get pod -o name | grep -o 'demo-server.*$$' | xargs -n1 kubectl delete pod
 	-kubectl delete configMap demo-server-config-front
-	-kubectl delete ingress demo-server-ingress
 	-kubectl delete service demo-server-service-front

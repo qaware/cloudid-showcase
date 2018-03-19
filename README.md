@@ -13,14 +13,6 @@ This allows a generic host name within the cluster.
 The Spire-Server is configured using a Kuberetes [ConfigMap](spire-server/k8s/configmap.yaml).
 Additionally it requires a [Secret](spire-server/k8s/secrets.yaml) to store the certificates for the Upstream CA.
 
-### Register the workload
-```bash
-kubectl exec $(kubectl get pod -o name | grep -o 'spire-server.*$') -- /opt/spire/spire-server register -parentID spiffe://salm.qaware.de/k8s/node/minikube -spiffeID spiffe://salm.qaware.de/host/workload -selector k8s:ns:default
-```
-
-### Fetches the certificates within the workload 
-
-
 ## Spire-Agent
 The Spire-Agent must run on every node which should schedule SPIRE secured pods.
 To start the agent it automatically retrieves a join token from the Spire-Server.
@@ -62,8 +54,30 @@ When changing the trust domain it is necessary to adjust them at the following p
         - Bash Support
     - Don't forget to activate annotation processing to make Lombok work in IntelliJ IDEA
 
-### Fetch certificates from the SPIRE agent
+### Minikube
+
+#### Deployment
+```bash
+make minikube-deploy-and-register
+```
+
+#### Accessing the service
+```bash
+make minikube-show-service
+curl -k SERVICE-URL
+```
+
+### Kubernetes
+
+#### Fetch certificates from the SPIRE agent
 ```bash
 kubectl exec $(kubectl get pod -o name | grep -o 'spire-agent.*$') -- /opt/spire/spire-agent api fetch -socketPath /spire/socket/agent.sock -write /root && kubectl cp $(kubectl get pod -o name | grep -o 'spire-agent.*$'):/root .
 ```
 
+#### Register workloads
+```bash
+kubectl exec $(kubectl get pod -o name | grep -o 'spire-server.*$') -- /opt/spire/spire-server register -parentID spiffe://salm.qaware.de/k8s/node/minikube -spiffeID spiffe://salm.qaware.de/host/workload -selector k8s:ns:default
+```
+
+## Known Issues
+- Ingress does not work on Minikube with TLS-protected backends
