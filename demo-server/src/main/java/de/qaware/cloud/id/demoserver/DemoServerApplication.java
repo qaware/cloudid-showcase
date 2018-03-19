@@ -1,5 +1,6 @@
 package de.qaware.cloud.id.demoserver;
 
+import de.qaware.cloud.id.spire.jsa.SPIREContextFactory;
 import de.qaware.cloud.id.spire.jsa.SPIREProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,8 +47,10 @@ public class DemoServerApplication {
     @Bean
     public HttpClient getHttpClient() {
         return HttpClients.custom()
+                .setSSLContext(SPIREContextFactory.get())
                 .setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)
                 .build();
+
     }
 
     /**
