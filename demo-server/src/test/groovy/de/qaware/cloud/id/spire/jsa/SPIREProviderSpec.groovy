@@ -9,9 +9,7 @@ import spock.util.environment.RestoreSystemProperties
 
 import javax.net.ssl.HttpsURLConnection
 import javax.net.ssl.KeyManagerFactory
-import javax.net.ssl.SSLContext
 import javax.net.ssl.SSLSocketFactory
-import java.security.SecureRandom
 import java.time.Duration
 
 import static com.github.tomakehurst.wiremock.client.WireMock.get
@@ -71,11 +69,8 @@ class SPIREProviderSpec extends Specification {
         server.stubFor(get('/').willReturn(ok(body)))
 
         and:
-        SSLContext sslContext = SSLContext.getInstance('TLS')
-        sslContext.init(new SPIREKeyManagerFactory().engineGetKeyManagers(), new SPIRETrustManagerFactory().engineGetTrustManagers(), SecureRandom.getInstanceStrong())
-
         def connection = (HttpsURLConnection) new URL("https://localhost:${server.httpsPort()}/").openConnection()
-        connection.setSSLSocketFactory(sslContext.getSocketFactory())
+        connection.setSSLSocketFactory(SPIREContextFactory.get().getSocketFactory())
 
         def responseBody = connection.inputStream.getText()
 
