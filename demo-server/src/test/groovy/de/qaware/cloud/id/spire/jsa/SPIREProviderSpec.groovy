@@ -26,13 +26,15 @@ class SPIREProviderSpec extends Specification {
         System.setProperty(BUNDLE_SUPPLIER_FACTORY_CLASS.getSysProp(), DebugBundleSupplierFactory.class.getName())
         System.setProperty(DebugBundleSupplierFactory.KEYSTORE_LOCATION.getSysProp(), "src/test/resources/spire_test_keystore.jks")
 
-        new SPIREProvider().install()
+        SPIREProvider.install()
+        SPIRESocketFactory.install()
 
-        waitUntilBundleIsAvailable(Duration.ofSeconds(30))
+        waitUntilBundleIsAvailable(Duration.ofSeconds(5))
     }
 
     void cleanupSpec() {
-        new SPIREProvider().uninstall()
+        SPIREProvider.uninstall()
+        SPIRESocketFactory.uninstall()
     }
 
     @Ignore("unclear if the key manager is actually required")
@@ -50,7 +52,7 @@ class SPIREProviderSpec extends Specification {
         def socketFactory = SSLSocketFactory.getDefault()
 
         then:
-        socketFactory.class.simpleName != 'javax.net.ssl.DefaultSSLSocketFactory'
+        socketFactory instanceof SPIRESocketFactory
     }
 
 
@@ -70,12 +72,9 @@ class SPIREProviderSpec extends Specification {
 
         and:
         def connection = (HttpsURLConnection) new URL("https://localhost:${server.httpsPort()}/").openConnection()
-        connection.setSSLSocketFactory(SPIREContextFactory.get().getSocketFactory())
-
-        def responseBody = connection.inputStream.getText()
 
         then:
-        responseBody == body
+        connection.inputStream.getText() == body
 
         cleanup:
         server.shutdown()
