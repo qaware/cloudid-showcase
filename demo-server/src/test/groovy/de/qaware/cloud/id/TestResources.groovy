@@ -6,6 +6,8 @@ import static spire.api.workload.WorkloadOuterClass.Bundles
 
 class TestResources {
 
+    static testKeystoreLocation = 'classpath:spire_test_keystore.jks'
+
     static Bundles getTestBundles() {
         return Bundles.parseFrom(TestResources.class.getResourceAsStream('/testBundles.grpc'))
     }
@@ -18,8 +20,5 @@ class TestResources {
         return ByteString.copyFrom(TestResources.class.getResourceAsStream('/certs/svid0-key.der').bytes)
     }
 
-    static getWmKeystorePath() {
-        return TestResources.getResource('/wm-keystore.jks').getPath()
-    }
 
 }

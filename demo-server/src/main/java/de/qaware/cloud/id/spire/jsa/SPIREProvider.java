@@ -52,8 +52,6 @@ public class SPIREProvider extends Provider {
         super.put(TRUST_MANAGER_FACTORY_PREFIX + ALGORITHM, SPIRETrustManagerFactory.class.getName());
         super.put(TRUST_MANAGER_FACTORY_PREFIX + "PKIX", SPIRETrustManagerFactory.class.getName());
 
-        // SunX095 is the default algorithm
-
         super.put(KEY_STORE_PREFIX + ALGORITHM, SPIREKeyStore.class.getName());
         super.put(KEY_STORE_PREFIX + "SunX509", SPIREKeyStore.class.getName());
 
@@ -62,7 +60,7 @@ public class SPIREProvider extends Provider {
     /**
      * Install this provider.
      */
-    public void install() {
+    public static void install() {
         if (Security.getProvider(NAME) == null) {
             // Install the provider at the first position
             Security.insertProviderAt(new SPIREProvider(), 1);
@@ -76,7 +74,7 @@ public class SPIREProvider extends Provider {
     /**
      * Uninstall this provider.
      */
-    public void uninstall() {
+    public static void uninstall() {
         if (Security.getProvider(NAME) != null) {
             Security.removeProvider(NAME);
         }

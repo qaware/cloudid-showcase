@@ -5,12 +5,15 @@ import de.qaware.cloud.id.util.config.Props;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.*;
 import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.function.Supplier;
 
+import static de.qaware.cloud.id.util.Reflection.getContextClassLoader;
 import static de.qaware.cloud.id.util.config.Props.stringOf;
 import static java.lang.String.format;
 import static java.util.Arrays.stream;
@@ -59,6 +62,7 @@ public class DebugBundleSupplierFactory implements BundleSupplierFactory {
     private static final int SAN_VALUE_I = 1;
 
     private static final String SPIFFE_URI_PREFIX = "spiffe://";
+    private static final String CLASSPATH_PREFIX = "classpath:";
 
     /**
      * Constructor.
@@ -120,11 +124,20 @@ public class DebugBundleSupplierFactory implements BundleSupplierFactory {
 
     private static KeyStore loadKeyStore() throws IOException, GeneralSecurityException {
         KeyStore keystore;
-        try (FileInputStream is = new FileInputStream(KEYSTORE_LOCATION.get())) {
+
+        try (InputStream is = open(KEYSTORE_LOCATION.get())) {
             keystore = KeyStore.getInstance(KEYSTORE_TYPE.get());
             keystore.load(is, KEYSTORE_PASSWORD.get().toCharArray());
         }
         return keystore;
+    }
+
+    private static InputStream open(String location) throws FileNotFoundException {
+        if (location.startsWith(CLASSPATH_PREFIX)) {
+            return getContextClassLoader().getResourceAsStream(location.substring(CLASSPATH_PREFIX.length()));
+        } else {
+            return new FileInputStream(location);
+        }
     }
 
 }

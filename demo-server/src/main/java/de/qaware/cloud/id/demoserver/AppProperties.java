@@ -19,19 +19,23 @@ import javax.validation.constraints.NotBlank;
 @ConfigurationProperties(prefix = "app")
 public class AppProperties {
 
+    /**
+     * Backend URL.
+     */
     @NotBlank
     private String backend;
 
-    @NotBlank
-    private String clientAuth;
+    /**
+     * Whether to log actual requests.
+     */
+    private boolean logRequests;
 
     /**
      * Log the config values on debug.
      */
     @PostConstruct
     public void debugLog() {
-        LOGGER.debug("Backend: {}", backend);
-        LOGGER.debug("Client Auth: {}", clientAuth);
+        LOGGER.debug("App Properties: {}", this);
     }
 
 }
