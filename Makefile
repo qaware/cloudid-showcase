@@ -49,3 +49,7 @@ minikube-deploy:
 
 .PHONY: minikube-deploy-and-register
 minikube-deploy-and-register: minikube-deploy spire-register
+
+.PHONY: minikube-show-service
+minikube-service:
+	minikube service --url --https demo-server-service-front
