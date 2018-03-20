@@ -1,20 +1,29 @@
 package de.qaware.cloudid.lib.util;
 
+import de.qaware.cloudid.lib.jsa.SPIRETrustManager;
 import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 
+import javax.annotation.Nullable;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.*;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.Date;
+import java.util.List;
+import java.util.regex.Pattern;
 
 import static java.util.Collections.singleton;
 
 /**
  * Utilities for certificates.
  */
+@Slf4j
 @UtilityClass
 public class Certificates {
+
+    private static final Pattern SPIFFE_ID_PATTERN = Pattern.compile("spiffe://.+");
 
     /**
      * Get the notAfter instant of a X.509 certificate.
@@ -82,4 +91,27 @@ public class Certificates {
         }
     }
 
+    /**
+     * Tries to find the SPIFFE ID in the given Subject Alternative Name collection using the given pattern.
+     *
+     * @param alternativeNames the collection which contains the SPIFFE Id somewhere in its Lists, either
+     *                         subject alternative names (SAN) or issuer alternative names
+     * @param spiffeIdPattern the pattern of the SPIFFE ID which is used to find the SPIFFE ID
+     * @return the SPIFFE ID or null if not found
+     */
+    @Nullable
+    public static String getSpiffeId(Collection<List<?>> alternativeNames) {
+        for (List<?> list : alternativeNames) {
+            for (Object object : list) {
+                if (object instanceof String) {
+                    String spiffeId = (String) object;
+                    if (SPIFFE_ID_PATTERN.matcher(spiffeId).matches()) {
+                        return spiffeId;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
 }

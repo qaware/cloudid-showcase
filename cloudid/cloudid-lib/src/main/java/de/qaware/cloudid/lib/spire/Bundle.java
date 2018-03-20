@@ -9,7 +9,7 @@ import java.time.Instant;
 import java.util.List;
 
 /**
- * A data transfer object that contains the parsed informations about a spiffe workload id.
+ * A data transfer object that contains the parsed information about a spiffe workload id.
  */
 @Data
 public class Bundle {
