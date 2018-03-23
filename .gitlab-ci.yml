@@ -1,4 +1,4 @@
-image: artifactory.qaware.de/qaware-docker/cloud-id-build:latest
+image: artifactory.qaware.de/qaware-qalabs-docker/cloud-id-build:latest
 
 
 variables:
