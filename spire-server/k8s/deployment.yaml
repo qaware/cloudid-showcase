@@ -27,11 +27,8 @@ spec:
             - name: spire-config
               mountPath: /spire/config
               readOnly: true
-            #- name: spire-plugins
-            #  mountPath: /spire/plugins
-            #  readOnly: true
-            - name: spire-tls
-              mountPath: /spire/tls
+            - name: spire-server-secrets
+              mountPath: /spire/secrets
               readOnly: true
             - name: spire-ds
               mountPath: /spire/datastore
@@ -62,22 +59,9 @@ spec:
             items:
               - key: server.conf
                 path: server.conf
-              - key: plugin-ca_memory.conf
-                path: plugin/ca_memory.conf
-              - key: plugin-ds_sqlite.conf
-                path: plugin/ds_sqlite.conf
-              - key: plugin-join_token.conf
-                path: plugin/join_token.conf
-              - key: plugin-noop.conf
-                path: plugin/noop.conf
-              - key: plugin-upstream_ca_memory.conf
-                path: plugin/upstream_ca_memory.conf
-#        - name: spire-plugins
-#          configMap:
-#            name: spire-server-plugins
-        - name: spire-tls
+        - name: spire-server-secrets
           secret:
-            secretName: spire-server-upstream-ca
+            secretName: spire-server-secrets
         - name: spire-ds
           hostPath:
             path: /Volumes/Cloud-ID/codebase/spire-k8s/datastore

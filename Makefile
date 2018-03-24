@@ -25,14 +25,14 @@ spire-register:
 
 	# Front demo server
 	kubectl exec $$(kubectl get pod | grep -Eo 'spire-server\S*') -- \
-		/opt/spire/spire-server register \
+		/opt/spire/spire-server entry create \
 		-parentID spiffe://salm.qaware.de/k8s/node/minikube \
 		-spiffeID spiffe://salm.qaware.de/demo-server \
 		-selector k8s:ns:default
 
 	# Back demo server
 	kubectl exec $$(kubectl get pod | grep -Eo 'spire-server\S*') -- \
-		/opt/spire/spire-server register \
+		/opt/spire/spire-server entry create \
 		-parentID spiffe://salm.qaware.de/k8s/node/minikube \
 		-spiffeID spiffe://salm.qaware.de/demo-server \
 		-selector k8s:ns:back

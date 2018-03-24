@@ -3,8 +3,8 @@ DEPLOYMENTS =  k8s/configmap.yaml k8s/deployment.yaml k8s/service.yaml
 
 .PHONY: deploy
 deploy: container-build
-	sed "s/{{TLS.KEY}}/$$(base64 ca/tls.key | tr -d '\r\n')/; \
-		 s/{{TLS.CRT}}/$$(base64 ca/tls.crt | tr -d '\r\n')/" \
+	sed "s/{{UPSTREAM_CA_KEY}}/$$(base64 ../upstream-ca/ca-key.pem | tr -d '\r\n')/; \
+		 s/{{UPSTREAM_CA}}/$$(base64 ../upstream-ca/ca.pem | tr -d '\r\n')/" \
 		 k8s/secrets.yaml | kubectl apply -f -
 	$(foreach f, $(DEPLOYMENTS), kubectl apply -f $f;)
 
@@ -14,6 +14,7 @@ container-build:
 
 .PHONY: delete
 delete:
+	-kubectl delete secret spire-server-upstream-ca
 	-$(foreach f, $(DEPLOYMENTS), kubectl delete -f $f;)
 
 clean:

@@ -34,6 +34,9 @@ spec:
             - name: spire-config
               mountPath: /spire/config
               readOnly: true
+            - name: spire-agent-secrets
+              mountPath: /spire/secrets
+              readOnly: true
             - name: spire-agent-socket
               mountPath: /spire/socket
               readOnly: false
@@ -61,18 +64,9 @@ spec:
             items:
               - key: agent.conf
                 path: agent.conf
-              - key: ca.crt
-                path: ca.crt
-              - key: plugin-join_token.conf
-                path: plugin/join_token.conf
-              - key: plugin-km_memory.conf
-                path: plugin/km_memory.conf
-              - key: plugin-wla_k8s.conf
-                path: plugin/wla_k8s.conf
-              - key: plugin-wla_secret_file.conf
-                path: plugin/wla_secret_file.conf
-              - key: plugin-wla_unix.conf
-                path: plugin/wla_unix.conf
+        - name: spire-agent-secrets
+          secret:
+            secretName: spire-agent-secrets
         - name: spire-agent-socket
           hostPath:
            path: /mnt/spire/agent/socket

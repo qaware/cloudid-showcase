@@ -4,72 +4,47 @@ metadata:
   name: spire-agent-config
 data:
   agent.conf: |
-    BindAddress = "0.0.0.0"
-    BindPort = "8080"
-    DataDir = "/spire/socket"
-    LogLevel = "DEBUG"
-    PluginDir = "/spire/config/plugin"
-    ServerAddress = "spire-server"
-    ServerPort = "8081"
-    SocketPath ="/spire/socket/agent.sock"
-    TrustBundlePath = "/spire/config/ca.crt"
-    TrustDomain = "salm.qaware.de"
-    Umask = ""
-    JoinToken = ""
-  ca.crt: |
-    -----BEGIN CERTIFICATE-----
-    MIIB+TCCAVqgAwIBAgIJALoxujntZoA2MAoGCCqGSM49BAMEMB4xCzAJBgNVBAYT
-    AlVTMQ8wDQYDVQQKDAZTUElGRkUwHhcNMTcxMTMwMTgzMzIxWhcNMjIxMTI5MTgz
-    MzIxWjAeMQswCQYDVQQGEwJVUzEPMA0GA1UECgwGU1BJRkZFMIGbMBAGByqGSM49
-    AgEGBSuBBAAjA4GGAAQAyLsuMBa6kiSqwyCPGTw+JFoh8M50jhmdTXFRP7tNLoBk
-    1GS9c/+ExsUcCng0FPdfS0tge4kBBAPO9cs55FF6IJYBrnkccjjMAqatPANUiQfR
-    8IKxhk0La6gjs/qtIZSl+XXAL9EmtriZjkF5GVc+l1rA0mfQK4AF+q64aV0oWSyE
-    HsKjPjA8MA8GA1UdEwEB/wQFMAMBAf8wDgYDVR0PAQH/BAQDAgEGMBkGA1UdEQQS
-    MBCGDnNwaWZmZTovL2xvY2FsMAoGCCqGSM49BAMEA4GMADCBiAJCAKp1G1wAcC3S
-    I/w+Tk/meBJQkhkF2tnlle8Xo33pDL9kFfol6xb6VopoW9BgvMPI+aYk+7vX3Bwz
-    BuMo/6cmOwmWAkIA0APsAWRfGKAGLITZHaDa7P8PAvrAr2Uhrht7BxD76IWFlbWI
-    u2qC/jYdDRgLpNXxEIQWn3gZO2ZYUnWr4avCE+s=
-    -----END CERTIFICATE-----
-  plugin-join_token.conf: |
-    pluginName = "join_token" //needs to match the name used in plugin serverConfig
-
-    pluginCmd = "/opt/spire/plugin/agent/nodeattestor-jointoken"
-    pluginChecksum = ""
-    enabled = true
-    pluginType = "NodeAttestor" //needs to match the handshake
-    pluginData {
-    	trust_domain = "salm.qaware.de"
+    agent {
+      bind_address = "0.0.0.0"
+      bind_port = "8080"
+      data_dir = "/spire/socket"
+      log_level = "DEBUG"
+      server_address = "spire-server"
+      server_port = "8081"
+      socket_path ="/spire/socket/agent.sock"
+      trust_bundle_path = "/spire/secrets/upstream-ca.pem"
+      trust_domain = "salm.qaware.de"
+      umask = ""
+      join_token = ""
     }
-  plugin-km_memory.conf: |
-    pluginName = "km_memory"
-    pluginCmd = "/opt/spire/plugin/agent/keymanager-memory"
-    pluginChecksum = ""
-    enabled = true
-    pluginType = "KeyManager"
-    pluginData {
-    }
-  plugin-wla_k8s.conf: |
-    pluginName = "wla_k8s"
-    pluginCmd = "/opt/spire/plugin/agent/workloadattestor-k8s"
-    pluginChecksum = ""
-    enabled = true
-    pluginType = "WorkloadAttestor"
-    pluginData {
-        kubelet_read_only_port = "10255"
-    }
-  plugin-wla_secret_file.conf: |
-    pluginName = "wla_secret_file"
-    pluginCmd = "/opt/spire/plugin/agent/workloadattestor-secretfile"
-    pluginChecksum = ""
-    enabled = true
-    pluginType = "WorkloadAttestor"
-    pluginData {
-    }
-  plugin-wla_unix.conf: |
-    pluginName = "wla_unix"
-    pluginCmd = "/opt/spire/plugin/agent/workloadattestor-unix"
-    pluginChecksum = ""
-    enabled = true
-    pluginType = "WorkloadAttestor"
-    pluginData {
+    plugins {
+      KeyManager "memory" {
+        enabled = true
+        plugin_cmd = "/opt/spire/plugin/agent/keymanager-memory"
+        plugin_data {}
+      }
+      WorkloadAttestor "k8s" {
+        enabled = true
+        plugin_cmd = "/opt/spire/plugin/agent/workloadattestor-k8s"
+        plugin_data {
+            kubelet_read_only_port = "10255"
+        }
+      }
+      NodeAttestor "join_token" {
+        enabled = true
+        plugin_cmd = "/opt/spire/plugin/agent/nodeattestor-jointoken"
+        plugin_data {
+          trust_domain = "salm.qaware.de"
+        }
+      }
+      WorkloadAttestor "secret_file" {
+        enabled = true
+        plugin_cmd = "/opt/spire/plugin/agent/workloadattestor-secretfile"
+        plugin_data { }
+      }
+      WorkloadAttestor "unix" {
+        enabled = true
+        plugin_cmd = "/opt/spire/plugin/agent/workloadattestor-unix"
+        plugin_data { }
+      }
     }

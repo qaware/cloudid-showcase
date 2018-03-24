@@ -1,8 +1,10 @@
 PROJECT_NAME = spire-agent
-DEPLOYMENTS =  $(wildcard k8s/*.yaml)
+DEPLOYMENTS =  k8s/daemonSet.yaml k8s/configmap.yaml
 
 .PHONY: deploy
 deploy: container-build
+	sed "s/{{UPSTREAM_CA}}/$$(base64 ../upstream-ca/ca.pem | tr -d '\r\n')/" \
+		 k8s/secrets.yaml | kubectl apply -f -
 	$(foreach f, $(DEPLOYMENTS), kubectl apply -f $f;)
 
 .PHONY: container-build
@@ -11,4 +13,5 @@ container-build:
 
 .PHONY: delete
 delete:
+	-kubectl delete -f k8s/secrets.yaml
 	-$(foreach f, $(DEPLOYMENTS), kubectl delete -f $f;)
