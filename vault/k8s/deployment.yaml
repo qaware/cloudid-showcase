@@ -13,13 +13,10 @@ spec:
       containers:
         - name: vault
           image: "vault:0.9.6"
-#          resources:
-#            requests:
-#              cpu: 300m
-#              memory: 1000Mi
-#            limits:
-#              cpu: 300m
-#              memory: 1500Mi
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
           command:
           - vault
           - server
@@ -28,11 +25,8 @@ spec:
           ports:
           - containerPort: 8200
             name: main-port
-          - containerPort: 8300
-            name: healthcheck
           readinessProbe:
             httpGet:
-              # TODO: Review
               path: /v1/sys/health
               port: 8300
             initialDelaySeconds: 5
