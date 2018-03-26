@@ -12,7 +12,7 @@ spec:
     spec:
       containers:
         - name: vault
-          image: "vault:0.9.3"
+          image: "vault:0.9.6"
 #          resources:
 #            requests:
 #              cpu: 300m
@@ -20,27 +20,45 @@ spec:
 #            limits:
 #              cpu: 300m
 #              memory: 1500Mi
+          command:
+          - vault
+          - server
+          - -config
+          - /vault/config/vault.conf
           ports:
           - containerPort: 8200
             name: main-port
-          env:
-          - name: VAULT_LOCAL_CONFIG
-          # TODO: Review
-            value:
-                 listener "tcp" {
-                  address = "0.0.0.0:9000"
-                  tls_disable = 1
-                }
+          - containerPort: 8300
+            name: healthcheck
           readinessProbe:
             httpGet:
               # TODO: Review
-              path: /v1/sys/leader
-              port: 9000
-            initialDelaySeconds: 30
+              path: /v1/sys/health
+              port: 8300
+            initialDelaySeconds: 5
             timeoutSeconds: 1
           volumeMounts:
-              - name: log-storage
+              - name: vault-config
+                mountPath: /vault/config
+                readOnly: true
+              - name: vault-secrets
+                mountPath: /vault/secrets
+                readOnly: true
+              - name: vault-file
+                mountPath: /vault/file
+              - name: vault-logs
                 mountPath: /vault/logs
       volumes:
-        - name: log-storage
+        - name: vault-config
+          configMap:
+            name: vault-config
+            items:
+            - key: vault.conf
+              path: vault.conf
+        - name: vault-secrets
+          secret:
+            secretName: vault-secrets
+        - name: vault-logs
+          emptyDir: {}
+        - name: vault-file
           emptyDir: {}
