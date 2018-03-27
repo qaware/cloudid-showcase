@@ -19,11 +19,11 @@ spec:
       containers:
         - name: spire-agent
           imagePullPolicy: Never
-          image: spire-agent
+          image: spire
           securityContext:
             privileged: true
           command:
-            - /opt/start-agent.sh
+            - /opt/spire/start-agent.sh
             # Path to the agent configuration file
             - /spire/config/agent.conf
             # TrustDomain; Must be the same as in the agent's configuration file!

@@ -1,4 +1,5 @@
-FROM openjdk:8-jdk-alpine
+# Using openjdk:8-jdk to have a common, Debian-based base image with SPIRE.
+FROM openjdk:8-jdk
 VOLUME /tmp
 
 ENV WORKDIR /deployment

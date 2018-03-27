@@ -9,7 +9,7 @@ deploy: container-build
 
 .PHONY: container-build
 container-build:
-	docker build -t $(PROJECT_NAME) .
+	$(MAKE) -C ../spire
 
 .PHONY: delete
 delete:

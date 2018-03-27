@@ -17,7 +17,7 @@ spec:
       containers:
         - name: spire-server
           imagePullPolicy: Never
-          image: spire-server
+          image: spire
           command:
             - /opt/spire/spire-server
             - run
