@@ -20,6 +20,10 @@ spec:
         - name: spire-agent
           imagePullPolicy: Never
           image: spire
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
           securityContext:
             privileged: true
           command:

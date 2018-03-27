@@ -18,6 +18,10 @@ spec:
         - name: spire-server
           imagePullPolicy: Never
           image: spire
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
           command:
             - /opt/spire/spire-server
             - run

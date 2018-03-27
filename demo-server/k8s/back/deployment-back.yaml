@@ -18,6 +18,10 @@ spec:
       - name: demo-server
         image: {{DOCKER_QUALIFIED_NAME}}
         imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+              cpu: 200m
+              memory: 512Mi
         volumeMounts:
         - name: application-config
           mountPath: /deployment/config
@@ -27,7 +31,7 @@ spec:
           readOnly: false
         env:
         - name: JAVA_TOOL_OPTIONS
-          value: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005 -Djavax.net.debug=all"
+          value: "-Xmx256m -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005 -Djavax.net.debug=all"
         ports:
         - name: https
           containerPort: 8443

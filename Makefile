@@ -60,3 +60,11 @@ minikube-test-service:
 delete-demo-server-pods:
 	kubectl -n back delete pod $$(kubectl -n back get pod -o name | grep -o 'demo-server.*$$')
 	kubectl delete pod $$(kubectl get pod -o name | grep -o 'demo-server.*$$')
+
+.PHONY: minikube-start
+minikube-start:
+	minikube start --memory 6144 --cpus 2
+
+.PHONY: minikube-stop
+minikube-stop:
+	minikube stop
