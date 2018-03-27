@@ -1,6 +1,6 @@
-# Image is based on Debian Stretch to speed up showcase deployment
-# Strech is the common Debian base for this image and the Java parts which are based on openjdk:8-jdk
-FROM debian:stretch
+# Image is based on Debian Sid slim to speed up showcase deployment
+# Sid slim is the common Debian base for this image and the Java parts which are based on openjdk:10-jdk
+FROM debian:sid-slim
 
 MAINTAINER Andreas Zitzelsberger<andreas.zitzelsberger@qaware.de>
 
