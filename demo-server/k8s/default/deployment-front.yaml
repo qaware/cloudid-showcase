@@ -34,24 +34,13 @@ spec:
         - name: jvm-debug
           containerPort: 5005
         livenessProbe:
-          failureThreshold: 3
+          failureThreshold: 2
           httpGet:
             path: /actuator/health
             port: 8081
             scheme: HTTP
-          initialDelaySeconds: 60
+          initialDelaySeconds: 30
           periodSeconds: 30
-          successThreshold: 1
-          timeoutSeconds: 1
-        readinessProbe:
-          failureThreshold: 3
-          httpGet:
-            path: /actuator/health
-            port: 8081
-            scheme: HTTP
-          initialDelaySeconds: 60
-          periodSeconds: 30
-          successThreshold: 1
           timeoutSeconds: 1
       imagePullSecrets:
         # Needs to be definied for this deployment to work
