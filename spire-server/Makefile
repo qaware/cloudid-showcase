@@ -14,7 +14,7 @@ container-build:
 
 .PHONY: delete
 delete:
-	-kubectl delete secret spire-server-upstream-ca
+	-kubectl delete secret spire-server-secrets
 	-$(foreach f, $(DEPLOYMENTS), kubectl delete -f $f;)
 
 clean:
