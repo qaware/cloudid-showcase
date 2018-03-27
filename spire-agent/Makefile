@@ -1,5 +1,5 @@
 PROJECT_NAME = spire-agent
-DEPLOYMENTS =  k8s/daemonSet.yaml k8s/configmap.yaml
+DEPLOYMENTS =  k8s/daemonset.yaml k8s/configmap.yaml
 
 .PHONY: deploy
 deploy: container-build
@@ -13,5 +13,5 @@ container-build:
 
 .PHONY: delete
 delete:
-	-kubectl delete -f k8s/secrets.yaml
+	-kubectl delete secret spire-agent-secrets
 	-$(foreach f, $(DEPLOYMENTS), kubectl delete -f $f;)

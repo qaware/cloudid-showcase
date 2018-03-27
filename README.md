@@ -19,7 +19,7 @@ To start the agent it automatically retrieves a join token from the Spire-Server
 
 ### Configuring the Spire-Agent
 As the Spire-Server, the spire agent is also be configured using the Kubernetes [ConfigMap](spire-agent/k8s/configmap.yaml).
-If you change the Spire-Server hostname and/or the trust domain you have to change it also within the arguments of the Spire-Agent [DaemonSet](spire-agent/k8s/daemonSet.yaml).
+If you change the Spire-Server hostname and/or the trust domain you have to change it also within the arguments of the Spire-Agent [DaemonSet](spire-agent/k8s/daemonset.yaml).
 
 ## Changing the TrustDomain
 When changing the trust domain it is necessary to adjust them at the following places:

@@ -39,18 +39,11 @@ spec:
             - name: grpc
               containerPort: 8081
           livenessProbe:
-            failureThreshold: 3
+            failureThreshold: 2
             tcpSocket:
               port: 8080
             initialDelaySeconds: 10
-            periodSeconds: 10
-            timeoutSeconds: 1
-          readinessProbe:
-            failureThreshold: 3
-            tcpSocket:
-              port: 8080
-            initialDelaySeconds: 10
-            periodSeconds: 10
+            periodSeconds: 30
             timeoutSeconds: 1
       volumes:
         - name: spire-config

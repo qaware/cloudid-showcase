@@ -23,7 +23,7 @@ spec:
           securityContext:
             privileged: true
           command:
-            - /opt/start.sh
+            - /opt/start-agent.sh
             # Path to the agent configuration file
             - /spire/config/agent.conf
             # TrustDomain; Must be the same as in the agent's configuration file!
@@ -40,23 +40,16 @@ spec:
             - name: spire-agent-socket
               mountPath: /spire/socket
               readOnly: false
-          ports:
-            - name: http
-              containerPort: 8080
-#          livenessProbe:
-#            failureThreshold: 3
-#            tcpSocket:
-#              port: 8080
-#            initialDelaySeconds: 10
-#            periodSeconds: 10
-#            timeoutSeconds: 1
-#          readinessProbe:
-#            failureThreshold: 3
-#            tcpSocket:
-#              port: 8080
-#            initialDelaySeconds: 10
-#            periodSeconds: 10
-#            timeoutSeconds: 1
+          livenessProbe:
+            exec:
+              command:
+              - /spire-agent
+              - api
+              - fetch
+              - -socketPath
+              - /spire/socket/agent.sock
+            initialDelaySeconds: 5
+            periodSeconds: 30
       volumes:
         - name: spire-config
           configMap:

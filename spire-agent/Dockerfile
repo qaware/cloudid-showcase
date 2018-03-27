@@ -9,13 +9,12 @@ RUN apt-get update \
 ARG SPIRE_VERSION=0.4
 ENV SPIRE_TGZ=https://github.com/spiffe/spire/releases/download/${SPIRE_VERSION}/spire-${SPIRE_VERSION}-linux-x86_64-glibc.tar.gz
 
-EXPOSE 8080
 VOLUME /spire/agent/socket
 
 RUN curl --silent --location $SPIRE_TGZ \
     | tar --directory /opt -xzf - spire-${SPIRE_VERSION}/spire-agent spire-${SPIRE_VERSION}/spire-server spire-${SPIRE_VERSION}/plugin/agent \
     && mv /opt/spire-${SPIRE_VERSION} /opt/spire
 
-COPY start.sh /opt/
+COPY start-agent.sh /opt/
 
-CMD /opt/start.sh
+CMD /opt/start-agent.sh
