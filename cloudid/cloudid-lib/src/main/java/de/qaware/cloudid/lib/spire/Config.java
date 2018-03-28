@@ -35,10 +35,6 @@ public class Config {
      */
     public static final Prop<Duration> FORCE_UPDATE_AFTER = Props.durationOf("spire.forceUpdateAfter", Duration.ofDays(1));
     /**
-     * Duration an update should be done before the bundles expire.
-     */
-    public static final Prop<Duration> UPDATE_AHEAD = Props.durationOf("spire.updateAhead", Duration.ofMinutes(1));
-    /**
      * Minimum update interval as a safety measure if the TTLs are too short.
      */
     public static final Prop<Duration> MIN_UPDATE_INTERVAL = Props.durationOf("spire.updateAhead", Duration.ofSeconds(30));

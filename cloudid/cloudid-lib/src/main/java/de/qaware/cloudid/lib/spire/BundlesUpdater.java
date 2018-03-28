@@ -69,7 +69,7 @@ class BundlesUpdater implements Supplier<WorkloadOuterClass.Bundles> {
         bundlesRef.set(bundles);
 
         Duration backoff = min(
-                max(Duration.ofSeconds(bundles.getTtl()).minus(UPDATE_AHEAD.get()), MIN_UPDATE_INTERVAL.get()),
+                max(Duration.ofSeconds(bundles.getTtl()), MIN_UPDATE_INTERVAL.get()),
                 FORCE_UPDATE_AFTER.get());
 
         LOGGER.debug("Backing off for {}", backoff);
