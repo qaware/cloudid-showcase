@@ -9,15 +9,15 @@ variables:
 
 
 before_script:
-    - export GRADLE_USER_HOME=`pwd`/demo-server/.gradle
-    - cd demo-server/
+    - export GRADLE_USER_HOME=`pwd`/cloudid/.gradle
+    - cd cloudid/
 
 
 cache:
   key: $CACHE_KEY
   paths:
-    - demo-server/.gradle/
-    - demo-server/build/
+    - cloudid/.gradle/
+    - cloudid/build/
 
 
 stages:

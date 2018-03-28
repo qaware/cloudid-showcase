@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: demo-server-service-back
+  name: cloudid-service-front
 spec:
   type: NodePort
   ports:
     - name: http
-      port: 444
+      port: 443
       targetPort: 8443
       protocol: TCP
   selector:
-    app: demo-server-back
+    app: cloudid-front

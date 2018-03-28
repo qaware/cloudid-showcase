@@ -17,6 +17,7 @@ buildscript {
 
 allprojects {
     group = 'de.qaware.cloudid'
+    version = '0.1-SNAPSHOT'
 }
 
 subprojects {
@@ -82,12 +83,10 @@ subprojects {
 //        }
 //    }
 
-
-
 //    sonarqube {
 //        properties {
 //            property 'sonar.exclusions', '**/*Generated.java, build/generated/**'
-//            property 'sonar.projectName', 'Cloud ID SPIRE Demo-Server'
+//            property 'sonar.projectName', 'Cloud ID SPIRE cloudid'
 //
 //            property 'sonar.issue.ignore.multicriteria', 'e1,e2,e3'
 //

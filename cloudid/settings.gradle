@@ -1,4 +1,4 @@
-rootProject.name = 'cloud-id'
+rootProject.name = 'cloudid'
 
 include ':cloudid-lib'
 include ':cloudid-proxy'

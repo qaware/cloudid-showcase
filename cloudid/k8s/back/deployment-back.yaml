@@ -1,21 +1,21 @@
 apiVersion: apps/v1beta2 # for versions before 1.9.0 use apps/v1beta2
 kind: Deployment
 metadata:
-  name: demo-server-front
+  name: cloudid-back
   labels:
-    app: demo-server-front
+    app: cloudid-back
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: demo-server-front
+      app: cloudid-back
   template:
     metadata:
       labels:
-        app: demo-server-front
+        app: cloudid-back
     spec:
       containers:
-      - name: demo-server
+      - name: cloudid
         image: {{DOCKER_QUALIFIED_NAME}}
         imagePullPolicy: IfNotPresent
         resources:
@@ -52,7 +52,7 @@ spec:
       volumes:
         - name: application-config
           configMap:
-            name: demo-server-config-front
+            name: cloudid-config-back
             items:
             - key: application.properties
               path: application.properties

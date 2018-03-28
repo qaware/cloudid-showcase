@@ -1,6 +1,6 @@
 SHELL = /bin/bash
 
-PROJECT_NAME = demo-server
+PROJECT_NAME = cloudid
 
 DEPLOYMENTS =  $(wildcard k8s/*.yaml)
 
@@ -99,7 +99,7 @@ sonar:
 .PHONY: delete
 delete:
 	-kubectl delete -f k8s/namespace-back.yaml
-	-kubectl delete deployment demo-server-front
-	-kubectl get pod -o name | grep -o 'demo-server.*$$' | xargs -n1 kubectl delete pod
-	-kubectl delete configMap demo-server-config-front
-	-kubectl delete service demo-server-service-front
+	-kubectl delete deployment cloudid-front
+	-kubectl get pod -o name | grep -o 'cloudid.*$$' | xargs -n1 kubectl delete pod
+	-kubectl delete configMap cloudid-config-front
+	-kubectl delete service cloudid-service-front

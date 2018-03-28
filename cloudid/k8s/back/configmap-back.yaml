@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: demo-server-config-back
+  name: cloudid-config-back
 data:
   application.properties: |
     app.backend=https://xkcd.com

@@ -1,8 +1,8 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: demo-server-config-front
+  name: cloudid-config-front
 data:
   application.properties: |
-    app.backend=https://demo-server-service-back.back:444
+    app.backend=https://cloudid-service-back.back:444
     server.ssl.client-auth=

@@ -1,6 +1,6 @@
-BUILDS = demo-server
-CONTAINERS = spire-agent spire-server demo-server
-DEPLOYMENTS = spire-agent spire-server vault demo-server
+BUILDS = cloudid
+CONTAINERS = spire-agent spire-server cloudid
+DEPLOYMENTS = spire-agent spire-server vault cloudid
 
 .PHONY: deploy
 deploy:
@@ -27,14 +27,14 @@ spire-register:
 	kubectl exec $$(kubectl get pod | grep -Eo 'spire-server\S*') -- \
 		/opt/spire/spire-server entry create \
 		-parentID spiffe://salm.qaware.de/k8s/node/minikube \
-		-spiffeID spiffe://salm.qaware.de/demo-server \
+		-spiffeID spiffe://salm.qaware.de/cloudid \
 		-selector k8s:ns:default
 
 	# Back demo server
 	kubectl exec $$(kubectl get pod | grep -Eo 'spire-server\S*') -- \
 		/opt/spire/spire-server entry create \
 		-parentID spiffe://salm.qaware.de/k8s/node/minikube \
-		-spiffeID spiffe://salm.qaware.de/demo-server \
+		-spiffeID spiffe://salm.qaware.de/cloudid \
 		-selector k8s:ns:back
 
 .PHONY: minikube-container-build
@@ -50,16 +50,16 @@ minikube-deploy-and-register: minikube-deploy spire-register
 
 .PHONY: minikube-show-service
 minikube-show-service:
-	minikube service --url --https demo-server-service-front
+	minikube service --url --https cloudid-service-front
 
 .PHONY: minikube-test-service
 minikube-test-service:
-	curl -k $$(minikube service --url --https demo-server-service-front)/123
+	curl -k $$(minikube service --url --https cloudid-service-front)/123
 
-.PHONY: delete-demo-server-pods
-delete-demo-server-pods:
-	kubectl -n back delete pod $$(kubectl -n back get pod -o name | grep -o 'demo-server.*$$')
-	kubectl delete pod $$(kubectl get pod -o name | grep -o 'demo-server.*$$')
+.PHONY: delete-cloudid-pods
+delete-cloudid-pods:
+	kubectl -n back delete pod $$(kubectl -n back get pod -o name | grep -o 'cloudid.*$$')
+	kubectl delete pod $$(kubectl get pod -o name | grep -o 'cloudid.*$$')
 
 .PHONY: minikube-start
 minikube-start:
