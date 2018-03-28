@@ -4,27 +4,27 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.5'
-        classpath 'com.google.gradle:osdetector-gradle-plugin:1.4.0'
+        classpath "com.google.protobuf:protobuf-gradle-plugin:0.8.5"
+        classpath "com.google.gradle:osdetector-gradle-plugin:1.4.0"
     }
 }
 
-apply plugin: 'com.google.protobuf'
-apply plugin: 'com.google.osdetector'
+apply plugin: "com.google.protobuf"
+apply plugin: "com.google.osdetector"
 
 
 ext {
-    grpcVersion = '1.5.0'
-    nettyVersion = '4.1.12.Final'
-    nettyTcnativeVersion = '2.0.5.Final'
-    bouncyCastleVersion = '1.59'
+    grpcVersion = "1.5.0"
+    nettyVersion = "4.1.12.Final"
+    nettyTcnativeVersion = "2.0.5.Final"
+    bouncyCastleVersion = "1.59"
 }
 
 sourceSets {
     main {
         java {
-            srcDirs 'build/generated/source/proto/main/grpc'
-            srcDirs 'build/generated/source/proto/main/java'
+            srcDirs "build/generated/source/proto/main/grpc"
+            srcDirs "build/generated/source/proto/main/java"
         }
     }
 }
@@ -64,12 +64,12 @@ dependencies {
     compile "org.bouncycastle:bcpkix-jdk15on:${bouncyCastleVersion}"
 
     // SLF4J
-    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
+    compile group: "org.slf4j", name: "slf4j-api", version: "1.7.25"
     // Logback as SLF4j implementation for tests
-    testCompile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+    testCompile group: "ch.qos.logback", name: "logback-classic", version: "1.2.3"
 
     // Apache Commons Lang 3
-    compile 'org.apache.commons:commons-lang3:3.7'
+    compile "org.apache.commons:commons-lang3:3.7"
 }
 
 compileJava.dependsOn(processResources)
