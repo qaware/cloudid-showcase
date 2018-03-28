@@ -3,8 +3,8 @@ FROM openjdk:10-jdk-slim
 VOLUME /tmp
 
 ENV WORKDIR /deployment
-ADD build/libs/demo-server.jar $WORKDIR/demo-server.jar
+ADD build/libs/cloudid-proxy.jar $WORKDIR/cloudid-proxy.jar
 WORKDIR $WORKDIR
 
 # Use non-blocking secure random to prevent lock-ups
-ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "demo-server.jar"]
+ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "cloudid-proxy.jar"]

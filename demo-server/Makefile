@@ -77,7 +77,7 @@ deploy: container-build
 
 .PHONY: container-build
 container-build: build
-	docker build -t "$(DOCKER_QUALIFIED_NAME)" .
+	docker build -t "$(DOCKER_QUALIFIED_NAME)" cloudid-proxy
 
 .PHONY: container-push
 container-push: container-build
