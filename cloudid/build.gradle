@@ -92,6 +92,18 @@ subprojects {
         testCompile "com.github.tomakehurst:wiremock-standalone:2.14.0"
     }
 
+
+    test {
+        testLogging {
+            // Log test logs to stdout/stderr if gradle is executed with the -i / --info command-line switch
+            if (project.gradle.startParameter.logLevel == LogLevel.INFO) {
+                testLogging.showStandardStreams = true
+                testLogging.exceptionFormat = 'full'
+            }
+        }
+    }
+
+
     sonarqube {
         properties {
             property "sonar.jacoco.reportPath", allTestCoverageFile

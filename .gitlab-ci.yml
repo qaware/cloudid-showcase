@@ -5,7 +5,7 @@ variables:
   GIT_STRATEGY: fetch
   DOCKER_IMAGE_NAME: $CI_PROJECT_NAME
   CACHE_KEY: $CI_COMMIT_REF_SLUG
-  GRADLE_ARGS: -Dorg.gradle.daemon=false --stacktrace --build-cache
+  GRADLE_ARGS: -Dorg.gradle.daemon=false --stacktrace --build-cache --info
 
 
 before_script:
