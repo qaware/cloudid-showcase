@@ -3,6 +3,7 @@ package de.qaware.cloudid.lib.jsa
 import com.github.tomakehurst.wiremock.WireMockServer
 import de.qaware.cloudid.lib.TestResources
 import de.qaware.cloudid.lib.spire.DebugBundleSupplierFactory
+import de.qaware.cloudid.lib.spire.StaticLauncher
 import groovy.util.logging.Slf4j
 import spock.lang.Ignore
 import spock.lang.Specification
@@ -36,6 +37,7 @@ class SPIREProviderSpec extends Specification {
     void cleanupSpec() {
         SPIREProvider.uninstall()
         SPIRESocketFactory.uninstall()
+        StaticLauncher.reset()
     }
 
     @Ignore("unclear if the key manager is actually required")

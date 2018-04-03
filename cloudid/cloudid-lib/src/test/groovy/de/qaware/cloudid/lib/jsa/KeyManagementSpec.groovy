@@ -1,5 +1,6 @@
 package de.qaware.cloudid.lib.jsa
 
+import de.qaware.cloudid.lib.spire.StaticLauncher
 import de.qaware.cloudid.lib.spire.TestBundleSupplierFactory
 import spock.lang.Specification
 import spock.util.environment.RestoreSystemProperties
@@ -24,6 +25,10 @@ class KeyManagementSpec extends Specification {
         System.setProperty(BUNDLE_SUPPLIER_FACTORY_CLASS.getSysProp(), TestBundleSupplierFactory.class.getName())
 
         keyManagerFactory = new SPIREKeyManagerFactory()
+    }
+
+    def cleanupSpec() {
+        StaticLauncher.reset()
     }
 
     def 'get key managers'() {

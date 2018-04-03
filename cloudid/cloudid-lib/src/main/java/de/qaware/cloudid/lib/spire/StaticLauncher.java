@@ -32,6 +32,16 @@ public class StaticLauncher {
         return bundleSupplierFactory.get();
     }
 
+    /**
+     * Reset the static launcher.
+     *
+     * Should only be used for tests.
+     */
+    public static synchronized void reset() {
+        LOGGER.warn("Resetting {}", StaticLauncher.class.getSimpleName());
+        bundleSupplierFactory = null;
+    }
+
     private static BundleSupplierFactory createBundleSupplierFactory() {
         // Log the configuration on DEBUG
         Props.debugLog(Config.class);
