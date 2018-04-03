@@ -60,8 +60,7 @@ public class SPIRETrustManager extends X509ExtendedTrustManager {
 
             validate(chain);
         } else {
-            // TODO: Implement fallback to delegate trust manager
-            LOGGER.error("Not a SPIFFE certificate, ignoring for now.");
+            LOGGER.error("Client certificate is not a SPIFFE certificate, ignoring for now.");
         }
 
 
@@ -116,10 +115,19 @@ public class SPIRETrustManager extends X509ExtendedTrustManager {
     }
 
     @Override
-    public void checkServerTrusted(X509Certificate[] chain, String authType) {
+    public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException{
         LOGGER.debug("Validating server {}, {}", chain, authType);
 
-        LOGGER.error("Blindly trusting server");
+        Validate.notEmpty(chain);
+
+        Collection<List<?>> sans = chain[0].getSubjectAlternativeNames();
+        String clientId = getSpiffeId(sans);
+        if (clientId != null) {
+            validate(chain);
+        } else {
+            // TODO: Implement fallback to delegate trust manager
+            LOGGER.error("Server certificate is not a SPIFFE certificate, ignoring for now.");
+        }
     }
 
     @Override
