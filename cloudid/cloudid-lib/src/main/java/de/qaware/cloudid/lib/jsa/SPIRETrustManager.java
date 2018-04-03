@@ -11,11 +11,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.Validate;
 
 import javax.net.ssl.*;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.Socket;
-import java.security.*;
+import java.security.GeneralSecurityException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.cert.*;
 import java.util.Collection;
 import java.util.List;
@@ -108,7 +109,7 @@ public class SPIRETrustManager extends X509ExtendedTrustManager {
 
             validate(chain);
         } else {
-            LOGGER.debug("Delegating to {}", delegate.getClass().getName());
+            LOGGER.debug("Client certificate is not a SPIFFE certificate. Delegating to {}", delegate.getClass().getName());
             delegate.checkClientTrusted(chain, authType);
         }
 
@@ -164,14 +165,18 @@ public class SPIRETrustManager extends X509ExtendedTrustManager {
     }
 
     @Override
-    public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+    public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException{
         LOGGER.debug("Validating server {}, {}", chain, authType);
-        String spiffeId = getSpiffeId(chain[0].getSubjectAlternativeNames());
-        if (spiffeId == null) {
-            LOGGER.debug("Delegating to {}", delegate.getClass().getName());
-            delegate.checkServerTrusted(chain, authType);
+
+        Validate.notEmpty(chain);
+
+        Collection<List<?>> sans = chain[0].getSubjectAlternativeNames();
+        String clientId = getSpiffeId(sans);
+        if (clientId != null) {
+            validate(chain);
         } else {
-            LOGGER.warn("Ignoring certs with spiffe-id");
+            LOGGER.debug("Server certificate is not a SPIFFE certificate. Delegating to {}", delegate.getClass().getName());
+            delegate.checkServerTrusted(chain, authType);
         }
     }
 
