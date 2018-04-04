@@ -11,7 +11,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.Validate;
 
 import javax.net.ssl.SSLEngine;
+import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509ExtendedTrustManager;
+import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
 import java.net.Socket;
 import java.security.GeneralSecurityException;
@@ -35,6 +37,16 @@ public class SPIRETrustManager extends X509ExtendedTrustManager {
 
     private static final String VAULT_ADDR = "https://localhost:8200";
     private final Supplier<Bundle> bundleSupplier;
+
+    private final X509TrustManager delegate = getDefaultTrustManager();
+
+    private static X509TrustManager getDefaultTrustManager() {
+        TrustManager[] trustManagers = SPIREProvider.DEFAULT_TRUST_MANAGER_FACTORY.getTrustManagers();
+        if (trustManagers.length > 1) {
+            LOGGER.error("More than one trust manager found");
+        }
+        return (X509TrustManager) trustManagers[0];
+    }
 
     @Override
     public X509Certificate[] getAcceptedIssuers() {
@@ -60,7 +72,8 @@ public class SPIRETrustManager extends X509ExtendedTrustManager {
 
             validate(chain);
         } else {
-            LOGGER.error("Client certificate is not a SPIFFE certificate, ignoring for now.");
+            LOGGER.debug("Delegating to {}", delegate.getClass().getName());
+            delegate.checkClientTrusted(chain, authType);
         }
 
 
@@ -115,19 +128,11 @@ public class SPIRETrustManager extends X509ExtendedTrustManager {
     }
 
     @Override
-    public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException{
+    public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
         LOGGER.debug("Validating server {}, {}", chain, authType);
+        LOGGER.debug("Delegating to {}", delegate.getClass().getName());
+        delegate.checkServerTrusted(chain, authType);
 
-        Validate.notEmpty(chain);
-
-        Collection<List<?>> sans = chain[0].getSubjectAlternativeNames();
-        String clientId = getSpiffeId(sans);
-        if (clientId != null) {
-            validate(chain);
-        } else {
-            // TODO: Implement fallback to delegate trust manager
-            LOGGER.error("Server certificate is not a SPIFFE certificate, ignoring for now.");
-        }
     }
 
     @Override

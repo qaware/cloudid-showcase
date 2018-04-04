@@ -3,8 +3,10 @@ package de.qaware.cloudid.lib.jsa;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.net.ssl.TrustManagerFactory;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
+import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
 import java.security.Security;
 import java.util.stream.Collectors;
@@ -40,6 +42,9 @@ public class SPIREProvider extends Provider {
     private static final long serialVersionUID = 0L;
 
     private String defaultAlgorithm;
+
+    static final TrustManagerFactory DEFAULT_TRUST_MANAGER_FACTORY = getTrustManagerFactory("PKIX");
+
 
     /**
      * Constructor.
@@ -107,5 +112,14 @@ public class SPIREProvider extends Provider {
                     .collect(Collectors.joining(", ")));
         }
     }
+
+    private static TrustManagerFactory getTrustManagerFactory(String algorithm)  {
+        try {
+            return TrustManagerFactory.getInstance(algorithm);
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
 
 }
