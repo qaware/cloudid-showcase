@@ -45,9 +45,10 @@ spec:
               mountPath: /spire/socket
               readOnly: false
           livenessProbe:
+            failureThreshold: 2
             exec:
               command:
-              - /spire-agent
+              - /opt/spire/spire-agent
               - api
               - fetch
               - -socketPath
