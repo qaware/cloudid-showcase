@@ -5,4 +5,4 @@ metadata:
 data:
   application.properties: |
     app.backend=https://cloudid-service-back.back:444
-    server.ssl.client-auth=
+    server.ssl.client-auth=need

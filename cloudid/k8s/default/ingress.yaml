@@ -1,0 +1,12 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: demo-server-ingress
+spec:
+  rules:
+   - http:
+      paths:
+      - path: /
+        backend:
+          serviceName: ingress-proxy-service
+          servicePort: 80

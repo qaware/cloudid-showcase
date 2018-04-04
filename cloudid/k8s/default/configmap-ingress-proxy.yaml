@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ingress-proxy-config
+data:
+  application.properties: |
+    app.backend=https://cloudid-service-front:444
+    server.port=8443
+    server.ssl.enabled=false

@@ -103,3 +103,8 @@ delete:
 	-kubectl get pod -o name | grep -o 'cloudid.*$$' | xargs -n1 kubectl delete pod
 	-kubectl delete configMap cloudid-config-front
 	-kubectl delete service cloudid-service-front
+	-kubectl delete deployment ingress-proxy
+	-kubectl get pod -o name | grep -o 'ingress-proxy.*$$' | xargs -n1 kubectl delete pod
+	-kubectl delete configMap ingress-proxy-config
+	-kubectl delete ingress demo-server-ingress
+	-kubectl delete service ingress-proxy-service
