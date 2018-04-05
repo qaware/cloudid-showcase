@@ -18,6 +18,7 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.cert.*;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +26,7 @@ import java.util.function.Supplier;
 
 import static de.qaware.cloudid.lib.util.Certificates.*;
 import static java.util.Arrays.asList;
+import static java.util.Arrays.stream;
 
 /**
  * X.509 trust manager backed by SPIRE bundles.
@@ -47,42 +49,11 @@ public class SPIRETrustManager extends X509ExtendedTrustManager {
             throw new IllegalStateException(e);
         }
 
-        X509TrustManager defaultTrustManager = null;
-        for (TrustManager tm : factory.getTrustManagers()) {
-            if (tm instanceof X509TrustManager) {
-                defaultTrustManager = (X509TrustManager) tm;
-                break;
-            }
-        }
-
-        /*
-        KeyStore keyStore;
-        try {
-            keyStore = KeyStore.getInstance(System.getProperty("javax.net.ssl.trustStoreType", "JKS"));
-        } catch (KeyStoreException e) {
-            throw new IllegalStateException(e);
-        }
-        // TODO: handle empty property
-        try (InputStream inputStream = new FileInputStream(System.getProperty("javax.net.ssl.trustStore"))) {
-            keyStore.load(inputStream, System.getProperty("javax.net.ssl.trustStorePassword", "").toCharArray());
-        } catch (CertificateException | NoSuchAlgorithmException | IOException e) {
-            throw new IllegalStateException(e);
-        }
-
-        try {
-            factory.init(keyStore);
-        } catch (KeyStoreException e) {
-            throw new IllegalStateException(e);
-        }
-
-        TrustManager[] trustManagers = factory.getTrustManagers();
-        // TODO: Review. Pick the right one
-        if (trustManagers.length > 1) {
-            LOGGER.error("More than one trust manager found");
-        }
-        return (X509TrustManager) trustManagers[0];
-        */
-        return defaultTrustManager;
+        return stream(factory.getTrustManagers())
+                .filter(tm -> tm instanceof X509TrustManager)
+                .map(tm -> (X509TrustManager) tm)
+                .findFirst()
+                .orElseThrow(IllegalStateException::new);
     }
 
     @Override
