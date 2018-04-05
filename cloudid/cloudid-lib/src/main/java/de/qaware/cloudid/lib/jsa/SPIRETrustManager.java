@@ -10,15 +10,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.Validate;
 
-import javax.net.ssl.SSLEngine;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509ExtendedTrustManager;
-import javax.net.ssl.X509TrustManager;
+import javax.net.ssl.*;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.Socket;
-import java.security.GeneralSecurityException;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.KeyStore;
+import java.security.*;
 import java.security.cert.*;
 import java.util.Collection;
 import java.util.List;
@@ -41,11 +38,50 @@ public class SPIRETrustManager extends X509ExtendedTrustManager {
     private final X509TrustManager delegate = getDefaultTrustManager();
 
     private static X509TrustManager getDefaultTrustManager() {
-        TrustManager[] trustManagers = SPIREProvider.DEFAULT_TRUST_MANAGER_FACTORY.getTrustManagers();
+        TrustManagerFactory factory = SPIREProvider.DEFAULT_TRUST_MANAGER_FACTORY;
+
+        try {
+            factory.init((KeyStore) null);
+        } catch (KeyStoreException e) {
+            throw new IllegalStateException(e);
+        }
+
+        X509TrustManager defaultTrustManager = null;
+        for (TrustManager tm : factory.getTrustManagers()) {
+            if (tm instanceof X509TrustManager) {
+                defaultTrustManager = (X509TrustManager) tm;
+                break;
+            }
+        }
+
+        /*
+        KeyStore keyStore;
+        try {
+            keyStore = KeyStore.getInstance(System.getProperty("javax.net.ssl.trustStoreType", "JKS"));
+        } catch (KeyStoreException e) {
+            throw new IllegalStateException(e);
+        }
+        // TODO: handle empty property
+        try (InputStream inputStream = new FileInputStream(System.getProperty("javax.net.ssl.trustStore"))) {
+            keyStore.load(inputStream, System.getProperty("javax.net.ssl.trustStorePassword", "").toCharArray());
+        } catch (CertificateException | NoSuchAlgorithmException | IOException e) {
+            throw new IllegalStateException(e);
+        }
+
+        try {
+            factory.init(keyStore);
+        } catch (KeyStoreException e) {
+            throw new IllegalStateException(e);
+        }
+
+        TrustManager[] trustManagers = factory.getTrustManagers();
+        // TODO: Review. Pick the right one
         if (trustManagers.length > 1) {
             LOGGER.error("More than one trust manager found");
         }
         return (X509TrustManager) trustManagers[0];
+        */
+        return defaultTrustManager;
     }
 
     @Override
@@ -130,9 +166,13 @@ public class SPIRETrustManager extends X509ExtendedTrustManager {
     @Override
     public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
         LOGGER.debug("Validating server {}, {}", chain, authType);
-        LOGGER.debug("Delegating to {}", delegate.getClass().getName());
-        delegate.checkServerTrusted(chain, authType);
-
+        String spiffeId = getSpiffeId(chain[0].getSubjectAlternativeNames());
+        if (spiffeId == null) {
+            LOGGER.debug("Delegating to {}", delegate.getClass().getName());
+            delegate.checkServerTrusted(chain, authType);
+        } else {
+            LOGGER.warn("Ignoring certs with spiffe-id");
+        }
     }
 
     @Override

@@ -96,11 +96,15 @@ public class Certificates {
      *
      * @param alternativeNames the collection which contains the SPIFFE Id somewhere in its Lists, either
      *                         subject alternative names (SAN) or issuer alternative names
-     * @param spiffeIdPattern the pattern of the SPIFFE ID which is used to find the SPIFFE ID
      * @return the SPIFFE ID or null if not found
      */
     @Nullable
-    public static String getSpiffeId(Collection<List<?>> alternativeNames) {
+    public static String getSpiffeId(@Nullable Collection<List<?>> alternativeNames) {
+        if (alternativeNames == null) {
+            // TODO Review if this check is a good idea
+            LOGGER.info("alternativeNames in getSpiffeId was null, assuming that there is no SAN extension and therefore no SPIFFE ID");
+            return null;
+        }
         for (List<?> list : alternativeNames) {
             for (Object object : list) {
                 if (object instanceof String) {
