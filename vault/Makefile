@@ -44,7 +44,8 @@ unseal-vault:
 	-curl $(VAULT_API_URL)/sys/policy/acl -H "X-Vault-Token: $$(sed -E 's/.*"root_token":"([^"]*).*/\1/' vault-init-response.json)" --request PUT --data '{"policy": "path \"secret/acl\" {capabilities = [\"read\"]}"}'
 	# Writing the acl secret
 	-curl $(VAULT_API_URL)/secret/acl -H "X-Vault-Token: $$(sed -E 's/.*"root_token":"([^"]*).*/\1/' vault-init-response.json)" --request PUT --data '{"acl": "spiffe://salm.qaware.de/cloudid/front -> spiffe://salm.qaware.de/cloudid/back\nspiffe://salm.qaware.de/cloudid/proxy -> spiffe://salm.qaware.de/cloudid/front"}'
-	# TODO Add the current SPIRE certificate
+	# Add the upstream cert to cert auth
+	-curl $(VAULT_API_URL)/auth/cert/certs/upstream -H "X-Vault-Token: $$(sed -E 's/.*"root_token":"([^"]*).*/\1/' vault-init-response.json)" --request PUT --data "{\"certificate\": \"$$(awk 1 ORS='\\n' ../upstream-ca/ca.pem)\", \"display_name\": \"upstream ca\", \"policies\": \"acl\"}"
 	# Cleanup
 	kill -9 $$(cat port-forward.pid)
 	rm -f port-forward.pid
