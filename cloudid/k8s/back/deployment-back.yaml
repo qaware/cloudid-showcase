@@ -29,9 +29,12 @@ spec:
         - name: spire-agent-socket
           mountPath: /spire/socket
           readOnly: false
+        - name: demo-secrets
+          mountPath: /deployment/secrets
+          readOnly: true
         env:
         - name: JAVA_TOOL_OPTIONS
-          value: "-Xmx256m -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005 -Djavax.net.debug=all"
+          value: "-Xmx256m -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005 -Djavax.net.debug=all -Djavax.net.ssl.trustStore=/deployment/secrets/additional_truststore.jks -Djavax.net.ssl.trustStorePassword= -Djavax.net.ssl.trustStoreType=jks"
         ports:
         - name: https
           containerPort: 8443
@@ -59,3 +62,6 @@ spec:
         - name: spire-agent-socket
           hostPath:
            path: /mnt/spire/agent/socket
+        - name: demo-secrets
+          secret:
+            secretName: demo-secrets

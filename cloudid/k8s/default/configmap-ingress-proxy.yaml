@@ -4,6 +4,6 @@ metadata:
   name: ingress-proxy-config
 data:
   application.properties: |
-    app.backend=https://cloudid-service-front:444
+    app.backend=https://cloudid-service-front.front:443
     server.port=8443
     server.ssl.enabled=false

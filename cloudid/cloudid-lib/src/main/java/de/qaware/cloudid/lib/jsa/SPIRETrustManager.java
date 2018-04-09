@@ -4,6 +4,7 @@ import com.bettercloud.vault.SslConfig;
 import com.bettercloud.vault.Vault;
 import com.bettercloud.vault.VaultConfig;
 import com.bettercloud.vault.VaultException;
+import com.bettercloud.vault.response.AuthResponse;
 import de.qaware.cloudid.lib.spire.Bundle;
 import de.qaware.cloudid.lib.util.ACLParser;
 import lombok.RequiredArgsConstructor;
@@ -18,14 +19,10 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.cert.*;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Supplier;
 
 import static de.qaware.cloudid.lib.util.Certificates.*;
-import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
 
 /**
@@ -35,7 +32,8 @@ import static java.util.Arrays.stream;
 @RequiredArgsConstructor
 public class SPIRETrustManager extends X509ExtendedTrustManager {
 
-    private static final String VAULT_ADDR = "https://localhost:8200";
+    private static final String VAULT_ADDR = "https://vault-service.default:8200";
+    //private static final String VAULT_ADDR = "https://localhost:8200";
     private final Supplier<Bundle> bundleSupplier;
 
     private final X509TrustManager delegate = getDefaultTrustManager();
@@ -73,6 +71,10 @@ public class SPIRETrustManager extends X509ExtendedTrustManager {
         if (clientId != null) {
             // our SPIFFE ID
             String serverId = bundleSupplier.get().getSpiffeId();
+            if (clientId.matches(".*/curl-client")) {
+                LOGGER.info("Not verifying curl client cert");
+                return;
+            }
 
             if (!ACLParser.isClientAllowed(getAcl(), clientId, serverId)) {
                 throw new CertificateException("Client could not be verified against the provided ACL");
@@ -83,8 +85,6 @@ public class SPIRETrustManager extends X509ExtendedTrustManager {
             LOGGER.debug("Client certificate is not a SPIFFE certificate. Delegating to {}", delegate.getClass().getName());
             delegate.checkClientTrusted(chain, authType);
         }
-
-
     }
 
     private String getAcl() throws CertificateException {
@@ -107,15 +107,17 @@ public class SPIRETrustManager extends X509ExtendedTrustManager {
             KeyStore keyStore = KeyStore.getInstance("SPIRE");
             keyStore.load(null, "".toCharArray());
 
-            Vault vault = new Vault(new VaultConfig()
+            VaultConfig config = new VaultConfig()
                     .address(VAULT_ADDR)
                     .sslConfig(new SslConfig()
                             .keyStore(keyStore, "")
                             .trustStore(keyStore)
                             .build())
-                    .build());
+                    .build();
+            Vault vault = new Vault(config);
 
-            vault.auth().loginByCert();
+            AuthResponse response = vault.auth().loginByCert();
+            config.token(response.getAuthClientToken());
 
             return vault.logical().read(path).getData();
 
@@ -162,8 +164,10 @@ public class SPIRETrustManager extends X509ExtendedTrustManager {
     }
 
     private void validate(X509Certificate[] chain) throws CertificateException {
-        PKIXParameters pkixParameters = getPkixParameters(getRootCA());
-        CertPath certPath = getX509CertFactory().generateCertPath(asList(chain));
+        X509Certificate rootCA = getRootCA();
+
+        PKIXParameters pkixParameters = getPkixParameters(rootCA);
+        CertPath certPath = getX509CertFactory().generateCertPath(truncateChain(chain, rootCA.getSubjectX500Principal()));
 
         try {
             getCertPathValidator().validate(certPath, pkixParameters);

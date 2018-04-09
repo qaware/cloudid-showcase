@@ -5,6 +5,7 @@ import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.annotation.Nullable;
+import javax.security.auth.x500.X500Principal;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.*;
@@ -14,6 +15,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
 
 /**
@@ -118,4 +120,28 @@ public class Certificates {
 
         return null;
     }
+
+    /**
+     * Truncate the certificate chain to the first certificate whose issuer matches the root subject provided.
+     * <p>
+     * This is to work around an "optimization" in sun.security.provider.certpath.PKIXCertPathValidator
+     * PKIXCertPathValidator takes the last certificate from the chain and only looks for trust anchors matching
+     * that certificate instead of properly building up the cert path from the bottom up.
+     *
+     * @param chain       certificate chain
+     * @param rootSubject root subject
+     * @return truncated chain as list
+     * @throws CertificateException if no certificate matches the root subject‚
+     */
+    public static List<X509Certificate> truncateChain(X509Certificate[] chain, X500Principal rootSubject) throws CertificateException {
+        for (int i = 0; i < chain.length; i++) {
+            X509Certificate certificate = chain[i];
+            if (rootSubject.equals(certificate.getIssuerX500Principal())) {
+                return asList(chain).subList(0, i);
+            }
+        }
+
+        throw new CertificateException("Path does not chain with any of the trust anchors");
+    }
+
 }

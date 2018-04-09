@@ -20,7 +20,7 @@ deploy: deploy-only unseal-vault
 .PHONY: delete
 delete:
 	-$(foreach f, $(DEPLOYMENTS), kubectl delete -f $f;)
-	kubectl delete secret vault-secrets
+	-kubectl delete secret vault-secrets
 	rm -f vault-init-response.json
 
 

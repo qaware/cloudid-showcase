@@ -8,6 +8,7 @@ DEPLOYMENTS =  $(wildcard k8s/*.yaml)
 DEPLOYMENTS_DEFAULT = $(wildcard k8s/default/*.yaml)
 # Deployments in the back namespace
 DEPLOYMENTS_BACK = $(wildcard k8s/back/*.yaml)
+DEPLOYMENTS_FRONT = $(wildcard k8s/front/*.yaml)
 
 ifdef CYGWIN_VERSION
 GRADLEW=./gradlew.bat
@@ -61,8 +62,19 @@ endif
 
 .PHONY: deploy
 deploy: container-build
-	# Create back namespace
+	# Create back and front namespace
 	kubectl apply -f k8s/namespace-back.yaml
+	kubectl apply -f k8s/namespace-front.yaml
+
+	# Create demo-secrets secret including the upstream-truststore (a different delimiter is necessary because the
+	# base64 encoded starts with /u)
+	sed "s|{{ADDITIONAL_TRUSTSTORE}}|$$(base64 secrets/additional_truststore.jks | tr -d '\r\n')|" \
+    		 secrets.yaml | kubectl apply -f -
+
+	sed "s|{{ADDITIONAL_TRUSTSTORE}}|$$(base64 secrets/additional_truststore.jks | tr -d '\r\n')|" \
+    		 secrets.yaml | kubectl apply --namespace=back -f -
+	sed "s|{{ADDITIONAL_TRUSTSTORE}}|$$(base64 secrets/additional_truststore.jks | tr -d '\r\n')|" \
+    		 secrets.yaml | kubectl apply --namespace=front -f -
 
 	# Deploy in back namespace
 	$(foreach f, $(DEPLOYMENTS_BACK), \
@@ -74,6 +86,10 @@ deploy: container-build
 		sed 's|{{DOCKER_QUALIFIED_NAME}}|$(DOCKER_QUALIFIED_NAME)|' $f \
 		| kubectl apply -f -;)
 
+	# Deploy in front namespace
+	$(foreach f, $(DEPLOYMENTS_FRONT), \
+		sed 's|{{DOCKER_QUALIFIED_NAME}}|$(DOCKER_QUALIFIED_NAME)|' $f \
+		| kubectl apply --namespace=front -f -;)
 
 .PHONY: container-build
 container-build: build
@@ -99,12 +115,10 @@ sonar:
 .PHONY: delete
 delete:
 	-kubectl delete -f k8s/namespace-back.yaml
-	-kubectl delete deployment cloudid-front
-	-kubectl get pod -o name | grep -o 'cloudid.*$$' | xargs -n1 kubectl delete pod
-	-kubectl delete configMap cloudid-config-front
-	-kubectl delete service cloudid-service-front
+	-kubectl delete -f k8s/namespace-front.yaml
 	-kubectl delete deployment ingress-proxy
 	-kubectl get pod -o name | grep -o 'ingress-proxy.*$$' | xargs -n1 kubectl delete pod
 	-kubectl delete configMap ingress-proxy-config
 	-kubectl delete ingress demo-server-ingress
 	-kubectl delete service ingress-proxy-service
+	-kubectl delete secret demo-secrets

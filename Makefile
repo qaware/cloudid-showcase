@@ -23,19 +23,26 @@ spire-register:
 	# Wait for the SPIRE server to become "Running"
 	while ! kubectl get pod  | grep 'spire-server.*Running' > /dev/null; do sleep 1; done
 
-	# Front demo server
+	# Ingress Proxy
 	kubectl exec $$(kubectl get pod | grep -Eo 'spire-server\S*') -- \
 		/opt/spire/spire-server entry create \
 		-parentID spiffe://salm.qaware.de/k8s/node/minikube \
-		-spiffeID spiffe://salm.qaware.de/cloudid \
+		-spiffeID spiffe://salm.qaware.de/cloudid/proxy \
 		-selector k8s:ns:default
 
 	# Back demo server
 	kubectl exec $$(kubectl get pod | grep -Eo 'spire-server\S*') -- \
 		/opt/spire/spire-server entry create \
 		-parentID spiffe://salm.qaware.de/k8s/node/minikube \
-		-spiffeID spiffe://salm.qaware.de/cloudid \
+		-spiffeID spiffe://salm.qaware.de/cloudid/back \
 		-selector k8s:ns:back
+
+	# front demo server
+	kubectl exec $$(kubectl get pod | grep -Eo 'spire-server\S*') -- \
+		/opt/spire/spire-server entry create \
+		-parentID spiffe://salm.qaware.de/k8s/node/minikube \
+		-spiffeID spiffe://salm.qaware.de/cloudid/front \
+		-selector k8s:ns:front
 
 .PHONY: minikube-container-build
 minikube-container-build:
