@@ -1,5 +1,7 @@
 package de.qaware.cloudid.proxy;
 
+import de.qaware.cloudid.lib.spire.Bundle;
+import de.qaware.cloudid.lib.spire.StaticLauncher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.Header;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.function.Supplier;
 
 /**
  * Simple proxy controller. Performs some requests against a configurable backend.
@@ -29,8 +32,10 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class Proxy {
 
+    private static final String TRACE_HEADER_NAME = "demo_trace";
     private final AppProperties appProperties;
     private final HttpClient httpClient;
+    private final Supplier<Bundle> bundleSupplier = StaticLauncher.getBundleSupplier();
 
     /**
      * Forwards a request 1:1 to the target defined in {@code de.qaware.cloud.id.demoserver.backend}.
@@ -51,7 +56,7 @@ public class Proxy {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         response.getEntity().writeTo(outputStream);
         String charsetName = responseHeaders.getContentType() != null ? responseHeaders.getContentType().getCharset().name() : "UTF-8";
-        LOGGER.info("Request was successfully: {}", response.getStatusLine());
+        LOGGER.info("Request was successful: {}", response.getStatusLine());
         return ResponseEntity.status(response.getStatusLine()
                 .getStatusCode())
                 .headers(responseHeaders)
@@ -60,6 +65,7 @@ public class Proxy {
 
     private HttpUriRequest buildBackendRequest(String path, HttpServletRequest request) throws IOException {
         RequestBuilder requestBuilder = RequestBuilder.create(request.getMethod());
+
 
         /*
         for (String name : list(request.getHeaderNames())) {

@@ -1,13 +1,9 @@
-package de.qaware.cloudid.proxy;
+package de.qaware.cloudid.demo;
 
-import de.qaware.cloudid.lib.jsa.SPIREContextFactory;
 import de.qaware.cloudid.lib.jsa.SPIREProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.filters.RequestDumperFilter;
-import org.apache.http.client.HttpClient;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.impl.client.HttpClients;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -37,20 +33,6 @@ public class DemoServerApplication {
         new SpringApplicationBuilder(DemoServerApplication.class)
                 .web(WebApplicationType.SERVLET)
                 .run(args);
-    }
-
-    /**
-     * Get an application-global HTTP client
-     *
-     * @return HTTP client
-     */
-    @Bean
-    public HttpClient getHttpClient() {
-        return HttpClients.custom()
-                .setSSLContext(SPIREContextFactory.get())
-                .setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)
-                .build();
-
     }
 
     /**

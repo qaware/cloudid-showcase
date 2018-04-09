@@ -2,3 +2,4 @@ rootProject.name = 'cloudid'
 
 include ':cloudid-lib'
 include ':cloudid-proxy'
+include ':cloudid-demo'
