@@ -17,6 +17,7 @@ import static de.qaware.cloudid.lib.util.Reflection.getContextClassLoader;
 import static de.qaware.cloudid.lib.util.config.Props.stringOf;
 import static java.lang.String.format;
 import static java.util.Arrays.stream;
+import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.startsWith;
 
@@ -94,7 +95,8 @@ public class DebugBundleSupplierFactory implements BundleSupplierFactory {
                 getSpiffeId(certificate),
                 certificate,
                 new KeyPair(certificate.getPublicKey(), privateKey),
-                caCertChain);
+                caCertChain,
+                emptyMap());
     }
 
     private static String getSpiffeId(X509Certificate certificate) throws GeneralSecurityException {

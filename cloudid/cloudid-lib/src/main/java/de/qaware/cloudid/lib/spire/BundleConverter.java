@@ -1,5 +1,6 @@
 package de.qaware.cloudid.lib.spire;
 
+import com.google.protobuf.ByteString;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
@@ -18,11 +19,14 @@ import java.security.KeyPair;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Stream.concat;
 
 /**
  * Converts a workload entry to a SVID bundle.
@@ -62,25 +66,47 @@ class BundleConverter implements Function<WorkloadEntry, Bundle> {
      * @throws CertificateException one of the certificates is invalid
      */
     public Bundle convert(WorkloadEntry workloadEntry) throws IOException, CertificateException {
-        List<X509Certificate> certPath = getCertPath2(workloadEntry);
+        List<X509Certificate> certPath = getCertPath(workloadEntry);
 
         return new Bundle(
                 workloadEntry.getSpiffeId(),
                 certPath.get(0),
                 getKeyPair(workloadEntry),
-                certPath);
+                certPath,
+                getBundlesMap(workloadEntry));
     }
 
+    private Map<String, List<X509Certificate>> getBundlesMap(WorkloadEntry workloadEntry) throws IOException, CertificateException {
+        Map<String, ByteString> federatedBundles = workloadEntry.getFederatedBundlesMap();
 
-    private List<X509Certificate> getCertPath2(WorkloadEntry workloadEntry) throws IOException, CertificateException {
-        try (InputStream bundleInputStream = workloadEntry.getSvidBundle().newInput();
-             InputStream svidInputStream = workloadEntry.getSvid().newInput()) {
-            return Stream.concat(
-                    Stream.of(certFactory.generateCertificate(svidInputStream)),
-                    certFactory.generateCertificates(bundleInputStream).stream())
+        Map<String, List<X509Certificate>> result = new HashMap<>(federatedBundles.size());
+
+        for (Map.Entry<String, ByteString> entry : federatedBundles.entrySet()) {
+            result.put(entry.getKey(), parseChain(entry.getValue()));
+        }
+
+        return result;
+    }
+
+    private X509Certificate parseCert(ByteString bytes) throws IOException, CertificateException {
+        try (InputStream inputStream = bytes.newInput()) {
+            return (X509Certificate) certFactory.generateCertificate(inputStream);
+        }
+    }
+
+    private List<X509Certificate> parseChain(ByteString bytes) throws IOException, CertificateException {
+        try (InputStream inputStream = bytes.newInput()) {
+            return certFactory.generateCertificates(inputStream).stream()
                     .map(c -> (X509Certificate) c)
                     .collect(toList());
         }
+    }
+
+    private List<X509Certificate> getCertPath(WorkloadEntry workloadEntry) throws IOException, CertificateException {
+        return concat(
+                Stream.of(parseCert(workloadEntry.getSvid())),
+                parseChain(workloadEntry.getSvidBundle()).stream())
+                .collect(toList());
     }
 
     private static KeyPair getKeyPair(WorkloadEntry workloadEntry) throws IOException {

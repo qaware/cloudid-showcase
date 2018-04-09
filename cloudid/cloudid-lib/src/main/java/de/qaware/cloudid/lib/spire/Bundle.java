@@ -7,6 +7,7 @@ import java.security.KeyPair;
 import java.security.cert.X509Certificate;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A data transfer object that contains the parsed information about a spiffe workload id.
@@ -18,6 +19,7 @@ public class Bundle {
     private final X509Certificate certificate;
     private final KeyPair keyPair;
     private final List<X509Certificate> caCertChain;
+    private final Map<String, List<X509Certificate>> federatedBundles;
 
     /**
      * Get the key type.
