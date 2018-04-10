@@ -11,7 +11,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.Validate;
 
-import javax.net.ssl.*;
+import javax.net.ssl.SSLEngine;
+import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509ExtendedTrustManager;
+import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
 import java.net.Socket;
 import java.security.GeneralSecurityException;
@@ -19,7 +22,9 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.cert.*;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 
 import static de.qaware.cloudid.lib.util.Certificates.*;
@@ -32,8 +37,8 @@ import static java.util.Arrays.stream;
 @RequiredArgsConstructor
 public class SPIRETrustManager extends X509ExtendedTrustManager {
 
-    private static final String VAULT_ADDR = "https://vault-service.default:8200";
-    //private static final String VAULT_ADDR = "https://localhost:8200";
+    private static final String VAULT_ADDR = getVaultAddress();
+    private static final String DEFAULT_LOCALHOST_VAULT_ADDR = "https://localhost:8200";
     private final Supplier<Bundle> bundleSupplier;
 
     private final X509TrustManager delegate = getDefaultTrustManager();
@@ -54,6 +59,15 @@ public class SPIRETrustManager extends X509ExtendedTrustManager {
                 .orElseThrow(IllegalStateException::new);
     }
 
+    private static String getVaultAddress() {
+        String address = System.getProperty("cloudid.vault.address");
+        if (address == null) {
+            address = DEFAULT_LOCALHOST_VAULT_ADDR;
+        }
+        LOGGER.debug("Vault address: {}", address);
+        return address;
+    }
+
     @Override
     public X509Certificate[] getAcceptedIssuers() {
         LOGGER.trace("getAcceptedIssuers()");
@@ -71,7 +85,7 @@ public class SPIRETrustManager extends X509ExtendedTrustManager {
         if (clientId != null) {
             // our SPIFFE ID
             String serverId = bundleSupplier.get().getSpiffeId();
-            if (clientId.matches(".*/curl-client")) {
+            if (LOGGER.isDebugEnabled() && clientId.matches(".*/curl-client")) {
                 LOGGER.info("Not verifying curl client cert");
                 return;
             }

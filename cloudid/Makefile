@@ -49,10 +49,15 @@ DOCKER_REGISTRY_REPO = qaware-qalabs-docker
 endif
 
 ifndef DOCKER_IMAGE_NAME
-DOCKER_IMAGE_NAME = $(PROJECT_NAME)
+DOCKER_IMAGE_NAME = $(PROJECT_NAME)-proxy
+endif
+
+ifndef DOCKER_IMAGE_NAME_DEMO
+DOCKER_IMAGE_NAME_DEMO = $(PROJECT_NAME)-demo
 endif
 
 DOCKER_QUALIFIED_NAME = $(DOCKER_REGISTRY_URL)/$(DOCKER_REGISTRY_REPO)/$(DOCKER_IMAGE_NAME):$(DOCKER_TAG_NAME)
+DOCKER_QUALIFIED_NAME_DEMO = $(DOCKER_REGISTRY_URL)/$(DOCKER_REGISTRY_REPO)/$(DOCKER_IMAGE_NAME_DEMO):$(DOCKER_TAG_NAME)
 
 # Sonar branch name, empty on master
 ifneq ($(BRANCH_NAME), master)
@@ -78,7 +83,7 @@ deploy: container-build
 
 	# Deploy in back namespace
 	$(foreach f, $(DEPLOYMENTS_BACK), \
-		sed 's|{{DOCKER_QUALIFIED_NAME}}|$(DOCKER_QUALIFIED_NAME)|' $f \
+		sed 's|{{DOCKER_QUALIFIED_NAME}}|$(DOCKER_QUALIFIED_NAME_DEMO)|' $f \
 		| kubectl apply --namespace=back -f -;)
 
 	# Deploy in default namespace
@@ -94,12 +99,14 @@ deploy: container-build
 .PHONY: container-build
 container-build: build
 	docker build -t "$(DOCKER_QUALIFIED_NAME)" cloudid-proxy
+	docker build -t "$(DOCKER_QUALIFIED_NAME_DEMO)" cloudid-demo
 
 .PHONY: container-push
 container-push: container-build
 	@echo docker login $(DOCKER_REGISTRY_USER)@$(DOCKER_REGISTRY_URL)
 	@docker login -u "$(DOCKER_REGISTRY_USER)" -p "$(DOCKER_REGISTRY_PASS)" $(DOCKER_REGISTRY_URL)
 	docker push "$(DOCKER_QUALIFIED_NAME)"
+	docker push "$(DOCKER_QUALIFIED_NAME_DEMO)"
 
 .PHONY: build
 build: assemble

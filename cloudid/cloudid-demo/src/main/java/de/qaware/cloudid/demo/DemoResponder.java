@@ -31,11 +31,11 @@ public class DemoResponder {
      */
     @RequestMapping("/{path}")
     public ResponseEntity demoPageRequest(@PathVariable String path, HttpServletRequest request) {
-        Enumeration<String> headers = request.getHeaders("demo_trace");
+        Enumeration<String> headers = request.getHeaders("X-demo-trace");
         String trace;
         if (headers.hasMoreElements()) {
             trace = headers.nextElement();
-            trace = trace.replace("\n", "<br />");
+            trace = trace.replace("#", "<br />");
         } else {
             trace = "NO TRACE AVAILABLE!";
         }

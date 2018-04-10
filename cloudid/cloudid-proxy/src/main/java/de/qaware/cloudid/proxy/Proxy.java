@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Enumeration;
 import java.util.function.Supplier;
 
 /**
@@ -32,7 +33,7 @@ import java.util.function.Supplier;
 @RequiredArgsConstructor
 public class Proxy {
 
-    private static final String TRACE_HEADER_NAME = "demo_trace";
+    private static final String TRACE_HEADER_NAME = "X-demo-trace";
     private final AppProperties appProperties;
     private final HttpClient httpClient;
     private final Supplier<Bundle> bundleSupplier = StaticLauncher.getBundleSupplier();
@@ -66,21 +67,21 @@ public class Proxy {
     private HttpUriRequest buildBackendRequest(String path, HttpServletRequest request) throws IOException {
         RequestBuilder requestBuilder = RequestBuilder.create(request.getMethod());
 
-
-        /*
-        for (String name : list(request.getHeaderNames())) {
-            if (equalsIgnoreCase(name, "host")) {
-                continue;
-            }
-            for (String value : list(request.getHeaders(name))) {
-                requestBuilder.addHeader(name, value);
-            }
-        }
-        */
-
         requestBuilder.setUri(appProperties.getBackend() + '/' + path)
                 .setEntity(new InputStreamEntity(request.getInputStream()));
 
+        Enumeration<String> headers = request.getHeaders(TRACE_HEADER_NAME);
+        String traceHeaderValue;
+        if (headers == null || !headers.hasMoreElements()) {
+            LOGGER.debug("No demo-trace header found in request. Creating a new one.");
+            traceHeaderValue = bundleSupplier.get().getSpiffeId() + "#";
+        } else {
+            String old_header = headers.nextElement();
+            LOGGER.debug("Received demo-trace header with content: {}", old_header);
+            traceHeaderValue = old_header + bundleSupplier.get().getSpiffeId() + "#";
+        }
+        LOGGER.debug("Adding header with name {} and value {} to forwarded request", TRACE_HEADER_NAME, traceHeaderValue);
+        requestBuilder.addHeader(TRACE_HEADER_NAME, traceHeaderValue);
         return requestBuilder.build();
     }
 
