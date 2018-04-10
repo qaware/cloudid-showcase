@@ -33,7 +33,7 @@ import java.util.function.Supplier;
 @RequiredArgsConstructor
 public class Proxy {
 
-    private static final String TRACE_HEADER_NAME = "X-demo-trace";
+    private static final String TRACE_HEADER_NAME = "X-SPIFFE-Callstack";
     private final AppProperties appProperties;
     private final HttpClient httpClient;
     private final Supplier<Bundle> bundleSupplier = StaticLauncher.getBundleSupplier();

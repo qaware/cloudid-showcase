@@ -1,5 +1,6 @@
 package de.qaware.cloudid.demo;
 
+import de.qaware.cloudid.lib.spire.StaticLauncher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -20,36 +21,66 @@ import java.util.Enumeration;
 @RequiredArgsConstructor
 public class DemoResponder {
 
-    private final AppProperties appProperties;
-
     /**
-     *
+     * Generates a html demo page which contains the SPIFFE callstack, if available.
      *
      * @param path    request path
      * @param request request
-     * @return response entity
+     * @return response entity with the generated html page
      */
     @RequestMapping("/{path}")
     public ResponseEntity demoPageRequest(@PathVariable String path, HttpServletRequest request) {
-        Enumeration<String> headers = request.getHeaders("X-demo-trace");
+        Enumeration<String> headers = request.getHeaders("X-SPIFFE-Callstack");
         String trace;
         if (headers.hasMoreElements()) {
             trace = headers.nextElement();
-            trace = trace.replace("#", "<br />");
+            LOGGER.debug("Received SPIFFE callstack: {}", trace);
+            trace = formatTrace(trace, true);
         } else {
+            LOGGER.debug("Received empty SPIFFE callstack");
             trace = "NO TRACE AVAILABLE!";
         }
+        String responseBody = generateResponseBody(trace);
         return ResponseEntity.status(200)
-                .body("<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \n" +
-                        "\"http://www.w3.org/TR/html4/loose.dtd\">\n" +
-                        "<html>\n" +
-                        "<head>\n" +
-                        "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n" +
-                        "<title>CNI Demo</title>\n" +
-                        "</head>\n" +
-                        "<body>Call trace:<br />" +
-                        trace +
-                        "</body>\n" +
-                        "</html>");
+                .body(responseBody);
+    }
+
+    private String generateResponseBody(String trace) {
+        String ourId = StaticLauncher.getBundleSupplier().get().getSpiffeId();
+        String body = getBodyTemplate();
+        body = body.replace("%TRACE", trace);
+        body = body.replace("%MY_IDENTITY", ourId);
+        return body;
+    }
+
+    private String getBodyTemplate() {
+        return "<!DOCTYPE html>\n" +
+                "<html lang=\"en\">\n" +
+                "<head>\n" +
+                "<meta charset=\"UTF-8\">\n" +
+                "<title>CNI Demo</title>\n" +
+                "</head>\n" +
+                "<body>\n" +
+                "<h2>My identity:</h2>\n" +
+                "%MY_IDENTITY\n" +
+                "<h2>Call trace:</h2><br />\n" +
+                "%TRACE\n" +
+                "</body>\n" +
+                "</html>";
+    }
+
+    private String formatTrace(String trace, boolean appendOwnId) {
+        assert trace != null;
+        if (appendOwnId) {
+            trace += StaticLauncher.getBundleSupplier().get().getSpiffeId();
+        }
+        String[] traces = trace.split("#");
+        StringBuilder traceBuilder = new StringBuilder();
+        traceBuilder.append("<ol>");
+        for (String currentTrace : traces) {
+            traceBuilder.append("<li>").append(currentTrace).append("</li><br />");
+        }
+        traceBuilder.append("</ol>");
+        return traceBuilder.toString();
     }
 }
