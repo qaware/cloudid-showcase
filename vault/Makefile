@@ -9,6 +9,7 @@ VAULT_API_URL = http://$(VAULT_HOST):$(VAULT_PORT)/v1
 .PHONY: deploy-only
 deploy-only:
 	sed "s/{{VAULT_KEY}}/$$(base64 secrets/vault-key.pem | tr -d '\r\n')/; \
+		 s/{{UPSTREAM_CERT}}/$$(base64 ../upstream-ca/ca.pem | tr -d '\r\n')/; \
 		 s/{{VAULT_CERT}}/$$(base64 secrets/vault.pem | tr -d '\r\n')/" \
 		 k8s/secrets.yaml | kubectl apply -f -
 	$(foreach f, $(DEPLOYMENTS), kubectl apply -f $f;)

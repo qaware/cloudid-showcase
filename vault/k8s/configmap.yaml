@@ -11,7 +11,8 @@ data:
         address = "0.0.0.0:8200"
         tls_cert_file = "/vault/secrets/vault.pem"
         tls_key_file = "/vault/secrets/vault-key.pem"
-        tls_require_and_verify_client_cert = "false"
+        tls_require_and_verify_client_cert = "true"
+        tls_client_ca_file = "/vault/secrets/upstream.pem"
     }
     listener "tcp" {
       address     = "0.0.0.0:8300"
