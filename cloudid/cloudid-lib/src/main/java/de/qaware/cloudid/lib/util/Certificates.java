@@ -1,22 +1,18 @@
 package de.qaware.cloudid.lib.util;
 
-import de.qaware.cloudid.lib.jsa.SPIRETrustManager;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.annotation.Nullable;
 import javax.security.auth.x500.X500Principal;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.*;
 import java.time.Instant;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.singleton;
+import static java.util.stream.Collectors.toSet;
 
 /**
  * Utilities for certificates.
@@ -75,17 +71,11 @@ public class Certificates {
         }
     }
 
-    /**
-     * Get PKIX parameters.
-     * <p>
-     * Certificate revocation will be disabled.
-     *
-     * @param certificate trust anchor
-     * @return PKIX parameters
-     */
-    public static PKIXParameters getPkixParameters(X509Certificate certificate) {
+    private static PKIXParameters toPkixParameters(Set<X509Certificate> trustedCerts) {
         try {
-            PKIXParameters pkixParameters = new PKIXParameters(singleton(new TrustAnchor(certificate, null)));
+            PKIXParameters pkixParameters = new PKIXParameters(trustedCerts.stream()
+                    .map(c -> new TrustAnchor(c, null))
+                    .collect(toSet()));
             pkixParameters.setRevocationEnabled(false);
             return pkixParameters;
         } catch (InvalidAlgorithmParameterException e) {
@@ -94,49 +84,52 @@ public class Certificates {
     }
 
     /**
-     * Tries to find the SPIFFE ID in the given Subject Alternative Name collection using the given pattern.
+     * Validate a certificate chain against a set of trusted certificates.
      *
-     * @param alternativeNames the collection which contains the SPIFFE Id somewhere in its Lists, either
-     *                         subject alternative names (SAN) or issuer alternative names
-     * @return the SPIFFE ID or null if not found
+     * @param chain        certificate chain
+     * @param trustedCerts trusted certificates
+     * @throws CertificateException if the validation fails
      */
-    @Nullable
-    public static String getSpiffeId(@Nullable Collection<List<?>> alternativeNames) {
-        if (alternativeNames == null) {
-            // TODO Review if this check is a good idea
-            LOGGER.info("alternativeNames in getSpiffeId was null, assuming that there is no SAN extension and therefore no SPIFFE ID");
-            return null;
-        }
-        for (List<?> list : alternativeNames) {
-            for (Object object : list) {
-                if (object instanceof String) {
-                    String spiffeId = (String) object;
-                    if (SPIFFE_ID_PATTERN.matcher(spiffeId).matches()) {
-                        return spiffeId;
-                    }
-                }
-            }
-        }
+    public void validate(X509Certificate[] chain, Set<X509Certificate> trustedCerts) throws CertificateException {
+        PKIXParameters pkixParameters = toPkixParameters(trustedCerts);
+        CertPath certPath = getX509CertFactory().generateCertPath(truncateChain(chain, trustedCerts));
 
-        return null;
+        try {
+            getCertPathValidator().validate(certPath, pkixParameters);
+        } catch (CertPathValidatorException | InvalidAlgorithmParameterException e) {
+            throw new CertificateException(e);
+        }
     }
 
     /**
-     * Truncate the certificate chain to the first certificate whose issuer matches the root subject provided.
-     * <p>
-     * This is to work around an "optimization" in sun.security.provider.certpath.PKIXCertPathValidator
-     * PKIXCertPathValidator takes the last certificate from the chain and only looks for trust anchors matching
-     * that certificate instead of properly building up the cert path from the bottom up.
+     * Get the SPIFFE Id from a SPIFFE certificate.
      *
-     * @param chain       certificate chain
-     * @param rootSubject root subject
-     * @return truncated chain as list
-     * @throws CertificateException if no certificate matches the root subject‚
+     * @param certificate certificate
+     * @return optional containing the SPIFFE Id
      */
-    public static List<X509Certificate> truncateChain(X509Certificate[] chain, X500Principal rootSubject) throws CertificateException {
+    public static Optional<String> getSpiffeId(X509Certificate certificate) throws CertificateParsingException {
+        Collection<List<?>> sans = certificate.getSubjectAlternativeNames();
+
+        if (sans == null) {
+            return Optional.empty();
+        }
+
+        return sans.stream()
+                .flatMap(List::stream)
+                .filter(o -> o instanceof String)
+                .map(o -> (String) o)
+                .filter(s -> SPIFFE_ID_PATTERN.matcher(s).matches())
+                .findFirst();
+    }
+
+    private static List<X509Certificate> truncateChain(X509Certificate[] chain, Set<X509Certificate> trustedCerts) throws CertificateException {
+        Set<X500Principal> trustedPrincipals = trustedCerts.stream()
+                .map(X509Certificate::getSubjectX500Principal)
+                .collect(toSet());
+
         for (int i = 0; i < chain.length; i++) {
             X509Certificate certificate = chain[i];
-            if (rootSubject.equals(certificate.getIssuerX500Principal())) {
+            if (trustedPrincipals.contains(certificate.getIssuerX500Principal())) {
                 return asList(chain).subList(0, i);
             }
         }

@@ -6,7 +6,9 @@ import com.bettercloud.vault.VaultConfig;
 import com.bettercloud.vault.VaultException;
 import com.bettercloud.vault.response.AuthResponse;
 import de.qaware.cloudid.lib.spire.Bundle;
+import de.qaware.cloudid.lib.spire.Config;
 import de.qaware.cloudid.lib.util.ACLParser;
+import de.qaware.cloudid.lib.util.Certificates;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.Validate;
@@ -18,16 +20,16 @@ import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
 import java.net.Socket;
 import java.security.GeneralSecurityException;
-import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
-import java.security.cert.*;
-import java.util.Collection;
-import java.util.List;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Supplier;
 
-import static de.qaware.cloudid.lib.util.Certificates.*;
+import static de.qaware.cloudid.lib.util.Certificates.getSpiffeId;
 import static java.util.Arrays.stream;
 
 /**
@@ -71,7 +73,8 @@ public class SPIRETrustManager extends X509ExtendedTrustManager {
     @Override
     public X509Certificate[] getAcceptedIssuers() {
         LOGGER.trace("getAcceptedIssuers()");
-        return new X509Certificate[]{getRootCA()};
+
+        return bundleSupplier.get().getTrustedCAs().toArray(new X509Certificate[0]);
     }
 
     @Override
@@ -80,21 +83,23 @@ public class SPIRETrustManager extends X509ExtendedTrustManager {
 
         Validate.notEmpty(chain);
 
-        Collection<List<?>> sans = chain[0].getSubjectAlternativeNames();
-        String clientId = getSpiffeId(sans);
-        if (clientId != null) {
-            // our SPIFFE ID
-            String serverId = bundleSupplier.get().getSpiffeId();
+        Optional<String> clientIdOpt = getSpiffeId(chain[0]);
+
+        if (clientIdOpt.isPresent()) {
+            String clientId = clientIdOpt.get();
+
+            Bundle svid = bundleSupplier.get();
+
             if (LOGGER.isDebugEnabled() && clientId.matches(".*/curl-client")) {
                 LOGGER.info("Not verifying curl client cert");
                 return;
             }
 
-            if (!ACLParser.isClientAllowed(getAcl(), clientId, serverId)) {
+            if (shouldCheckAcl() && !ACLParser.isClientAllowed(getAcl(), clientId, svid.getSpiffeId())) {
                 throw new CertificateException("Client could not be verified against the provided ACL");
             }
 
-            validate(chain);
+            Certificates.validate(chain, svid.getTrustedCAs());
         } else {
             LOGGER.debug("Client certificate is not a SPIFFE certificate. Delegating to {}", delegate.getClass().getName());
             delegate.checkClientTrusted(chain, authType);
@@ -152,15 +157,14 @@ public class SPIRETrustManager extends X509ExtendedTrustManager {
     }
 
     @Override
-    public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException{
+    public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
         LOGGER.debug("Validating server {}, {}", chain, authType);
 
         Validate.notEmpty(chain);
 
-        Collection<List<?>> sans = chain[0].getSubjectAlternativeNames();
-        String clientId = getSpiffeId(sans);
-        if (clientId != null) {
-            validate(chain);
+        Optional<String> clientIdOpt = getSpiffeId(chain[0]);
+        if (clientIdOpt.isPresent()) {
+            Certificates.validate(chain, bundleSupplier.get().getTrustedCAs());
         } else {
             LOGGER.debug("Server certificate is not a SPIFFE certificate. Delegating to {}", delegate.getClass().getName());
             delegate.checkServerTrusted(chain, authType);
@@ -177,21 +181,9 @@ public class SPIRETrustManager extends X509ExtendedTrustManager {
         checkServerTrusted(chain, authType);
     }
 
-    private void validate(X509Certificate[] chain) throws CertificateException {
-        X509Certificate rootCA = getRootCA();
 
-        PKIXParameters pkixParameters = getPkixParameters(rootCA);
-        CertPath certPath = getX509CertFactory().generateCertPath(truncateChain(chain, rootCA.getSubjectX500Principal()));
-
-        try {
-            getCertPathValidator().validate(certPath, pkixParameters);
-        } catch (CertPathValidatorException | InvalidAlgorithmParameterException e) {
-            throw new CertificateException(e);
-        }
+    private boolean shouldCheckAcl() {
+        return !Config.ACL_DISABLED.get();
     }
 
-    private X509Certificate getRootCA() {
-        List<X509Certificate> caCertChain = bundleSupplier.get().getCaCertChain();
-        return caCertChain.get(caCertChain.size() - 1);
-    }
 }
