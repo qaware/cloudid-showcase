@@ -5,8 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.time.Duration;
 
-import static java.lang.String.format;
-
 /**
  * Utilities for dealing with concurrency.
  */
@@ -48,6 +46,7 @@ public class Concurrent {
 
     /**
      * Repeatedly call a runnable until the thread has been interrupted.
+     *
      * @param runnable runnable
      */
     @SuppressWarnings("squid:S2221" /* Stack traces would be lost otherwise */)
@@ -57,7 +56,7 @@ public class Concurrent {
                 run(runnable);
             }
         } catch (Exception e) {
-            LOGGER.error(format("%s died unexpectedly", Thread.currentThread().getName()), e);
+            LOGGER.error("{} died unexpectedly", Thread.currentThread().getName(), e);
         }
     }
 

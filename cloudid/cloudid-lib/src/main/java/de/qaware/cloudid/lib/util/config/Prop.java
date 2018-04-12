@@ -3,10 +3,11 @@ package de.qaware.cloudid.lib.util.config;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.text.MessageFormat;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static java.lang.String.format;
+import static java.text.MessageFormat.format;
 
 /**
  * Property.
@@ -46,12 +47,15 @@ public class Prop<T> {
         try {
             return Optional.of(converter.apply(value));
         } catch (RuntimeException e) {
-            throw new IllegalArgumentException(format("Unable to convert system property %s=%s", sysProp, value), e);
+            throw new IllegalArgumentException(
+                    format("Unable to convert system property {0}={1}", sysProp, value),
+                    e);
         }
     }
 
     /**
      * Tells whether this property has been overridden.
+     *
      * @return whether this property has been overridden
      */
     public boolean isOverridden() {

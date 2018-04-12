@@ -15,7 +15,7 @@ import java.util.function.Supplier;
 
 import static de.qaware.cloudid.lib.util.Reflection.getContextClassLoader;
 import static de.qaware.cloudid.lib.util.config.Props.stringOf;
-import static java.lang.String.format;
+import static java.text.MessageFormat.format;
 import static java.util.Arrays.stream;
 import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.toList;
@@ -106,7 +106,7 @@ public class DebugBundleSupplierFactory implements BundleSupplierFactory {
                 .filter(uri -> startsWith(uri, SPIFFE_URI_PREFIX))
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException(
-                        format("No SPIFFE Id SAN found in certificate %s", certificate)));
+                        format("No SPIFFE Id SAN found in certificate {0}", certificate)));
     }
 
     private static PrivateKey getPrivateKey(KeyStore keystore, String alias) throws GeneralSecurityException {
