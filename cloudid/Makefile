@@ -74,12 +74,12 @@ deploy: container-build
 	# Create demo-secrets secret including the upstream-truststore (a different delimiter is necessary because the
 	# base64 encoded starts with /u)
 	sed "s|{{ADDITIONAL_TRUSTSTORE}}|$$(base64 secrets/additional_truststore.jks | tr -d '\r\n')|" \
-    		 secrets.yaml | kubectl apply -f -
+    		 k8s/secrets.yaml | kubectl apply -f -
 
 	sed "s|{{ADDITIONAL_TRUSTSTORE}}|$$(base64 secrets/additional_truststore.jks | tr -d '\r\n')|" \
-    		 secrets.yaml | kubectl apply --namespace=back -f -
+    		 k8s/secrets.yaml | kubectl apply --namespace=back -f -
 	sed "s|{{ADDITIONAL_TRUSTSTORE}}|$$(base64 secrets/additional_truststore.jks | tr -d '\r\n')|" \
-    		 secrets.yaml | kubectl apply --namespace=front -f -
+    		 k8s/secrets.yaml | kubectl apply --namespace=front -f -
 
 	# Deploy in back namespace
 	$(foreach f, $(DEPLOYMENTS_BACK), \
@@ -126,6 +126,6 @@ delete:
 	-kubectl delete deployment ingress-proxy
 	-kubectl get pod -o name | grep -o 'ingress-proxy.*$$' | xargs -n1 kubectl delete pod
 	-kubectl delete configMap ingress-proxy-config
-	-kubectl delete ingress demo-server-ingress
+	-kubectl delete ingress cloudid-ingress
 	-kubectl delete service ingress-proxy-service
 	-kubectl delete secret demo-secrets
