@@ -5,5 +5,5 @@ metadata:
 data:
   application.properties: |
     app.backend=https://cloudid-service-front.front:443
-    server.port=8443
+    server.port=8080
     server.ssl.enabled=false
