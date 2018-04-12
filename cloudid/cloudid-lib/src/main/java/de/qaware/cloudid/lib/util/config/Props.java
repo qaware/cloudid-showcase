@@ -79,6 +79,17 @@ public class Props {
     }
 
     /**
+     * Create an boolean property.
+     *
+     * @param name         system property name
+     * @param defaultValue default value
+     * @return property
+     */
+    public static Prop<Boolean> booleanOf(String name, Boolean defaultValue) {
+        return new Prop<>(name, Boolean::parseBoolean, defaultValue);
+    }
+
+    /**
      * log all public static {@link Prop} fields of the target class on DEBUG using the classes Logger.
      *
      * @param clazz target class

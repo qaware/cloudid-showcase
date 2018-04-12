@@ -44,4 +44,9 @@ public class Config {
      */
     public static final Prop<Class<DefaultBundleSupplierFactory>> BUNDLE_SUPPLIER_FACTORY_CLASS = Props.classOf("spire.bundleSupplierClass", DefaultBundleSupplierFactory.class);
 
+    /**
+     * Whether to disable ACL validation.
+     */
+    public static final Prop<Boolean> ACL_DISABLED = Props.booleanOf("spire.disableAcl", false);
+
 }
