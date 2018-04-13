@@ -70,7 +70,10 @@ public class DefaultCloudIdManager implements CloudIdManager {
 
     @Override
     public synchronized void addListener(Consumer<Bundles> listener) {
-        this.listeners.add(listener);
+        listeners.add(listener);
+        if (bundles != null) {
+            listener.accept(bundles);
+        }
     }
 
     private void update() {
@@ -79,7 +82,7 @@ public class DefaultCloudIdManager implements CloudIdManager {
         if (!Objects.equals(newBundles, this.bundles)) {
             this.bundles = newBundles;
             setLatch.countDown();
-            listeners.forEach(l -> l.accept(newBundles));
+            notifyListeners(newBundles);
         }
 
         Duration backoff = min(
@@ -88,6 +91,10 @@ public class DefaultCloudIdManager implements CloudIdManager {
 
         LOGGER.debug("Backing off for {}", backoff);
         sleep(backoff);
+    }
+
+    private synchronized void notifyListeners(Bundles bundles) {
+        listeners.forEach(l -> l.accept(bundles));
     }
 
 }

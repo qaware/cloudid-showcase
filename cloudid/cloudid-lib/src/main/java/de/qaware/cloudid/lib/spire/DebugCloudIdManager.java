@@ -75,13 +75,14 @@ public class DebugCloudIdManager implements CloudIdManager {
     }
 
     @Override
-    public Bundles getBundles() {
+    public synchronized Bundles getBundles() {
         return bundles;
     }
 
     @Override
-    public void addListener(Consumer<Bundles> listener) {
+    public synchronized void addListener(Consumer<Bundles> listener) {
         listeners.add(listener);
+        listener.accept(bundles);
     }
 
 

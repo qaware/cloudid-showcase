@@ -38,6 +38,8 @@ public interface CloudIdManager {
     /**
      * Add a listener that gets notified whenever the current set of bundles changes.
      *
+     * Listeners should be called immediately if bundles were available before they are added.
+     *
      * @param listener listener
      */
     void addListener(Consumer<Bundles> listener);
