@@ -1,7 +1,7 @@
 package de.qaware.cloudid.proxy;
 
-import de.qaware.cloudid.lib.spire.Bundle;
-import de.qaware.cloudid.lib.spire.StaticLauncher;
+import de.qaware.cloudid.lib.spire.CloudId;
+import de.qaware.cloudid.lib.spire.CloudIdManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.Header;
@@ -22,7 +22,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Enumeration;
-import java.util.function.Supplier;
 
 /**
  * Simple proxy controller. Performs some requests against a configurable backend.
@@ -36,7 +35,7 @@ public class Proxy {
     private static final String TRACE_HEADER_NAME = "X-SPIFFE-Callstack";
     private final AppProperties appProperties;
     private final HttpClient httpClient;
-    private final Supplier<Bundle> bundleSupplier = StaticLauncher.getBundleSupplier();
+    private final CloudIdManager cloudIdManager = CloudId.getManager();
 
     /**
      * Forwards a request 1:1 to the target defined in {@code de.qaware.cloud.id.demoserver.backend}.
@@ -74,11 +73,11 @@ public class Proxy {
         String traceHeaderValue;
         if (headers == null || !headers.hasMoreElements()) {
             LOGGER.debug("No demo-trace header found in request. Creating a new one.");
-            traceHeaderValue = bundleSupplier.get().getSpiffeId() + "#";
+            traceHeaderValue = cloudIdManager.getPreferredBundle().getSpiffeId() + "#";
         } else {
             String old_header = headers.nextElement();
             LOGGER.debug("Received demo-trace header with content: {}", old_header);
-            traceHeaderValue = old_header + bundleSupplier.get().getSpiffeId() + "#";
+            traceHeaderValue = old_header + cloudIdManager.getPreferredBundle().getSpiffeId() + "#";
         }
         LOGGER.debug("Adding header with name {} and value {} to forwarded request", TRACE_HEADER_NAME, traceHeaderValue);
         requestBuilder.addHeader(TRACE_HEADER_NAME, traceHeaderValue);

@@ -1,7 +1,7 @@
 package de.qaware.cloudid.lib.jsa;
 
-import de.qaware.cloudid.lib.spire.Bundle;
-import de.qaware.cloudid.lib.spire.StaticLauncher;
+import de.qaware.cloudid.lib.spire.CloudId;
+import de.qaware.cloudid.lib.spire.CloudIdManager;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.InputStream;
@@ -13,7 +13,6 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Objects;
-import java.util.function.Supplier;
 
 import static java.util.Collections.enumeration;
 import static java.util.Collections.singleton;
@@ -26,32 +25,32 @@ import static java.util.Collections.singleton;
 @Slf4j
 public class SPIREKeyStore extends KeyStoreSpi {
 
-    private final Supplier<Bundle> bundleSupplier;
+    private final CloudIdManager cloudIdManager;
 
     /**
      * Constructor
      */
     public SPIREKeyStore() {
-        bundleSupplier = StaticLauncher.getBundleSupplier();
+        cloudIdManager = CloudId.getManager();
     }
 
     @Override
     public Key engineGetKey(String alias, char[] password) {
         LOGGER.trace("engineGetKey({}, ...)", alias);
-        return bundleSupplier.get().getKeyPair().getPrivate();
+        return cloudIdManager.getPreferredBundle().getKeyPair().getPrivate();
     }
 
     @Override
     public Certificate[] engineGetCertificateChain(String alias) {
         LOGGER.trace("engineGetCertificateChain({})", alias);
 
-        return bundleSupplier.get().getCaCertChainArray();
+        return cloudIdManager.getPreferredBundle().getCaCertChainArray();
     }
 
     @Override
     public Certificate engineGetCertificate(String alias) {
         LOGGER.trace("engineGetCertificate({})", alias);
-        return bundleSupplier.get().getCertificate();
+        return cloudIdManager.getPreferredBundle().getCertificate();
     }
 
     @Override

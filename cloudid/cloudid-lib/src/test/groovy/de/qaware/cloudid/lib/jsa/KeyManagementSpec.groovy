@@ -1,7 +1,7 @@
 package de.qaware.cloudid.lib.jsa
 
-import de.qaware.cloudid.lib.spire.StaticLauncher
-import de.qaware.cloudid.lib.spire.TestBundleSupplierFactory
+import de.qaware.cloudid.lib.spire.CloudId
+import de.qaware.cloudid.lib.spire.TestCloudIdManager
 import spock.lang.Specification
 import spock.util.environment.RestoreSystemProperties
 
@@ -10,7 +10,7 @@ import java.security.Principal
 import java.time.Duration
 
 import static de.qaware.cloudid.lib.jsa.SPIREProvider.ALIAS
-import static de.qaware.cloudid.lib.spire.Config.BUNDLE_SUPPLIER_FACTORY_CLASS
+import static de.qaware.cloudid.lib.spire.Config.CLOUD_ID_MANAGER_CLASS
 import static de.qaware.cloudid.lib.spire.TestUtils.waitUntilBundleIsAvailable
 
 /**
@@ -22,13 +22,13 @@ class KeyManagementSpec extends Specification {
     static SPIREKeyManagerFactory keyManagerFactory
 
     def setupSpec() {
-        System.setProperty(BUNDLE_SUPPLIER_FACTORY_CLASS.getSysProp(), TestBundleSupplierFactory.class.getName())
+        System.setProperty(CLOUD_ID_MANAGER_CLASS.getSysProp(), TestCloudIdManager.class.getName())
 
         keyManagerFactory = new SPIREKeyManagerFactory()
     }
 
     def cleanupSpec() {
-        StaticLauncher.reset()
+        CloudId.reset()
     }
 
     def 'get key managers'() {

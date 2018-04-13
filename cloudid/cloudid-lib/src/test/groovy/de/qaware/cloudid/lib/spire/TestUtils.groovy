@@ -17,7 +17,7 @@ class TestUtils {
 
         while (Duration.between(start, Instant.now()) < timeout) {
             try {
-                StaticLauncher.getBundleSupplier().get()
+                CloudId.getManager().getPreferredBundle()
                 return
             } catch (IllegalStateException ignored) {
                 Thread.sleep(100)

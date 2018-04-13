@@ -1,6 +1,6 @@
 package de.qaware.cloudid.lib.jsa;
 
-import de.qaware.cloudid.lib.spire.StaticLauncher;
+import de.qaware.cloudid.lib.spire.CloudId;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.net.ssl.ManagerFactoryParameters;
@@ -26,6 +26,6 @@ public class SPIRETrustManagerFactory extends TrustManagerFactorySpi {
 
     @Override
     protected TrustManager[] engineGetTrustManagers() {
-        return new TrustManager[]{new SPIRETrustManager(StaticLauncher.getBundleSupplier())};
+        return new TrustManager[]{new SPIRETrustManager(CloudId.getManager())};
     }
 }

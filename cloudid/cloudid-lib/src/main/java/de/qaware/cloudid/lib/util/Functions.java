@@ -2,6 +2,7 @@ package de.qaware.cloudid.lib.util;
 
 import lombok.experimental.UtilityClass;
 
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -22,6 +23,19 @@ public class Functions {
      */
     public static <T, R> Supplier<R> compose(Function<? super T, R> f, Supplier<T> s) {
         return () -> f.apply(s.get());
+    }
+
+    /**
+     * Compose a function and a consumer.
+     *
+     * @param f   function
+     * @param c   original consumer
+     * @param <T> original input type
+     * @param <R> consumers input type
+     * @return {@code x -> c.accept(f.apply(x))}
+     */
+    public static <T, R> Consumer<T> compose(Function<? super T, R> f, Consumer<R> c) {
+        return x -> c.accept(f.apply(x));
     }
 
 }

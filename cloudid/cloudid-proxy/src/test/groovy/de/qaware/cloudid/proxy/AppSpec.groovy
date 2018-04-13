@@ -1,15 +1,15 @@
 package de.qaware.cloudid.proxy
 
 import de.qaware.cloudid.lib.jsa.SPIREProvider
-import de.qaware.cloudid.lib.spire.DebugBundleSupplierFactory
+import de.qaware.cloudid.lib.spire.DebugCloudIdManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContext
 import spock.lang.Specification
 import spock.util.environment.RestoreSystemProperties
 
-import static de.qaware.cloudid.lib.spire.Config.BUNDLE_SUPPLIER_FACTORY_CLASS
-import static de.qaware.cloudid.lib.spire.DebugBundleSupplierFactory.KEYSTORE_LOCATION
+import static de.qaware.cloudid.lib.spire.Config.CLOUD_ID_MANAGER_CLASS
+import static de.qaware.cloudid.lib.spire.DebugCloudIdManager.KEYSTORE_LOCATION
 
 /**
  * Specification for the Spring Boot applicaton
@@ -23,8 +23,7 @@ class AppSpec extends Specification {
     ApplicationContext context
 
     void setupSpec() {
-        System.setProperty(BUNDLE_SUPPLIER_FACTORY_CLASS.getSysProp(),
-                DebugBundleSupplierFactory.class.getName())
+        System.setProperty(CLOUD_ID_MANAGER_CLASS.getSysProp(), DebugCloudIdManager.class.getName())
         System.setProperty(KEYSTORE_LOCATION.getSysProp(), TestResources.testKeystoreLocation)
 
         SPIREProvider.install()

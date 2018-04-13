@@ -1,6 +1,7 @@
 package de.qaware.cloudid.demo;
 
-import de.qaware.cloudid.lib.spire.StaticLauncher;
+import de.qaware.cloudid.lib.spire.CloudId;
+import de.qaware.cloudid.lib.spire.CloudIdManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -20,6 +21,8 @@ import java.util.Enumeration;
 @ConfigurationProperties
 @RequiredArgsConstructor
 public class DemoResponder {
+
+    private final CloudIdManager cloudIdManager = CloudId.getManager();
 
     /**
      * Generates a html demo page which contains the SPIFFE callstack, if available.
@@ -46,7 +49,7 @@ public class DemoResponder {
     }
 
     private String generateResponseBody(String trace) {
-        String ourId = StaticLauncher.getBundleSupplier().get().getSpiffeId();
+        String ourId = cloudIdManager.getPreferredBundle().getSpiffeId();
         String body = getBodyTemplate();
         body = body.replace("%TRACE", trace);
         body = body.replace("%MY_IDENTITY", ourId);
@@ -72,7 +75,7 @@ public class DemoResponder {
     private String formatTrace(String trace, boolean appendOwnId) {
         assert trace != null;
         if (appendOwnId) {
-            trace += StaticLauncher.getBundleSupplier().get().getSpiffeId();
+            trace += cloudIdManager.getPreferredBundle().getSpiffeId();
         }
         String[] traces = trace.split("#");
         StringBuilder traceBuilder = new StringBuilder();

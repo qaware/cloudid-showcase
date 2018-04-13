@@ -1,6 +1,6 @@
 package de.qaware.cloudid.lib.jsa;
 
-import de.qaware.cloudid.lib.spire.Bundle;
+import de.qaware.cloudid.lib.spire.CloudIdManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -11,7 +11,6 @@ import java.security.Principal;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.Objects;
-import java.util.function.Supplier;
 
 import static de.qaware.cloudid.lib.jsa.SPIREProvider.ALIAS;
 
@@ -22,7 +21,7 @@ import static de.qaware.cloudid.lib.jsa.SPIREProvider.ALIAS;
 @RequiredArgsConstructor
 public class SPIREKeyManager extends X509ExtendedKeyManager {
 
-    private final Supplier<Bundle> bundleSupplier;
+    private final CloudIdManager cloudIdManager;
 
     @Override
     public PrivateKey getPrivateKey(String alias) {
@@ -32,7 +31,7 @@ public class SPIREKeyManager extends X509ExtendedKeyManager {
             return null;
         }
 
-        return bundleSupplier.get().getKeyPair().getPrivate();
+        return cloudIdManager.getPreferredBundle().getKeyPair().getPrivate();
     }
 
     @SuppressWarnings("squid:S1168" /* null is required by the interface to signal that the chain is not available */)
@@ -44,7 +43,7 @@ public class SPIREKeyManager extends X509ExtendedKeyManager {
             return null;
         }
 
-        return bundleSupplier.get().getCaCertChainArray();
+        return cloudIdManager.getPreferredBundle().getCaCertChainArray();
     }
 
     @Override

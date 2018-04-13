@@ -40,9 +40,9 @@ public class Config {
     public static final Prop<Duration> MIN_UPDATE_INTERVAL = Props.durationOf("spire.updateAhead", Duration.ofSeconds(30));
 
     /**
-     * Get the bundle supplier factory class.
+     * Get the bundles manager class.
      */
-    public static final Prop<Class<DefaultBundleSupplierFactory>> BUNDLE_SUPPLIER_FACTORY_CLASS = Props.classOf("spire.bundleSupplierClass", DefaultBundleSupplierFactory.class);
+    public static final Prop<Class<CloudIdManager>> CLOUD_ID_MANAGER_CLASS = Props.classOf("cloudid.bundlesManagerClass", DefaultCloudIdManager.class);
 
     /**
      * Whether to disable ACL validation.

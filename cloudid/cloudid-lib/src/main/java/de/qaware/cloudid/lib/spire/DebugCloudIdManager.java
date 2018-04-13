@@ -1,8 +1,8 @@
 package de.qaware.cloudid.lib.spire;
 
+import de.qaware.cloudid.lib.util.Certificates;
 import de.qaware.cloudid.lib.util.config.Prop;
 import de.qaware.cloudid.lib.util.config.Props;
-import lombok.extern.slf4j.Slf4j;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -10,23 +10,24 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.*;
 import java.security.cert.X509Certificate;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Supplier;
+import java.util.function.Consumer;
 
 import static de.qaware.cloudid.lib.util.Reflection.getContextClassLoader;
 import static de.qaware.cloudid.lib.util.config.Props.stringOf;
 import static java.text.MessageFormat.format;
 import static java.util.Arrays.stream;
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
-import static org.apache.commons.lang3.StringUtils.startsWith;
 
 /**
- * Bundle supplier factory for debugging backed by a local key store.
+ * Debug CloudId Manager.
  */
-@SuppressWarnings("unused" /* Referenced by system properties */)
-@Slf4j
-public class DebugBundleSupplierFactory implements BundleSupplierFactory {
+public class DebugCloudIdManager implements CloudIdManager {
 
     /**
      * Keystore location.
@@ -49,38 +50,40 @@ public class DebugBundleSupplierFactory implements BundleSupplierFactory {
      */
     public static final Prop<String> KEY_PASSWORD = stringOf("spire.debug.key.password", "");
 
-    /**
-     * Id of an URI subject alternative name.
-     */
-    private static final int SAN_URI_OID = 6;
-    /**
-     * Index of the object Id field.
-     */
-    private static final int SAN_OID_I = 0;
-    /**
-     * Index of the value field.
-     */
-    private static final int SAN_VALUE_I = 1;
 
-    private static final String SPIFFE_URI_PREFIX = "spiffe://";
     private static final String CLASSPATH_PREFIX = "classpath:";
 
-    /**
-     * Constructor.
-     */
-    public DebugBundleSupplierFactory() {
-        Props.debugLog(getClass());
-    }
+    private final Collection<Consumer<Bundles>> listeners = new ArrayList<>();
+    private Bundles bundles;
+
 
     @Override
-    public Supplier<Bundle> get() {
+    public synchronized void start() {
+        Props.debugLog(getClass());
+
         try {
-            Bundle bundle = loadBundle();
-            return () -> bundle;
+            bundles = new Bundles(singletonList(loadBundle()), Instant.MAX);
+            listeners.forEach(l -> l.accept(bundles));
         } catch (IOException | GeneralSecurityException e) {
             throw new IllegalStateException(e);
         }
     }
+
+    @Override
+    public synchronized void stop() {
+        bundles = null;
+    }
+
+    @Override
+    public Bundles getBundles() {
+        return bundles;
+    }
+
+    @Override
+    public void addListener(Consumer<Bundles> listener) {
+        listeners.add(listener);
+    }
+
 
     private static Bundle loadBundle() throws IOException, GeneralSecurityException {
         KeyStore keystore = loadKeyStore();
@@ -90,23 +93,14 @@ public class DebugBundleSupplierFactory implements BundleSupplierFactory {
         PrivateKey privateKey = getPrivateKey(keystore, alias);
         X509Certificate certificate = getCertificate(keystore, alias);
         List<X509Certificate> caCertChain = getCaCertChain(keystore, alias);
+        String spiffeId = Certificates.getSpiffeId(certificate).orElseThrow(IllegalStateException::new);
 
         return new Bundle(
-                getSpiffeId(certificate),
+                spiffeId,
                 certificate,
                 new KeyPair(certificate.getPublicKey(), privateKey),
                 caCertChain,
                 emptyMap());
-    }
-
-    private static String getSpiffeId(X509Certificate certificate) throws GeneralSecurityException {
-        return certificate.getSubjectAlternativeNames().stream()
-                .filter(san -> ((Integer) san.get(SAN_OID_I) == SAN_URI_OID))
-                .map(san -> (String) san.get(SAN_VALUE_I))
-                .filter(uri -> startsWith(uri, SPIFFE_URI_PREFIX))
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException(
-                        format("No SPIFFE Id SAN found in certificate {0}", certificate)));
     }
 
     private static PrivateKey getPrivateKey(KeyStore keystore, String alias) throws GeneralSecurityException {
@@ -136,10 +130,13 @@ public class DebugBundleSupplierFactory implements BundleSupplierFactory {
 
     private static InputStream open(String location) throws FileNotFoundException {
         if (location.startsWith(CLASSPATH_PREFIX)) {
-            return getContextClassLoader().getResourceAsStream(location.substring(CLASSPATH_PREFIX.length()));
+            InputStream inputStream = getContextClassLoader().getResourceAsStream(location.substring(CLASSPATH_PREFIX.length()));
+            if (inputStream == null) {
+                throw new IllegalArgumentException(format("Unable to load keystore {0}", location));
+            }
+            return inputStream;
         } else {
             return new FileInputStream(location);
         }
     }
-
 }

@@ -1,6 +1,6 @@
 package de.qaware.cloudid.lib.jsa;
 
-import de.qaware.cloudid.lib.spire.StaticLauncher;
+import de.qaware.cloudid.lib.spire.CloudId;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.net.ssl.KeyManager;
@@ -27,7 +27,7 @@ public class SPIREKeyManagerFactory extends KeyManagerFactorySpi {
     }
 
     private void init() {
-        keyManager = new SPIREKeyManager(StaticLauncher.getBundleSupplier());
+        keyManager = new SPIREKeyManager(CloudId.getManager());
     }
 
     @Override

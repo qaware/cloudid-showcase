@@ -2,10 +2,9 @@ package de.qaware.cloudid.lib.jsa
 
 import com.github.tomakehurst.wiremock.WireMockServer
 import de.qaware.cloudid.lib.TestResources
-import de.qaware.cloudid.lib.spire.DebugBundleSupplierFactory
-import de.qaware.cloudid.lib.spire.StaticLauncher
+import de.qaware.cloudid.lib.spire.CloudId
+import de.qaware.cloudid.lib.spire.DebugCloudIdManager
 import groovy.util.logging.Slf4j
-import spock.lang.Ignore
 import spock.lang.Specification
 import spock.util.environment.RestoreSystemProperties
 
@@ -17,7 +16,7 @@ import java.time.Duration
 import static com.github.tomakehurst.wiremock.client.WireMock.get
 import static com.github.tomakehurst.wiremock.client.WireMock.ok
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options
-import static de.qaware.cloudid.lib.spire.Config.BUNDLE_SUPPLIER_FACTORY_CLASS
+import static de.qaware.cloudid.lib.spire.Config.CLOUD_ID_MANAGER_CLASS
 import static de.qaware.cloudid.lib.spire.TestUtils.waitUntilBundleIsAvailable
 
 @Slf4j
@@ -25,8 +24,8 @@ import static de.qaware.cloudid.lib.spire.TestUtils.waitUntilBundleIsAvailable
 class SPIREProviderSpec extends Specification {
 
     void setupSpec() {
-        System.setProperty(BUNDLE_SUPPLIER_FACTORY_CLASS.getSysProp(), DebugBundleSupplierFactory.class.getName())
-        System.setProperty(DebugBundleSupplierFactory.KEYSTORE_LOCATION.getSysProp(), TestResources.testKeystoreLocation)
+        System.setProperty(CLOUD_ID_MANAGER_CLASS.getSysProp(), DebugCloudIdManager.class.getName())
+        System.setProperty(DebugCloudIdManager.KEYSTORE_LOCATION.getSysProp(), TestResources.testKeystoreLocation)
 
         SPIREProvider.install()
         SPIRESocketFactory.install()
@@ -37,10 +36,9 @@ class SPIREProviderSpec extends Specification {
     void cleanupSpec() {
         SPIREProvider.uninstall()
         SPIRESocketFactory.uninstall()
-        StaticLauncher.reset()
+        CloudId.reset()
     }
 
-    @Ignore("unclear if the key manager is actually required")
     def 'get key manager'() {
         when:
         def keyManagerFactory = KeyManagerFactory.getInstance('SPIRE')
@@ -80,7 +78,7 @@ class SPIREProviderSpec extends Specification {
         connection.inputStream.getText() == body
 
         cleanup:
-        server.shutdown()
+        if (server!= null) server.shutdown()
     }
 
 

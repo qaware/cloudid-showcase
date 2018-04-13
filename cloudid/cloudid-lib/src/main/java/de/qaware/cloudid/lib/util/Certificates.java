@@ -8,11 +8,14 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.*;
 import java.time.Instant;
-import java.util.*;
-import java.util.regex.Pattern;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toSet;
+import static org.apache.commons.lang3.StringUtils.startsWith;
 
 /**
  * Utilities for certificates.
@@ -21,7 +24,20 @@ import static java.util.stream.Collectors.toSet;
 @UtilityClass
 public class Certificates {
 
-    private static final Pattern SPIFFE_ID_PATTERN = Pattern.compile("spiffe://.+");
+    /**
+     * Id of an URI subject alternative name.
+     */
+    private static final int SAN_URI_OID = 6;
+    /**
+     * Index of the object Id field.
+     */
+    private static final int SAN_OID_I = 0;
+    /**
+     * Index of the value field.
+     */
+    private static final int SAN_VALUE_I = 1;
+
+    private static final String SPIFFE_URI_PREFIX = "spiffe://";
 
     /**
      * Get the notAfter instant of a X.509 certificate.
@@ -109,18 +125,12 @@ public class Certificates {
      * @throws CertificateParsingException if parsing the certificate fails
      */
     public static Optional<String> getSpiffeId(X509Certificate certificate) throws CertificateParsingException {
-        Collection<List<?>> sans = certificate.getSubjectAlternativeNames();
-
-        if (sans == null) {
-            return Optional.empty();
-        }
-
-        return sans.stream()
-                .flatMap(List::stream)
-                .filter(o -> o instanceof String)
-                .map(o -> (String) o)
-                .filter(s -> SPIFFE_ID_PATTERN.matcher(s).matches())
-                .findFirst();
+        return Optional.ofNullable(certificate.getSubjectAlternativeNames())
+                .flatMap(sans -> sans.stream()
+                        .filter(san -> ((Integer) san.get(SAN_OID_I) == SAN_URI_OID))
+                        .map(san -> (String) san.get(SAN_VALUE_I))
+                        .filter(uri -> startsWith(uri, SPIFFE_URI_PREFIX))
+                        .findFirst());
     }
 
     private static List<X509Certificate> truncateChain(X509Certificate[] chain, Set<X509Certificate> trustedCerts) throws CertificateException {

@@ -6,6 +6,7 @@ import com.bettercloud.vault.VaultConfig;
 import com.bettercloud.vault.VaultException;
 import com.bettercloud.vault.response.AuthResponse;
 import de.qaware.cloudid.lib.spire.Bundle;
+import de.qaware.cloudid.lib.spire.CloudIdManager;
 import de.qaware.cloudid.lib.spire.Config;
 import de.qaware.cloudid.lib.util.ACLParser;
 import de.qaware.cloudid.lib.util.Certificates;
@@ -19,15 +20,12 @@ import javax.net.ssl.X509ExtendedTrustManager;
 import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
 import java.net.Socket;
-import java.security.GeneralSecurityException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
+import java.security.*;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
-import java.util.function.Supplier;
 
 import static de.qaware.cloudid.lib.util.Certificates.getSpiffeId;
 import static java.util.Arrays.stream;
@@ -41,25 +39,9 @@ public class SPIRETrustManager extends X509ExtendedTrustManager {
 
     private static final String VAULT_ADDR = getVaultAddress();
     private static final String DEFAULT_LOCALHOST_VAULT_ADDR = "https://localhost:8200";
-    private final Supplier<Bundle> bundleSupplier;
+    private final CloudIdManager cloudIdManager;
 
     private final X509TrustManager delegate = getDefaultTrustManager();
-
-    private static X509TrustManager getDefaultTrustManager() {
-        TrustManagerFactory factory = SPIREProvider.DEFAULT_TRUST_MANAGER_FACTORY;
-
-        try {
-            factory.init((KeyStore) null);
-        } catch (KeyStoreException e) {
-            throw new IllegalStateException(e);
-        }
-
-        return stream(factory.getTrustManagers())
-                .filter(tm -> tm instanceof X509TrustManager)
-                .map(tm -> (X509TrustManager) tm)
-                .findFirst()
-                .orElseThrow(IllegalStateException::new);
-    }
 
     private static String getVaultAddress() {
         String address = System.getProperty("cloudid.vault.address");
@@ -74,7 +56,7 @@ public class SPIRETrustManager extends X509ExtendedTrustManager {
     public X509Certificate[] getAcceptedIssuers() {
         LOGGER.trace("getAcceptedIssuers()");
 
-        return bundleSupplier.get().getTrustedCAs().toArray(new X509Certificate[0]);
+        return cloudIdManager.getPreferredBundle().getTrustedCAs().toArray(new X509Certificate[0]);
     }
 
     @Override
@@ -88,7 +70,7 @@ public class SPIRETrustManager extends X509ExtendedTrustManager {
         if (clientIdOpt.isPresent()) {
             String clientId = clientIdOpt.get();
 
-            Bundle svid = bundleSupplier.get();
+            Bundle svid = cloudIdManager.getPreferredBundle();
 
             if (LOGGER.isDebugEnabled() && clientId.matches(".*/curl-client")) {
                 LOGGER.info("Not verifying curl client cert");
@@ -164,7 +146,7 @@ public class SPIRETrustManager extends X509ExtendedTrustManager {
 
         Optional<String> clientIdOpt = getSpiffeId(chain[0]);
         if (clientIdOpt.isPresent()) {
-            Certificates.validate(chain, bundleSupplier.get().getTrustedCAs());
+            Certificates.validate(chain, cloudIdManager.getPreferredBundle().getTrustedCAs());
         } else {
             LOGGER.debug("Server certificate is not a SPIFFE certificate. Delegating to {}", delegate.getClass().getName());
             delegate.checkServerTrusted(chain, authType);
@@ -181,9 +163,31 @@ public class SPIRETrustManager extends X509ExtendedTrustManager {
         checkServerTrusted(chain, authType);
     }
 
-
     private boolean shouldCheckAcl() {
         return !Config.ACL_DISABLED.get();
+    }
+
+    private static X509TrustManager getDefaultTrustManager() {
+        return stream(Security.getProviders("TrustManagerFactory.PKIX"))
+                .map(Provider::getName)
+                .filter(name -> !Objects.equals(name, SPIREProvider.NAME))
+                .map(SPIRETrustManager::getX509TrustManager)
+                .findFirst()
+                .orElseThrow(IllegalStateException::new);
+    }
+
+    private static X509TrustManager getX509TrustManager(String name) {
+        try {
+            TrustManagerFactory factory = TrustManagerFactory.getInstance("PKIX", name);
+            factory.init((KeyStore) null);
+            return stream(factory.getTrustManagers())
+                    .filter(tm -> tm instanceof X509TrustManager)
+                    .map(tm -> (X509TrustManager) tm)
+                    .findFirst()
+                    .orElseThrow(IllegalStateException::new);
+        } catch (NoSuchAlgorithmException | NoSuchProviderException | KeyStoreException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
 }
