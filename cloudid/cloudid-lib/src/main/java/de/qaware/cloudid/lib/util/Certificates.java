@@ -106,6 +106,7 @@ public class Certificates {
      *
      * @param certificate certificate
      * @return optional containing the SPIFFE Id
+     * @throws CertificateParsingException if parsing the certificate fails
      */
     public static Optional<String> getSpiffeId(X509Certificate certificate) throws CertificateParsingException {
         Collection<List<?>> sans = certificate.getSubjectAlternativeNames();
