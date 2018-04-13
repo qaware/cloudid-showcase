@@ -3,7 +3,6 @@ package de.qaware.cloudid.lib.util.config;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.text.MessageFormat;
 import java.util.Optional;
 import java.util.function.Function;
 
