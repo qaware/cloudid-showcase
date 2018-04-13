@@ -30,8 +30,9 @@ public class Props {
      * @param <T>          class type
      * @return property
      */
-    public static <T> Prop<Class<T>> classOf(String name, Class<T> defaultValue) {
-        return new Prop<>(name, Reflection::loadClass, defaultValue);
+    @SuppressWarnings("unchecked")
+    public static <T> Prop<Class<T>> classOf(String name, Class<? extends T> defaultValue) {
+        return new Prop<>(name, Reflection::loadClass, (Class) defaultValue);
     }
 
     /**
