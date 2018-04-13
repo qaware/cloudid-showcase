@@ -1,8 +1,8 @@
 package de.qaware.cloudid.lib.spire;
 
+import de.qaware.cloudid.lib.util.concurrent.RandomExponentialBackoffSupplier;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import spire.api.workload.WorkloadOuterClass;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -12,10 +12,10 @@ import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import static de.qaware.cloudid.lib.spire.Config.FORCE_UPDATE_AFTER;
-import static de.qaware.cloudid.lib.spire.Config.MIN_UPDATE_INTERVAL;
+import static de.qaware.cloudid.lib.spire.Config.*;
 import static de.qaware.cloudid.lib.util.Comparables.max;
 import static de.qaware.cloudid.lib.util.Comparables.min;
+import static de.qaware.cloudid.lib.util.Functions.compose;
 import static de.qaware.cloudid.lib.util.concurrent.Concurrent.*;
 import static java.time.Instant.now;
 
@@ -28,15 +28,18 @@ public class DefaultCloudIdManager implements CloudIdManager {
 
     private static final String THREAD_NAME = "cloudid-updater";
 
-    private static final BundlesConverter BUNDLES_CONVERTER = new BundlesConverter();
-
     private final Collection<Consumer<Bundles>> listeners = new ArrayList<>();
 
     private Thread updater;
     private volatile Bundles bundles;
     private final CountDownLatch setLatch = new CountDownLatch(1);
 
-    private final Supplier<WorkloadOuterClass.Bundles> bundlesSupplier;
+    private final Supplier<Bundles> supplier = compose(new BundlesConverter(),
+            new RandomExponentialBackoffSupplier<>(
+                    new UdsBundlesSupplier(AGENT_SOCKET.get()),
+                    EXP_BACKOFF_BASE.get(),
+                    EXP_BACKOFF_STEP.get(),
+                    EXP_BACKOFF_RETRIES_CAP.get()));
 
     @Override
     public synchronized void start() {
@@ -45,6 +48,7 @@ public class DefaultCloudIdManager implements CloudIdManager {
         }
 
         updater = new Thread(() -> repeat(this::update), THREAD_NAME);
+        updater.setDaemon(true);
         updater.start();
     }
 
@@ -70,7 +74,7 @@ public class DefaultCloudIdManager implements CloudIdManager {
     }
 
     private void update() {
-        Bundles newBundles = BUNDLES_CONVERTER.apply(bundlesSupplier.get());
+        Bundles newBundles = supplier.get();
 
         if (!Objects.equals(newBundles, this.bundles)) {
             this.bundles = newBundles;
