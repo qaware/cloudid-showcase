@@ -16,7 +16,9 @@ import java.time.Duration
 import static com.github.tomakehurst.wiremock.client.WireMock.get
 import static com.github.tomakehurst.wiremock.client.WireMock.ok
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options
+import static de.qaware.cloudid.lib.spire.Config.ACL_DISABLED
 import static de.qaware.cloudid.lib.spire.Config.CLOUD_ID_MANAGER_CLASS
+import static de.qaware.cloudid.lib.spire.DebugCloudIdManager.KEYSTORE_LOCATION
 import static de.qaware.cloudid.lib.spire.TestUtils.waitUntilBundleIsAvailable
 
 @Slf4j
@@ -25,7 +27,8 @@ class SPIREProviderSpec extends Specification {
 
     void setupSpec() {
         System.setProperty(CLOUD_ID_MANAGER_CLASS.getSysProp(), DebugCloudIdManager.class.getName())
-        System.setProperty(DebugCloudIdManager.KEYSTORE_LOCATION.getSysProp(), TestResources.testKeystoreLocation)
+        System.setProperty(KEYSTORE_LOCATION.getSysProp(), TestResources.testKeystoreLocation)
+        System.setProperty(ACL_DISABLED.sysProp, true.toString())
 
         SPIREProvider.install()
         SPIRESocketFactory.install()
@@ -46,6 +49,11 @@ class SPIREProviderSpec extends Specification {
         then:
         keyManagerFactory.keyManagers.length == 1
         keyManagerFactory.keyManagers[0] instanceof SPIREKeyManager
+    }
+
+    def 'get default key manager'() {
+        expect:
+        KeyManagerFactory.getDefaultAlgorithm() == SPIREProvider.ALGORITHM
     }
 
     def 'get default SSLSocketFactory'() {
@@ -78,7 +86,7 @@ class SPIREProviderSpec extends Specification {
         connection.inputStream.getText() == body
 
         cleanup:
-        if (server!= null) server.shutdown()
+        if (server != null) server.shutdown()
     }
 
 

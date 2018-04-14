@@ -15,7 +15,7 @@ import java.util.Objects;
 import static de.qaware.cloudid.lib.jsa.SPIREProvider.ALIAS;
 
 /**
- * X.509 key manager backed by SPIRE bundles.
+ * X.509 key manager backed by cloud identities.
  */
 @Slf4j
 @RequiredArgsConstructor
@@ -49,37 +49,60 @@ public class SPIREKeyManager extends X509ExtendedKeyManager {
     @Override
     public String[] getClientAliases(String keyType, Principal[] issuers) {
         LOGGER.trace("Get client aliases for {}, {}", keyType, issuers);
-        return new String[]{ALIAS};
+        return getAliases(keyType);
     }
 
     @Override
     public String chooseClientAlias(String[] keyTypes, Principal[] issuers, Socket socket) {
         LOGGER.trace("Choose client alias for {}, {}, {}", keyTypes, issuers, socket);
-        return ALIAS;
+        return getAlias(keyTypes);
     }
 
     @Override
     public String chooseEngineClientAlias(String[] keyTypes, Principal[] issuers, SSLEngine sslEngine) {
         LOGGER.trace("Choose client alias for {}, {}, {}", keyTypes, issuers, sslEngine);
-        return ALIAS;
+        return getAlias(keyTypes);
     }
 
     @Override
     public String[] getServerAliases(String keyType, Principal[] issuers) {
         LOGGER.trace("getServerAliases({}, {})", keyType, issuers);
-        return new String[]{ALIAS};
+
+        return getAliases(keyType);
     }
 
     @Override
     public String chooseEngineServerAlias(String keyType, Principal[] issuers, SSLEngine sslEngine) {
         LOGGER.trace("chooseEngineServerAlias({}, {}, {})", keyType, issuers, sslEngine);
-        return ALIAS;
+        return getAlias(keyType);
     }
 
     @Override
     public String chooseServerAlias(String keyType, Principal[] issuers, Socket socket) {
         LOGGER.trace("chooseServerAlias({}, {}, {})", keyType, issuers, socket);
-        return ALIAS;
+        return getAlias(keyType);
     }
+
+    private String getAlias(String ...keyTypes) {
+        String idAlgorithm = cloudIdManager.getSingleBundle().getKeyPair().getPrivate().getAlgorithm();
+
+        for (String keyType : keyTypes) {
+            if (keyType.equals(idAlgorithm)) {
+                return ALIAS;
+            }
+        }
+
+        return null;
+    }
+
+    private String[] getAliases(String keyType) {
+        String alias = getAlias(keyType);
+        if (alias != null) {
+            return new String[]{alias};
+        } else {
+            return new String[0];
+        }
+    }
+
 
 }

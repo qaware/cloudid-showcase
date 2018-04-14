@@ -3,6 +3,7 @@ package de.qaware.cloudid.lib.jsa;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.net.ssl.KeyManagerFactory;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.security.Provider;
@@ -31,7 +32,7 @@ public class SPIREProvider extends Provider {
     /**
      * Provider name.
      */
-    public static final String NAME = "spiffe-provider";
+    static final String NAME = "spiffe-provider";
     private static final double VERSION = 0.1;
     private static final String DESCRIPTION = "";
 
@@ -40,6 +41,8 @@ public class SPIREProvider extends Provider {
     private static final String KEY_STORE_PREFIX = "KeyStore.";
 
     private static final long serialVersionUID = 0L;
+
+    private static String defaultKeyManagerFactoryAlgorithm;
 
 
     /**
@@ -61,8 +64,13 @@ public class SPIREProvider extends Provider {
     /**
      * Install this provider.
      */
-    public static void install() {
+    public static synchronized void install() {
         if (Security.getProvider(NAME) == null) {
+
+            // Install the Key Manager Factory as default
+            defaultKeyManagerFactoryAlgorithm = KeyManagerFactory.getDefaultAlgorithm();
+            Security.setProperty("ssl.KeyManagerFactory.algorithm", ALGORITHM);
+
             // Install the provider at the first position
             Security.insertProviderAt(new SPIREProvider(), 1);
 
@@ -75,8 +83,10 @@ public class SPIREProvider extends Provider {
     /**
      * Uninstall this provider.
      */
-    public static void uninstall() {
+    public static synchronized void uninstall() {
         if (Security.getProvider(NAME) != null) {
+            Security.setProperty("ssl.KeyManagerFactory.algorithm", defaultKeyManagerFactoryAlgorithm);
+
             Security.removeProvider(NAME);
         }
     }
