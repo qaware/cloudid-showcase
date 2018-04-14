@@ -1,5 +1,8 @@
 package de.qaware.cloudid.lib.spire;
 
+import org.apache.commons.lang3.Validate;
+
+import java.util.List;
 import java.util.function.Consumer;
 
 /**
@@ -27,18 +30,20 @@ public interface CloudIdManager {
     Bundles getBundles();
 
     /**
-     * Get the bundle that contains the workload Id.
+     * Get the single bundle if there is only one.
      *
      * @return bundle
      */
-    default Bundle getPreferredBundle() {
-        return getBundles().getBundleList().get(0);
+    default Bundle getSingleBundle() {
+        List<Bundle> bundleList = getBundles().getBundleList();
+        Validate.isTrue(bundleList.size() == 1);
+        return bundleList.get(0);
     }
 
     /**
      * Add a listener that gets notified whenever the current set of bundles changes.
      *
-     * Listeners should be called immediately if bundles were available before they are added.
+     * Listeners will be notified immediately if bundles were available before they are added.
      *
      * @param listener listener
      */

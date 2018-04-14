@@ -37,20 +37,20 @@ public class SPIREKeyStore extends KeyStoreSpi {
     @Override
     public Key engineGetKey(String alias, char[] password) {
         LOGGER.trace("engineGetKey({}, ...)", alias);
-        return cloudIdManager.getPreferredBundle().getKeyPair().getPrivate();
+        return cloudIdManager.getSingleBundle().getKeyPair().getPrivate();
     }
 
     @Override
     public Certificate[] engineGetCertificateChain(String alias) {
         LOGGER.trace("engineGetCertificateChain({})", alias);
 
-        return cloudIdManager.getPreferredBundle().getCaCertChainArray();
+        return cloudIdManager.getSingleBundle().getCaCertChainArray();
     }
 
     @Override
     public Certificate engineGetCertificate(String alias) {
         LOGGER.trace("engineGetCertificate({})", alias);
-        return cloudIdManager.getPreferredBundle().getCertificate();
+        return cloudIdManager.getSingleBundle().getCertificate();
     }
 
     @Override

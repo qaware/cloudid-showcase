@@ -31,7 +31,7 @@ public class SPIREKeyManager extends X509ExtendedKeyManager {
             return null;
         }
 
-        return cloudIdManager.getPreferredBundle().getKeyPair().getPrivate();
+        return cloudIdManager.getSingleBundle().getKeyPair().getPrivate();
     }
 
     @SuppressWarnings("squid:S1168" /* null is required by the interface to signal that the chain is not available */)
@@ -43,7 +43,7 @@ public class SPIREKeyManager extends X509ExtendedKeyManager {
             return null;
         }
 
-        return cloudIdManager.getPreferredBundle().getCaCertChainArray();
+        return cloudIdManager.getSingleBundle().getCaCertChainArray();
     }
 
     @Override

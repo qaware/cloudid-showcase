@@ -73,11 +73,11 @@ public class Proxy {
         String traceHeaderValue;
         if (headers == null || !headers.hasMoreElements()) {
             LOGGER.debug("No demo-trace header found in request. Creating a new one.");
-            traceHeaderValue = cloudIdManager.getPreferredBundle().getSpiffeId() + "#";
+            traceHeaderValue = cloudIdManager.getSingleBundle().getSpiffeId() + "#";
         } else {
             String old_header = headers.nextElement();
             LOGGER.debug("Received demo-trace header with content: {}", old_header);
-            traceHeaderValue = old_header + cloudIdManager.getPreferredBundle().getSpiffeId() + "#";
+            traceHeaderValue = old_header + cloudIdManager.getSingleBundle().getSpiffeId() + "#";
         }
         LOGGER.debug("Adding header with name {} and value {} to forwarded request", TRACE_HEADER_NAME, traceHeaderValue);
         requestBuilder.addHeader(TRACE_HEADER_NAME, traceHeaderValue);

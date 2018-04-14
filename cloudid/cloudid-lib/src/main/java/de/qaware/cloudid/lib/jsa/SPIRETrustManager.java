@@ -56,7 +56,7 @@ public class SPIRETrustManager extends X509ExtendedTrustManager {
     public X509Certificate[] getAcceptedIssuers() {
         LOGGER.trace("getAcceptedIssuers()");
 
-        return cloudIdManager.getPreferredBundle().getTrustedCAs().toArray(new X509Certificate[0]);
+        return cloudIdManager.getSingleBundle().getTrustedCAs().toArray(new X509Certificate[0]);
     }
 
     @Override
@@ -70,7 +70,7 @@ public class SPIRETrustManager extends X509ExtendedTrustManager {
         if (clientIdOpt.isPresent()) {
             String clientId = clientIdOpt.get();
 
-            Bundle svid = cloudIdManager.getPreferredBundle();
+            Bundle svid = cloudIdManager.getSingleBundle();
 
             if (LOGGER.isDebugEnabled() && clientId.matches(".*/curl-client")) {
                 LOGGER.info("Not verifying curl client cert");
@@ -146,7 +146,7 @@ public class SPIRETrustManager extends X509ExtendedTrustManager {
 
         Optional<String> clientIdOpt = getSpiffeId(chain[0]);
         if (clientIdOpt.isPresent()) {
-            Certificates.validate(chain, cloudIdManager.getPreferredBundle().getTrustedCAs());
+            Certificates.validate(chain, cloudIdManager.getSingleBundle().getTrustedCAs());
         } else {
             LOGGER.debug("Server certificate is not a SPIFFE certificate. Delegating to {}", delegate.getClass().getName());
             delegate.checkServerTrusted(chain, authType);
