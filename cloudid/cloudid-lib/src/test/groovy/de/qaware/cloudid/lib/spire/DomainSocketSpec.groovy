@@ -19,7 +19,7 @@ import static java.util.concurrent.TimeUnit.SECONDS
 @IgnoreIf({ !NettySocket.CURRENT.domainSocketsSupported() })
 class DomainSocketSpec extends Specification {
 
-    static final socketFile = "/tmp/${DomainSocketSpec.class.getName()}.sock"
+    static final socketFile = "/tmp/${DomainSocketSpec.name}.sock"
 
     Server server
     EventLoopGroup serverGroup
