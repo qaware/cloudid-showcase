@@ -1,7 +1,6 @@
 package de.qaware.cloudid.lib.spire;
 
 import de.qaware.cloudid.lib.util.concurrent.RandomExponentialBackoffSupplier;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Duration;
@@ -23,7 +22,6 @@ import static java.time.Instant.now;
  * Default bundles manager.
  */
 @Slf4j
-@RequiredArgsConstructor
 public class DefaultCloudIdManager implements CloudIdManager {
 
     private static final String THREAD_NAME = "cloudid-updater";
