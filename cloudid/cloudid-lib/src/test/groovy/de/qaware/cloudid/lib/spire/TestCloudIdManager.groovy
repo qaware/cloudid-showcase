@@ -3,7 +3,6 @@ package de.qaware.cloudid.lib.spire
 import de.qaware.cloudid.lib.TestResources
 
 import java.util.function.Consumer
-import java.util.function.Supplier
 
 class TestCloudIdManager implements CloudIdManager {
 
@@ -26,7 +25,7 @@ class TestCloudIdManager implements CloudIdManager {
 
     @Override
     void addListener(Consumer<Bundles> listener) {
-
+        listener.accept(bundles)
     }
 
 }

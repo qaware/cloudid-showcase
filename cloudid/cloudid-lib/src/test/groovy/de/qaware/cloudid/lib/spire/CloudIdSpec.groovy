@@ -10,6 +10,7 @@ import spock.lang.Specification
 import spock.util.environment.RestoreSystemProperties
 
 import java.nio.file.Paths
+import java.util.concurrent.CountDownLatch
 
 import static java.nio.file.Files.deleteIfExists
 import static java.util.concurrent.TimeUnit.SECONDS
@@ -27,6 +28,8 @@ class CloudIdSpec extends Specification {
     static EventLoopGroup serverGroup
 
     void setupSpec() {
+        CloudId.reset()
+
         System.setProperty(Config.AGENT_SOCKET.sysProp, socketFile)
 
         deleteIfExists(Paths.get(socketFile))
@@ -61,12 +64,14 @@ class CloudIdSpec extends Specification {
     }
 
     def 'callbacks work'() {
+        given:
+        def notifiedLatch = new CountDownLatch(1)
+
         when:
-        def bundle
-        CloudId.manager.addListener({ b -> bundle = b})
+        CloudId.manager.addListener({ b -> notifiedLatch.countDown() })
 
         then:
-        bundle != null
+        notifiedLatch.await(5, SECONDS)
     }
 
 

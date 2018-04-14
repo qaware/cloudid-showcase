@@ -34,8 +34,10 @@ public class CloudId {
      */
     public static synchronized void reset() {
         LOGGER.warn("Resetting {}", CloudId.class.getSimpleName());
-        cloudIdManager.stop();
-        cloudIdManager = null;
+        if (cloudIdManager != null) {
+            cloudIdManager.stop();
+            cloudIdManager = null;
+        }
     }
 
 }
