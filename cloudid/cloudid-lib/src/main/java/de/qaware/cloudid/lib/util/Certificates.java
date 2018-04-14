@@ -39,6 +39,9 @@ public class Certificates {
 
     private static final String SPIFFE_URI_PREFIX = "spiffe://";
 
+    private static final CertificateFactory CERTIFICATE_FACTORY = getX509CertificateFactory();
+    private static final CertPathValidator CERT_PATH_VALIDATOR = getPKIXCertPathValidator();
+
     /**
      * Get the notAfter instant of a X.509 certificate.
      *
@@ -59,32 +62,6 @@ public class Certificates {
     public static Instant getNotBefore(X509Certificate certificate) {
         Date date = certificate.getNotBefore();
         return date != null ? date.toInstant() : Instant.MIN;
-    }
-
-    /**
-     * Get a X.509 certificate factory
-     *
-     * @return {@code CertificateFactory.getInstance("X.509")}
-     */
-    public static CertificateFactory getX509CertFactory() {
-        try {
-            return CertificateFactory.getInstance("X.509");
-        } catch (CertificateException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
-    /**
-     * Get a PKIX certificate path validator.
-     *
-     * @return {@code CertPathValidator.getInstance("PKIX")}
-     */
-    public static CertPathValidator getCertPathValidator() {
-        try {
-            return CertPathValidator.getInstance("PKIX");
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException(e);
-        }
     }
 
     private static PKIXParameters toPkixParameters(Set<X509Certificate> trustedCerts) {
@@ -108,10 +85,10 @@ public class Certificates {
      */
     public void validate(X509Certificate[] chain, Set<X509Certificate> trustedCerts) throws CertificateException {
         PKIXParameters pkixParameters = toPkixParameters(trustedCerts);
-        CertPath certPath = getX509CertFactory().generateCertPath(truncateChain(chain, trustedCerts));
+        CertPath certPath = CERTIFICATE_FACTORY.generateCertPath(truncateChain(chain, trustedCerts));
 
         try {
-            getCertPathValidator().validate(certPath, pkixParameters);
+            CERT_PATH_VALIDATOR.validate(certPath, pkixParameters);
         } catch (CertPathValidatorException | InvalidAlgorithmParameterException e) {
             throw new CertificateException(e);
         }
@@ -146,6 +123,22 @@ public class Certificates {
         }
 
         throw new CertificateException("Path does not chain with any of the trust anchors");
+    }
+
+    private static CertificateFactory getX509CertificateFactory() {
+        try {
+            return CertificateFactory.getInstance("X.509");
+        } catch (CertificateException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    private static CertPathValidator getPKIXCertPathValidator() {
+        try {
+            return CertPathValidator.getInstance("PKIX");
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
 }
