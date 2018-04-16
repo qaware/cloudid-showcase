@@ -2,6 +2,8 @@ package de.qaware.cloudid.lib.spire;
 
 import de.qaware.cloudid.lib.util.config.Prop;
 import de.qaware.cloudid.lib.util.config.Props;
+import de.qaware.cloudid.lib.vault.ACLFactory;
+import de.qaware.cloudid.lib.vault.VaultACLFactory;
 import lombok.experimental.UtilityClass;
 
 import java.time.Duration;
@@ -45,8 +47,23 @@ public class Config {
     public static final Prop<Class<CloudIdManager>> CLOUD_ID_MANAGER_CLASS = Props.classOf("cloudid.bundlesManagerClass", DefaultCloudIdManager.class);
 
     /**
+     * Get the ACL supplier factory class.
+     */
+    public static final Prop<Class<ACLFactory>> ACL_SUPPLIER_CLASS = Props.classOf("spire.aclSupplierClass", VaultACLFactory.class);
+
+    /**
      * Whether to disable ACL validation.
      */
     public static final Prop<Boolean> ACL_DISABLED = Props.booleanOf("spire.disableAcl", false);
+
+    /**
+     * The address for accessing Vault.
+     */
+    public static final Prop<String> VAULT_ADDRESS = Props.stringOf("cloudid.vault.address", "https://localhost:8200");
+
+    /**
+     * The path where the ACL secret is deposited in vault (default: secret/acl)
+     */
+    public static final Prop<String> VAULT_ACL_SECRET_PATH = Props.stringOf("cloudid.vault.aclPath", "secret/acl");
 
 }

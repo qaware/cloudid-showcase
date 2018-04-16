@@ -24,8 +24,8 @@ public class BlockingReference<T> implements Reference<T> {
 
     @Override
     public void set(T value) {
-        setLatch.countDown();
         this.value = value;
+        setLatch.countDown();
     }
 
 }

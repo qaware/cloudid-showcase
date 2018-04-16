@@ -1,15 +1,10 @@
 package de.qaware.cloudid.lib.jsa;
 
-import com.bettercloud.vault.SslConfig;
-import com.bettercloud.vault.Vault;
-import com.bettercloud.vault.VaultConfig;
-import com.bettercloud.vault.VaultException;
-import com.bettercloud.vault.response.AuthResponse;
 import de.qaware.cloudid.lib.spire.Bundle;
 import de.qaware.cloudid.lib.spire.CloudIdManager;
 import de.qaware.cloudid.lib.spire.Config;
-import de.qaware.cloudid.lib.util.ACLParser;
 import de.qaware.cloudid.lib.util.Certificates;
+import de.qaware.cloudid.lib.vault.ACLFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.Validate;
@@ -18,16 +13,15 @@ import javax.net.ssl.SSLEngine;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509ExtendedTrustManager;
 import javax.net.ssl.X509TrustManager;
-import java.io.IOException;
 import java.net.Socket;
 import java.security.*;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
 import static de.qaware.cloudid.lib.util.Certificates.getSpiffeId;
+import static de.qaware.cloudid.lib.util.Reflection.instantiate;
 import static java.util.Arrays.stream;
 
 /**
@@ -37,20 +31,10 @@ import static java.util.Arrays.stream;
 @RequiredArgsConstructor
 public class SPIRETrustManager extends X509ExtendedTrustManager {
 
-    private static final String VAULT_ADDR = getVaultAddress();
-    private static final String DEFAULT_LOCALHOST_VAULT_ADDR = "https://localhost:8200";
     private final CloudIdManager cloudIdManager;
 
     private final X509TrustManager delegate = getDefaultTrustManager();
-
-    private static String getVaultAddress() {
-        String address = System.getProperty("cloudid.vault.address");
-        if (address == null) {
-            address = DEFAULT_LOCALHOST_VAULT_ADDR;
-        }
-        LOGGER.debug("Vault address: {}", address);
-        return address;
-    }
+    private final ACLFactory aclFactory =  instantiate(Config.ACL_SUPPLIER_CLASS.get());
 
     @Override
     public X509Certificate[] getAcceptedIssuers() {
@@ -72,12 +56,7 @@ public class SPIRETrustManager extends X509ExtendedTrustManager {
 
             Bundle svid = cloudIdManager.getSingleBundle();
 
-            if (LOGGER.isDebugEnabled() && clientId.matches(".*/curl-client")) {
-                LOGGER.info("Not verifying curl client cert");
-                return;
-            }
-
-            if (shouldCheckAcl() && !ACLParser.isClientAllowed(getAcl(), clientId, svid.getSpiffeId())) {
+            if (shouldCheckAcl() && !aclFactory.get().isAllowed(clientId, svid.getSpiffeId())) {
                 throw new CertificateException("Client could not be verified against the provided ACL");
             }
 
@@ -85,46 +64,6 @@ public class SPIRETrustManager extends X509ExtendedTrustManager {
         } else {
             LOGGER.debug("Client certificate is not a SPIFFE certificate. Delegating to {}", delegate.getClass().getName());
             delegate.checkClientTrusted(chain, authType);
-        }
-    }
-
-    private String getAcl() throws CertificateException {
-        // TODO: Refactor
-        Map<String, String> vaultData = queryVault("secret/acl");
-
-        LOGGER.debug("Vault Response Data: {}", vaultData);
-
-        if (vaultData == null || vaultData.isEmpty() || !vaultData.containsKey("acl")) {
-            throw new CertificateException("Vault response was empty or did not contain the key 'acl'. Rejecting client certificate before checking the chain");
-        }
-
-        return vaultData.get("acl");
-
-    }
-
-    private Map<String, String> queryVault(String path) {
-        // TODO: Re-use the vault connection
-        try {
-            KeyStore keyStore = KeyStore.getInstance("SPIRE");
-            keyStore.load(null, "".toCharArray());
-
-            VaultConfig config = new VaultConfig()
-                    .address(VAULT_ADDR)
-                    .sslConfig(new SslConfig()
-                            .keyStore(keyStore, "")
-                            .trustStore(keyStore)
-                            .build())
-                    .build();
-            Vault vault = new Vault(config);
-
-            AuthResponse response = vault.auth().loginByCert();
-            config.token(response.getAuthClientToken());
-
-            return vault.logical().read(path).getData();
-
-        } catch (VaultException | GeneralSecurityException | IOException e) {
-            LOGGER.error("Error querying vault", e);
-            throw new IllegalStateException(e);
         }
     }
 
