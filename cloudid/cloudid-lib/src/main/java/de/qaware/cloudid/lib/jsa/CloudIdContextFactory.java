@@ -10,10 +10,10 @@ import java.security.NoSuchAlgorithmException;
  * SSL context factory.
  */
 @UtilityClass
-public class SPIREContextFactory {
+public class CloudIdContextFactory {
 
     /**
-     * Create a SSL context backed by the SPIRE provider
+     * Create a SSL context backed by CloudId.
      *
      * @return SSL context
      */
@@ -21,8 +21,8 @@ public class SPIREContextFactory {
         try {
             SSLContext sslContext = SSLContext.getInstance("TLS");
             sslContext.init(
-                    new SPIREKeyManagerFactory().engineGetKeyManagers(),
-                    new SPIRETrustManagerFactory().engineGetTrustManagers(),
+                    new CloudIdKeyManagerFactory().engineGetKeyManagers(),
+                    new CloudIdTrustManagerFactory().engineGetTrustManagers(),
                     null);
             return sslContext;
         } catch (NoSuchAlgorithmException | KeyManagementException e) {

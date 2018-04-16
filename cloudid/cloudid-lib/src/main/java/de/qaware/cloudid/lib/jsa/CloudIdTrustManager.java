@@ -1,10 +1,7 @@
 package de.qaware.cloudid.lib.jsa;
 
-import de.qaware.cloudid.lib.spire.Bundle;
-import de.qaware.cloudid.lib.spire.CloudIdManager;
-import de.qaware.cloudid.lib.spire.Config;
+import de.qaware.cloudid.lib.*;
 import de.qaware.cloudid.lib.util.Certificates;
-import de.qaware.cloudid.lib.vault.ACLFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.Validate;
@@ -21,26 +18,25 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static de.qaware.cloudid.lib.util.Certificates.getSpiffeId;
-import static de.qaware.cloudid.lib.util.Reflection.instantiate;
 import static java.util.Arrays.stream;
 
 /**
- * X.509 trust manager backed by SPIRE bundles.
+ * X.509 trust manager backed by CloudId.
  */
 @Slf4j
 @RequiredArgsConstructor
-public class SPIRETrustManager extends X509ExtendedTrustManager {
+public class CloudIdTrustManager extends X509ExtendedTrustManager {
 
-    private final CloudIdManager cloudIdManager;
+    private final IdManager idManager;
+    private final ACLManager aclManager;
 
     private final X509TrustManager delegate = getDefaultTrustManager();
-    private final ACLFactory aclFactory =  instantiate(Config.ACL_SUPPLIER_CLASS.get());
 
     @Override
     public X509Certificate[] getAcceptedIssuers() {
         LOGGER.trace("getAcceptedIssuers()");
 
-        return cloudIdManager.getSingleBundle().getTrustedCAs().toArray(new X509Certificate[0]);
+        return idManager.getSingleBundle().getTrustedCAs().toArray(new X509Certificate[0]);
     }
 
     @Override
@@ -54,9 +50,9 @@ public class SPIRETrustManager extends X509ExtendedTrustManager {
         if (clientIdOpt.isPresent()) {
             String clientId = clientIdOpt.get();
 
-            Bundle svid = cloudIdManager.getSingleBundle();
+            Bundle svid = idManager.getSingleBundle();
 
-            if (shouldCheckAcl() && !aclFactory.get().isAllowed(clientId, svid.getSpiffeId())) {
+            if (shouldCheckAcl() && !aclManager.get().isAllowed(clientId, svid.getSpiffeId())) {
                 throw new CertificateException("Client could not be verified against the provided ACL");
             }
 
@@ -85,7 +81,7 @@ public class SPIRETrustManager extends X509ExtendedTrustManager {
 
         Optional<String> clientIdOpt = getSpiffeId(chain[0]);
         if (clientIdOpt.isPresent()) {
-            Certificates.validate(chain, cloudIdManager.getSingleBundle().getTrustedCAs());
+            Certificates.validate(chain, idManager.getSingleBundle().getTrustedCAs());
         } else {
             LOGGER.debug("Server certificate is not a SPIFFE certificate. Delegating to {}", delegate.getClass().getName());
             delegate.checkServerTrusted(chain, authType);
@@ -109,8 +105,8 @@ public class SPIRETrustManager extends X509ExtendedTrustManager {
     private static X509TrustManager getDefaultTrustManager() {
         return stream(Security.getProviders("TrustManagerFactory.PKIX"))
                 .map(Provider::getName)
-                .filter(name -> !Objects.equals(name, SPIREProvider.NAME))
-                .map(SPIRETrustManager::getX509TrustManager)
+                .filter(name -> !Objects.equals(name, CloudId.PROVIDER_NAME))
+                .map(CloudIdTrustManager::getX509TrustManager)
                 .findFirst()
                 .orElseThrow(IllegalStateException::new);
     }

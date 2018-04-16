@@ -3,9 +3,14 @@ package de.qaware.cloudid.lib.util.config;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.function.Function;
 
+import static de.qaware.cloudid.lib.util.Reflection.getContextClassLoader;
 import static java.text.MessageFormat.format;
 
 /**
@@ -16,11 +21,11 @@ import static java.text.MessageFormat.format;
 @RequiredArgsConstructor
 public class Prop<T> {
 
+    private static final Properties DEFAULTS = loadProperties("default-config.properties");
+
     @Getter
     private final String sysProp;
     private final Function<String, T> converter;
-    @Getter
-    private final T defaultValue;
 
     /**
      * Get the system property value.
@@ -28,7 +33,13 @@ public class Prop<T> {
      * @return system property value or default value, if the system property is unset.
      */
     public T get() {
-        return getOptional().orElse(defaultValue);
+        return getOptional()
+                .orElseGet(() -> {
+                    if (!DEFAULTS.containsKey(sysProp)) {
+                        throw new NoSuchElementException(sysProp + " is unset");
+                    }
+                    return converter.apply(DEFAULTS.getProperty(sysProp));
+                });
     }
 
     /**
@@ -59,6 +70,20 @@ public class Prop<T> {
      */
     public boolean isOverridden() {
         return getOptional().isPresent();
+    }
+
+
+    private static Properties loadProperties(String location) {
+        Properties properties;
+        try (InputStream inputStream = getContextClassLoader().getResourceAsStream(location)) {
+
+            properties = new Properties();
+            properties.load(inputStream);
+
+            return properties;
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
 }

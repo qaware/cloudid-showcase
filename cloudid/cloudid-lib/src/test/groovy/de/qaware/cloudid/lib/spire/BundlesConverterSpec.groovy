@@ -1,5 +1,6 @@
 package de.qaware.cloudid.lib.spire
 
+import de.qaware.cloudid.lib.Bundles
 import de.qaware.cloudid.lib.TestResources
 import spire.api.workload.WorkloadOuterClass
 import spock.lang.Specification

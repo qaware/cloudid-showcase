@@ -1,7 +1,7 @@
 package de.qaware.cloudid.lib.jsa
 
-import de.qaware.cloudid.lib.spire.CloudId
-import de.qaware.cloudid.lib.spire.TestCloudIdManager
+import de.qaware.cloudid.lib.CloudId
+import de.qaware.cloudid.lib.spire.TestIdManager
 import spock.lang.Specification
 import spock.util.environment.RestoreSystemProperties
 
@@ -13,9 +13,9 @@ import java.security.PrivateKey
 import java.security.cert.X509Certificate
 import java.time.Duration
 
-import static de.qaware.cloudid.lib.jsa.SPIREProvider.ALIAS
-import static de.qaware.cloudid.lib.spire.Config.ACL_DISABLED
-import static de.qaware.cloudid.lib.spire.Config.CLOUD_ID_MANAGER_CLASS
+import static de.qaware.cloudid.lib.CloudId.SINGLE_ALIAS
+import static de.qaware.cloudid.lib.Config.ACL_DISABLED
+import static de.qaware.cloudid.lib.Config.ID_MANAGER_CLASS
 import static de.qaware.cloudid.lib.spire.TestUtils.waitUntilBundleIsAvailable
 
 /**
@@ -24,14 +24,14 @@ import static de.qaware.cloudid.lib.spire.TestUtils.waitUntilBundleIsAvailable
 @RestoreSystemProperties
 class KeyManagementSpec extends Specification {
 
-    static SPIREKeyManagerFactory keyManagerFactory
+    static CloudIdKeyManagerFactory keyManagerFactory
 
     def setupSpec() {
         System.setProperty(ACL_DISABLED.sysProp, true.toString())
-        System.setProperty(CLOUD_ID_MANAGER_CLASS.getSysProp(), TestCloudIdManager.class.getName())
+        System.setProperty(ID_MANAGER_CLASS.getSysProp(), TestIdManager.class.getName())
         getKeyType()
 
-        keyManagerFactory = new SPIREKeyManagerFactory()
+        keyManagerFactory = new CloudIdKeyManagerFactory()
     }
 
     def cleanupSpec() {
@@ -53,27 +53,27 @@ class KeyManagementSpec extends Specification {
         waitUntilBundleIsAvailable(Duration.ofSeconds(5))
 
         then:
-        keyManager.getPrivateKey(ALIAS) == privateKey
+        keyManager.getPrivateKey(SINGLE_ALIAS) == privateKey
         keyManager.getPrivateKey('no-such-alias') == null
-        keyManager.getCertificateChain(ALIAS) == chain
+        keyManager.getCertificateChain(SINGLE_ALIAS) == chain
         keyManager.getCertificateChain('no-such-alias') == null
 
-        keyManager.getClientAliases(keyType, [] as Principal[]).toList() == [ALIAS]
+        keyManager.getClientAliases(keyType, [] as Principal[]).toList() == [SINGLE_ALIAS]
         keyManager.getClientAliases('no-such-alias', [] as Principal[]).toList() == []
-        keyManager.chooseClientAlias([keyType] as String[], [] as Principal[], Stub(Socket)) == ALIAS
-        keyManager.chooseEngineClientAlias([keyType] as String[], [] as Principal[], Stub(SSLEngine)) == ALIAS
+        keyManager.chooseClientAlias([keyType] as String[], [] as Principal[], Stub(Socket)) == SINGLE_ALIAS
+        keyManager.chooseEngineClientAlias([keyType] as String[], [] as Principal[], Stub(SSLEngine)) == SINGLE_ALIAS
 
-        keyManager.getServerAliases(keyType, [] as Principal[]).toList() == [ALIAS]
-        keyManager.chooseServerAlias(keyType, [] as Principal[], Stub(Socket)) == ALIAS
-        keyManager.chooseEngineServerAlias(keyType, [] as Principal[], Stub(SSLEngine)) == ALIAS
+        keyManager.getServerAliases(keyType, [] as Principal[]).toList() == [SINGLE_ALIAS]
+        keyManager.chooseServerAlias(keyType, [] as Principal[], Stub(Socket)) == SINGLE_ALIAS
+        keyManager.chooseEngineServerAlias(keyType, [] as Principal[], Stub(SSLEngine)) == SINGLE_ALIAS
     }
 
     private static X509Certificate[] getChain() {
-        CloudId.manager.singleBundle.caCertChainArray
+        CloudId.idManager.singleBundle.caCertChainArray
     }
 
     private static PrivateKey getPrivateKey() {
-        CloudId.manager.singleBundle.keyPair.private
+        CloudId.idManager.singleBundle.keyPair.private
     }
 
     private static String getKeyType() {

@@ -1,6 +1,6 @@
 package de.qaware.cloudid.lib.jsa;
 
-import de.qaware.cloudid.lib.spire.CloudIdManager;
+import de.qaware.cloudid.lib.IdManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -12,26 +12,26 @@ import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.Objects;
 
-import static de.qaware.cloudid.lib.jsa.SPIREProvider.ALIAS;
+import static de.qaware.cloudid.lib.CloudId.SINGLE_ALIAS;
 
 /**
  * X.509 key manager backed by cloud identities.
  */
 @Slf4j
 @RequiredArgsConstructor
-public class SPIREKeyManager extends X509ExtendedKeyManager {
+public class CloudIdKeyManager extends X509ExtendedKeyManager {
 
-    private final CloudIdManager cloudIdManager;
+    private final IdManager idManager;
 
     @Override
     public PrivateKey getPrivateKey(String alias) {
         LOGGER.trace("getPrivateKey({})", alias);
 
-        if (!Objects.equals(alias, ALIAS)) {
+        if (!Objects.equals(alias, SINGLE_ALIAS)) {
             return null;
         }
 
-        return cloudIdManager.getSingleBundle().getKeyPair().getPrivate();
+        return idManager.getSingleBundle().getKeyPair().getPrivate();
     }
 
     @SuppressWarnings("squid:S1168" /* null is required by the interface to signal that the chain is not available */)
@@ -39,11 +39,11 @@ public class SPIREKeyManager extends X509ExtendedKeyManager {
     public X509Certificate[] getCertificateChain(String alias) {
         LOGGER.trace("getCertificateChain({})", alias);
 
-        if (!Objects.equals(alias, ALIAS)) {
+        if (!Objects.equals(alias, SINGLE_ALIAS)) {
             return null;
         }
 
-        return cloudIdManager.getSingleBundle().getCaCertChainArray();
+        return idManager.getSingleBundle().getCaCertChainArray();
     }
 
     @Override
@@ -84,11 +84,11 @@ public class SPIREKeyManager extends X509ExtendedKeyManager {
     }
 
     private String getAlias(String ...keyTypes) {
-        String idAlgorithm = cloudIdManager.getSingleBundle().getKeyPair().getPrivate().getAlgorithm();
+        String idAlgorithm = idManager.getSingleBundle().getKeyPair().getPrivate().getAlgorithm();
 
         for (String keyType : keyTypes) {
             if (keyType.equals(idAlgorithm)) {
-                return ALIAS;
+                return SINGLE_ALIAS;
             }
         }
 

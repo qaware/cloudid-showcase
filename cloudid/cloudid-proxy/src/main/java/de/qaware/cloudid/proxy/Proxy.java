@@ -1,7 +1,7 @@
 package de.qaware.cloudid.proxy;
 
-import de.qaware.cloudid.lib.spire.CloudId;
-import de.qaware.cloudid.lib.spire.CloudIdManager;
+import de.qaware.cloudid.lib.CloudId;
+import de.qaware.cloudid.lib.IdManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.Header;
@@ -35,7 +35,7 @@ public class Proxy {
     private static final String TRACE_HEADER_NAME = "X-SPIFFE-Callstack";
     private final AppProperties appProperties;
     private final HttpClient httpClient;
-    private final CloudIdManager cloudIdManager = CloudId.getManager();
+    private final IdManager idManager = CloudId.getIdManager();
 
     /**
      * Forwards a request 1:1 to the target defined in {@code de.qaware.cloud.id.demoserver.backend}.
@@ -73,11 +73,11 @@ public class Proxy {
         String traceHeaderValue;
         if (headers == null || !headers.hasMoreElements()) {
             LOGGER.debug("No demo-trace header found in request. Creating a new one.");
-            traceHeaderValue = cloudIdManager.getSingleBundle().getSpiffeId() + "#";
+            traceHeaderValue = idManager.getSingleBundle().getSpiffeId() + "#";
         } else {
             String old_header = headers.nextElement();
             LOGGER.debug("Received demo-trace header with content: {}", old_header);
-            traceHeaderValue = old_header + cloudIdManager.getSingleBundle().getSpiffeId() + "#";
+            traceHeaderValue = old_header + idManager.getSingleBundle().getSpiffeId() + "#";
         }
         LOGGER.debug("Adding header with name {} and value {} to forwarded request", TRACE_HEADER_NAME, traceHeaderValue);
         requestBuilder.addHeader(TRACE_HEADER_NAME, traceHeaderValue);

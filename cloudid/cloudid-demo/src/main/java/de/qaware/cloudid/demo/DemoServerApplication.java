@@ -1,6 +1,6 @@
 package de.qaware.cloudid.demo;
 
-import de.qaware.cloudid.lib.jsa.SPIREProvider;
+import de.qaware.cloudid.lib.jsa.CloudIdProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.filters.RequestDumperFilter;
@@ -28,7 +28,7 @@ public class DemoServerApplication {
      * @param args command line arguments
      */
     public static void main(String[] args) {
-        SPIREProvider.install();
+        CloudIdProvider.install();
 
         new SpringApplicationBuilder(DemoServerApplication.class)
                 .web(WebApplicationType.SERVLET)

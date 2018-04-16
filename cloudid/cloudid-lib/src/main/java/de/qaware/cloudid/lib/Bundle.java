@@ -1,4 +1,4 @@
-package de.qaware.cloudid.lib.spire;
+package de.qaware.cloudid.lib;
 
 import lombok.Data;
 
@@ -13,7 +13,14 @@ import static java.util.stream.Collectors.toSet;
 import static java.util.stream.Stream.concat;
 
 /**
- * A data transfer object that contains the parsed information about a spiffe workload id.
+ * Represents a workload identity.
+ * <p>
+ * A workload identity consists of the following parts:
+ * <ul>
+ * <li>spiffeId: The business identity in SPIFFE format</li>
+ * <li>certificate, keyPair, caCertChain: The technical identity as SPIFFE SVID</li>
+ * <li>federatedBundles: A set of CAs that should also be trusted</li>
+ * </ul>
  */
 @Data
 public class Bundle {
@@ -36,7 +43,7 @@ public class Bundle {
     /**
      * Get the trusted CAs.
      * <p>
-     * The  trusted CAs consist of the SPIRE CA and the federated SPIRE CAs.
+     * The trusted CAs consist of the SPIRE CA and the federated SPIRE CAs.
      *
      * @return trusted CAs
      */

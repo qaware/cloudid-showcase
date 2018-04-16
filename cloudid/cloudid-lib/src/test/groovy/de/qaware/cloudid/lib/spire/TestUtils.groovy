@@ -1,5 +1,7 @@
 package de.qaware.cloudid.lib.spire
 
+import de.qaware.cloudid.lib.CloudId
+
 import java.time.Duration
 import java.time.Instant
 
@@ -17,7 +19,7 @@ class TestUtils {
 
         while (Duration.between(start, Instant.now()) < timeout) {
             try {
-                CloudId.getManager().getSingleBundle()
+                CloudId.getIdManager().getSingleBundle()
                 return
             } catch (IllegalStateException ignored) {
                 Thread.sleep(100)

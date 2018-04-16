@@ -1,5 +1,6 @@
 package de.qaware.cloudid.lib.spire
 
+import de.qaware.cloudid.lib.Bundle
 import de.qaware.cloudid.lib.TestResources
 import spock.lang.Specification
 

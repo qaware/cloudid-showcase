@@ -1,5 +1,6 @@
 package de.qaware.cloudid.lib.jsa;
 
+import de.qaware.cloudid.lib.CloudId;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 
@@ -13,28 +14,11 @@ import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.joining;
 
 /**
- * Java Security API provider backed by SPIRE.
+ * JSA provider backed by CloudId.
  */
 @Slf4j
 @EqualsAndHashCode(doNotUseGetters = true, callSuper = true)
-public class SPIREProvider extends Provider {
-
-    /**
-     * Algorithm name.
-     */
-    public static final String ALGORITHM = "SPIRE";
-
-    /**
-     * Fixed alias to allow static initialization.
-     */
-    public static final String ALIAS = "spiffe";
-
-    /**
-     * Provider name.
-     */
-    static final String NAME = "spiffe-provider";
-    private static final double VERSION = 0.1;
-    private static final String DESCRIPTION = "";
+public class CloudIdProvider extends Provider {
 
     private static final String KEY_MANAGER_FACTORY_PREFIX = "KeyManagerFactory.";
     private static final String TRUST_MANAGER_FACTORY_PREFIX = "TrustManagerFactory.";
@@ -49,15 +33,22 @@ public class SPIREProvider extends Provider {
      * Constructor.
      */
     @SuppressWarnings("deprecation" /* Required for Java 8 compatibility */)
-    public SPIREProvider() {
-        super(NAME, VERSION, DESCRIPTION);
+    public CloudIdProvider() {
+        super(CloudId.PROVIDER_NAME, CloudId.PROVIDER_VERSION, CloudId.PROVIDER_DESCRIPTION);
 
-        super.put(KEY_MANAGER_FACTORY_PREFIX + ALGORITHM, SPIREKeyManagerFactory.class.getName());
-        super.put(TRUST_MANAGER_FACTORY_PREFIX + ALGORITHM, SPIRETrustManagerFactory.class.getName());
-        super.put(TRUST_MANAGER_FACTORY_PREFIX + "PKIX", SPIRETrustManagerFactory.class.getName());
+        // Custom key manager
+        super.put(KEY_MANAGER_FACTORY_PREFIX + CloudId.ALGORITHM, CloudIdKeyManagerFactory.class.getName());
 
-        super.put(KEY_STORE_PREFIX + ALGORITHM, SPIREKeyStore.class.getName());
-        super.put(KEY_STORE_PREFIX + "SunX509", SPIREKeyStore.class.getName());
+        // Custom trust manager
+        super.put(TRUST_MANAGER_FACTORY_PREFIX + CloudId.ALGORITHM, CloudIdTrustManagerFactory.class.getName());
+        super.put(TRUST_MANAGER_FACTORY_PREFIX + "PKIX", CloudIdTrustManagerFactory.class.getName());
+
+        // Custom key store
+        super.put(KEY_STORE_PREFIX + CloudId.ALGORITHM, CloudIdKeyStore.class.getName());
+        super.put(KEY_STORE_PREFIX + "SunX509", CloudIdKeyStore.class.getName());
+
+        // Custom trust store
+        super.put(KEY_STORE_PREFIX + CloudId.TRUST_STORE_ALGORITHM, CloudIdTrustStore.class.getName());
 
     }
 
@@ -65,14 +56,14 @@ public class SPIREProvider extends Provider {
      * Install this provider.
      */
     public static synchronized void install() {
-        if (Security.getProvider(NAME) == null) {
+        if (Security.getProvider(CloudId.PROVIDER_NAME) == null) {
 
             // Install the Key Manager Factory as default
             defaultKeyManagerFactoryAlgorithm = KeyManagerFactory.getDefaultAlgorithm();
-            Security.setProperty("ssl.KeyManagerFactory.algorithm", ALGORITHM);
+            Security.setProperty("ssl.KeyManagerFactory.algorithm", CloudId.ALGORITHM);
 
             // Install the provider at the first position
-            Security.insertProviderAt(new SPIREProvider(), 1);
+            Security.insertProviderAt(new CloudIdProvider(), 1);
 
             logJVM();
             logProviders();
@@ -84,10 +75,10 @@ public class SPIREProvider extends Provider {
      * Uninstall this provider.
      */
     public static synchronized void uninstall() {
-        if (Security.getProvider(NAME) != null) {
+        if (Security.getProvider(CloudId.PROVIDER_NAME) != null) {
             Security.setProperty("ssl.KeyManagerFactory.algorithm", defaultKeyManagerFactoryAlgorithm);
 
-            Security.removeProvider(NAME);
+            Security.removeProvider(CloudId.PROVIDER_NAME);
         }
     }
 

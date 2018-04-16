@@ -1,7 +1,7 @@
 package de.qaware.cloudid.proxy;
 
-import de.qaware.cloudid.lib.jsa.SPIREContextFactory;
-import de.qaware.cloudid.lib.jsa.SPIREProvider;
+import de.qaware.cloudid.lib.jsa.CloudIdContextFactory;
+import de.qaware.cloudid.lib.jsa.CloudIdProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.filters.RequestDumperFilter;
@@ -32,7 +32,7 @@ public class DemoServerApplication {
      * @param args command line arguments
      */
     public static void main(String[] args) {
-        SPIREProvider.install();
+        CloudIdProvider.install();
 
         new SpringApplicationBuilder(DemoServerApplication.class)
                 .web(WebApplicationType.SERVLET)
@@ -47,7 +47,7 @@ public class DemoServerApplication {
     @Bean
     public HttpClient getHttpClient() {
         return HttpClients.custom()
-                .setSSLContext(SPIREContextFactory.get())
+                .setSSLContext(CloudIdContextFactory.get())
                 .setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)
                 .build();
 

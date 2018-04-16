@@ -1,6 +1,7 @@
-package de.qaware.cloudid.lib.vault;
+package de.qaware.cloudid.lib;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Set;
@@ -9,6 +10,7 @@ import java.util.Set;
  * Represents an Access Control List (ACL) with entries of the pattern "client with a SPIFFE ID clientId is allowed to
  * access server with SPIFFE ID serverId".
  */
+@EqualsAndHashCode
 @RequiredArgsConstructor
 public class ACL {
 

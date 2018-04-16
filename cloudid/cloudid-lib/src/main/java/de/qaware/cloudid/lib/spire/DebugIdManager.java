@@ -1,7 +1,10 @@
 package de.qaware.cloudid.lib.spire;
 
+import de.qaware.cloudid.lib.Bundle;
+import de.qaware.cloudid.lib.Bundles;
+import de.qaware.cloudid.lib.Config;
+import de.qaware.cloudid.lib.IdManager;
 import de.qaware.cloudid.lib.util.Certificates;
-import de.qaware.cloudid.lib.util.config.Prop;
 import de.qaware.cloudid.lib.util.config.Props;
 
 import java.io.FileInputStream;
@@ -17,7 +20,6 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import static de.qaware.cloudid.lib.util.Reflection.getContextClassLoader;
-import static de.qaware.cloudid.lib.util.config.Props.stringOf;
 import static java.text.MessageFormat.format;
 import static java.util.Arrays.stream;
 import static java.util.Collections.emptyMap;
@@ -25,30 +27,9 @@ import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 
 /**
- * Debug CloudId Manager.
+ * Debug Id Manager.
  */
-public class DebugCloudIdManager implements CloudIdManager {
-
-    /**
-     * Keystore location.
-     */
-    public static final Prop<String> KEYSTORE_LOCATION = stringOf("spire.debug.keystore.location", "spire-debug.jks");
-    /**
-     * Keystore type.
-     */
-    public static final Prop<String> KEYSTORE_TYPE = stringOf("spire.debug.keystore.type", "jks");
-    /**
-     * Keystore password.
-     */
-    public static final Prop<String> KEYSTORE_PASSWORD = stringOf("spire.debug.keystore.password", "");
-    /**
-     * Keystore alias.
-     */
-    public static final Prop<String> KEYSTORE_ALIAS = stringOf("spire.debug.keystore.alias", "spiffe");
-    /**
-     * Key password.
-     */
-    public static final Prop<String> KEY_PASSWORD = stringOf("spire.debug.key.password", "");
+public class DebugIdManager implements IdManager {
 
 
     private static final String CLASSPATH_PREFIX = "classpath:";
@@ -75,7 +56,7 @@ public class DebugCloudIdManager implements CloudIdManager {
     }
 
     @Override
-    public synchronized Bundles getBundles() {
+    public synchronized Bundles get() {
         return bundles;
     }
 
@@ -89,7 +70,7 @@ public class DebugCloudIdManager implements CloudIdManager {
     private static Bundle loadBundle() throws IOException, GeneralSecurityException {
         KeyStore keystore = loadKeyStore();
 
-        String alias = KEYSTORE_ALIAS.get();
+        String alias = Config.DEBUG_KEYSTORE_ALIAS.get();
 
         PrivateKey privateKey = getPrivateKey(keystore, alias);
         X509Certificate certificate = getCertificate(keystore, alias);
@@ -105,7 +86,7 @@ public class DebugCloudIdManager implements CloudIdManager {
     }
 
     private static PrivateKey getPrivateKey(KeyStore keystore, String alias) throws GeneralSecurityException {
-        return (PrivateKey) keystore.getKey(alias, KEY_PASSWORD.get().toCharArray());
+        return (PrivateKey) keystore.getKey(alias, Config.DEBUG_KEY_PASSWORD.get().toCharArray());
     }
 
     private static X509Certificate getCertificate(KeyStore keystore, String alias) throws KeyStoreException {
@@ -122,9 +103,9 @@ public class DebugCloudIdManager implements CloudIdManager {
     private static KeyStore loadKeyStore() throws IOException, GeneralSecurityException {
         KeyStore keystore;
 
-        try (InputStream is = open(KEYSTORE_LOCATION.get())) {
-            keystore = KeyStore.getInstance(KEYSTORE_TYPE.get());
-            keystore.load(is, KEYSTORE_PASSWORD.get().toCharArray());
+        try (InputStream is = open(Config.DEBUG_KEYSTORE_LOCATION.get())) {
+            keystore = KeyStore.getInstance(Config.DEBUG_KEYSTORE_TYPE.get());
+            keystore.load(is, Config.DEBUG_KEYSTORE_PASSWORD.get().toCharArray());
         }
         return keystore;
     }

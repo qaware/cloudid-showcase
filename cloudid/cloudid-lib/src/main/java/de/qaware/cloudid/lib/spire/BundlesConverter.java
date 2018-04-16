@@ -1,5 +1,7 @@
 package de.qaware.cloudid.lib.spire;
 
+import de.qaware.cloudid.lib.Bundle;
+import de.qaware.cloudid.lib.Bundles;
 import spire.api.workload.WorkloadOuterClass;
 
 import java.time.Instant;

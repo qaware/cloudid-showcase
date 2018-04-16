@@ -1,10 +1,12 @@
 package de.qaware.cloudid.lib.spire
 
+import de.qaware.cloudid.lib.Bundles
+import de.qaware.cloudid.lib.IdManager
 import de.qaware.cloudid.lib.TestResources
 
 import java.util.function.Consumer
 
-class TestCloudIdManager implements CloudIdManager {
+class TestIdManager implements IdManager {
 
     static final BundlesConverter bundlesConverter = new BundlesConverter()
 
@@ -19,13 +21,13 @@ class TestCloudIdManager implements CloudIdManager {
     }
 
     @Override
-    Bundles getBundles() {
+    Bundles get() {
         return bundlesConverter.apply(TestResources.getTestBundles())
     }
 
     @Override
     void addListener(Consumer<Bundles> listener) {
-        listener.accept(bundles)
+        listener.accept(get())
     }
 
 }

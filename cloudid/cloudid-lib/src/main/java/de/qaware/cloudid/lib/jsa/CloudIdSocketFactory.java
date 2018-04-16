@@ -9,22 +9,22 @@ import java.security.Security;
 import java.util.Optional;
 
 /**
- * SPIRE client socket factory.
+ * CloudId client socket factory.
  */
-public class SPIRESocketFactory extends SSLSocketFactory {
+public class CloudIdSocketFactory extends SSLSocketFactory {
 
     private static final String SOCKET_FACTORY_PROVIDER = "ssl.SocketFactory.provider";
 
     private static String socketFactoryProvider;
 
-    private final SSLSocketFactory delegate = SPIREContextFactory.get().getSocketFactory();
+    private final SSLSocketFactory delegate = CloudIdContextFactory.get().getSocketFactory();
 
     /**
      * Install the client socket factory
      */
     public static synchronized void install() {
         socketFactoryProvider = Security.getProperty(SOCKET_FACTORY_PROVIDER);
-        Security.setProperty(SOCKET_FACTORY_PROVIDER, SPIRESocketFactory.class.getName());
+        Security.setProperty(SOCKET_FACTORY_PROVIDER, CloudIdSocketFactory.class.getName());
     }
 
     /**

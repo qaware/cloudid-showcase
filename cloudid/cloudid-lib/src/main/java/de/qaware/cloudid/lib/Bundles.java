@@ -1,4 +1,4 @@
-package de.qaware.cloudid.lib.spire;
+package de.qaware.cloudid.lib;
 
 import lombok.Data;
 
@@ -6,7 +6,7 @@ import java.time.Instant;
 import java.util.List;
 
 /**
- * SPIRE Bundles.
+ * List of identities for a workload.
  */
 @Data
 public class Bundles {

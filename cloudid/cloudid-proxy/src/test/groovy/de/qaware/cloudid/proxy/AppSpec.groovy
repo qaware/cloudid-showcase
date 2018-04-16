@@ -1,15 +1,15 @@
 package de.qaware.cloudid.proxy
 
-import de.qaware.cloudid.lib.jsa.SPIREProvider
-import de.qaware.cloudid.lib.spire.DebugCloudIdManager
+import de.qaware.cloudid.lib.jsa.CloudIdProvider
+import de.qaware.cloudid.lib.spire.DebugIdManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContext
 import spock.lang.Specification
 import spock.util.environment.RestoreSystemProperties
 
-import static de.qaware.cloudid.lib.spire.Config.CLOUD_ID_MANAGER_CLASS
-import static de.qaware.cloudid.lib.spire.DebugCloudIdManager.KEYSTORE_LOCATION
+import static de.qaware.cloudid.lib.Config.DEBUG_KEYSTORE_LOCATION
+import static de.qaware.cloudid.lib.Config.ID_MANAGER_CLASS
 
 /**
  * Specification for the Spring Boot applicaton
@@ -23,14 +23,14 @@ class AppSpec extends Specification {
     ApplicationContext context
 
     void setupSpec() {
-        System.setProperty(CLOUD_ID_MANAGER_CLASS.getSysProp(), DebugCloudIdManager.class.getName())
-        System.setProperty(KEYSTORE_LOCATION.getSysProp(), TestResources.testKeystoreLocation)
+        System.setProperty(ID_MANAGER_CLASS.getSysProp(), DebugIdManager.class.getName())
+        System.setProperty(DEBUG_KEYSTORE_LOCATION.getSysProp(), TestResources.testKeystoreLocation)
 
-        SPIREProvider.install()
+        CloudIdProvider.install()
     }
 
     void cleanupSpec() {
-        SPIREProvider.uninstall()
+        CloudIdProvider.uninstall()
     }
 
     def "context loads"() {

@@ -22,72 +22,67 @@ public class Props {
     private static final Pattern PWD_PATTERN = Pattern.compile("pwd|password", CASE_INSENSITIVE);
     private static final String PWD_REPLACEMENT = "...";
 
+
     /**
      * Create a class property
      *
      * @param name         system property name
-     * @param defaultValue default value
      * @param <T>          class type
      * @return property
      */
     @SuppressWarnings("unchecked")
-    public static <T> Prop<Class<T>> classOf(String name, Class<? extends T> defaultValue) {
-        return new Prop<>(name, Reflection::loadClass, (Class) defaultValue);
+    public static <T> Prop<Class<T>> classOf(String name) {
+        return new Prop<>(name, Reflection::loadClass);
     }
 
     /**
      * Create a string property.
      *
      * @param name         system property name
-     * @param defaultValue default value
      * @return property
      */
-    public static Prop<String> stringOf(String name, String defaultValue) {
-        return new Prop<>(name, s -> s, defaultValue);
+    public static Prop<String> stringOf(String name) {
+        return new Prop<>(name, s -> s);
     }
 
     /**
      * Create a duration property.
      *
      * @param name         system property name
-     * @param defaultValue default value
      * @return property
      */
-    public static Prop<Duration> durationOf(String name, Duration defaultValue) {
-        return new Prop<>(name, Duration::parse, defaultValue);
+    public static Prop<Duration> durationOf(String name) {
+        return new Prop<>(name, Duration::parse);
     }
 
     /**
      * Create a double property.
      *
      * @param name         system property name
-     * @param defaultValue default value
      * @return property
      */
-    public static Prop<Double> doubleOf(String name, Double defaultValue) {
-        return new Prop<>(name, Double::valueOf, defaultValue);
+    public static Prop<Double> doubleOf(String name) {
+        return new Prop<>(name, Double::valueOf);
     }
 
     /**
      * Create an integer property.
      *
      * @param name         system property name
-     * @param defaultValue default value
      * @return property
      */
-    public static Prop<Integer> intOf(String name, Integer defaultValue) {
-        return new Prop<>(name, Integer::valueOf, defaultValue);
+    public static Prop<Integer> intOf(String name) {
+        return new Prop<>(name, Integer::valueOf);
     }
 
     /**
      * Create an boolean property.
      *
      * @param name         system property name
-     * @param defaultValue default value
      * @return property
      */
-    public static Prop<Boolean> booleanOf(String name, Boolean defaultValue) {
-        return new Prop<>(name, Boolean::parseBoolean, defaultValue);
+    public static Prop<Boolean> booleanOf(String name) {
+        return new Prop<>(name, Boolean::parseBoolean);
     }
 
     /**
@@ -112,5 +107,6 @@ public class Props {
     private static Object maskPasswords(Prop p) {
         return PWD_PATTERN.matcher(p.getSysProp()).find()? PWD_REPLACEMENT : p.get();
     }
+
 
 }

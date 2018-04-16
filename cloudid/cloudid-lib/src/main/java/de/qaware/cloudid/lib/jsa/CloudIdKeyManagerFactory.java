@@ -1,6 +1,6 @@
 package de.qaware.cloudid.lib.jsa;
 
-import de.qaware.cloudid.lib.spire.CloudId;
+import de.qaware.cloudid.lib.CloudId;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactorySpi;
@@ -10,7 +10,7 @@ import java.security.KeyStore;
 /**
  * CloudId key manager factory
  */
-public class SPIREKeyManagerFactory extends KeyManagerFactorySpi {
+public class CloudIdKeyManagerFactory extends KeyManagerFactorySpi {
 
     @Override
     protected void engineInit(KeyStore keyStore, char[] chars) {
@@ -24,7 +24,7 @@ public class SPIREKeyManagerFactory extends KeyManagerFactorySpi {
 
     @Override
     protected KeyManager[] engineGetKeyManagers() {
-        return new KeyManager[]{new SPIREKeyManager(CloudId.getManager())};
+        return new KeyManager[]{new CloudIdKeyManager(CloudId.getIdManager())};
     }
 
 }

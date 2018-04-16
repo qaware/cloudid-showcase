@@ -1,5 +1,7 @@
 package de.qaware.cloudid.lib.spire
 
+import de.qaware.cloudid.lib.CloudId
+import de.qaware.cloudid.lib.Config
 import de.qaware.cloudid.lib.util.NettySocket
 import io.grpc.Server
 import io.grpc.netty.NettyServerBuilder
@@ -16,7 +18,7 @@ import static java.nio.file.Files.deleteIfExists
 import static java.util.concurrent.TimeUnit.SECONDS
 
 /**
- * Specification for {@link CloudId}.
+ * Specification for {@link de.qaware.cloudid.lib.CloudId}.
  */
 @RestoreSystemProperties
 @IgnoreIf({ !NettySocket.CURRENT.domainSocketsSupported() })
@@ -30,7 +32,7 @@ class CloudIdSpec extends Specification {
     void setupSpec() {
         CloudId.reset()
 
-        System.setProperty(Config.AGENT_SOCKET.sysProp, socketFile)
+        System.setProperty(Config.SPIRE_AGENT_SOCKET.sysProp, socketFile)
 
         deleteIfExists(Paths.get(socketFile))
 
@@ -55,12 +57,12 @@ class CloudIdSpec extends Specification {
 
     def 'manager is created'() {
         expect:
-        CloudId.manager != null
+        CloudId.idManager != null
     }
 
     def 'bundle is available'() {
         expect:
-        CloudId.manager.singleBundle != null
+        CloudId.idManager.singleBundle != null
     }
 
     def 'callbacks work'() {
@@ -68,7 +70,7 @@ class CloudIdSpec extends Specification {
         def notifiedLatch = new CountDownLatch(1)
 
         when:
-        CloudId.manager.addListener({ b -> notifiedLatch.countDown() })
+        CloudId.idManager.addListener({ b -> notifiedLatch.countDown() })
 
         then:
         notifiedLatch.await(5, SECONDS)

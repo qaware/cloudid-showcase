@@ -1,6 +1,7 @@
 package de.qaware.cloudid.lib.spire;
 
 import com.google.protobuf.ByteString;
+import de.qaware.cloudid.lib.Bundle;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
