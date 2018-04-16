@@ -7,8 +7,6 @@ import javax.security.auth.x500.X500Principal;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.*;
-import java.time.Instant;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -41,28 +39,6 @@ public class Certificates {
 
     private static final CertificateFactory CERTIFICATE_FACTORY = getX509CertificateFactory();
     private static final CertPathValidator CERT_PATH_VALIDATOR = getPKIXCertPathValidator();
-
-    /**
-     * Get the notAfter instant of a X.509 certificate.
-     *
-     * @param certificate certificate
-     * @return notAfter instant or {@code Instant#MAX} if the field is unset
-     */
-    public static Instant getNotAfter(X509Certificate certificate) {
-        Date date = certificate.getNotAfter();
-        return date != null ? date.toInstant() : Instant.MAX;
-    }
-
-    /**
-     * Get the notBefore instant of a X.509 certificate.
-     *
-     * @param certificate certificate
-     * @return notBefore instant or {@code Instant#MIN} if the field is unset
-     */
-    public static Instant getNotBefore(X509Certificate certificate) {
-        Date date = certificate.getNotBefore();
-        return date != null ? date.toInstant() : Instant.MIN;
-    }
 
     private static PKIXParameters toPkixParameters(Set<X509Certificate> trustedCerts) {
         try {
