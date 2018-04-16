@@ -1,6 +1,6 @@
 package de.qaware.cloudid.lib.spire;
 
-import de.qaware.cloudid.lib.util.NettySocket;
+import de.qaware.cloudid.util.NettySocket;
 import io.grpc.ManagedChannel;
 import io.grpc.netty.NettyChannelBuilder;
 import io.netty.channel.EventLoopGroup;

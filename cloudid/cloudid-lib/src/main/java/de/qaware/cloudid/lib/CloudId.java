@@ -3,7 +3,7 @@ package de.qaware.cloudid.lib;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
-import static de.qaware.cloudid.lib.util.Reflection.instantiate;
+import static de.qaware.cloudid.util.Reflection.instantiate;
 
 /**
  * Provided facilities for dealing with workload identities.

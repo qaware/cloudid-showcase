@@ -1,5 +1,6 @@
 package de.qaware.cloudid.lib;
 
+import de.qaware.cloudid.util.Updater;
 import org.apache.commons.lang3.Validate;
 
 import java.util.List;

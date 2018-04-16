@@ -1,4 +1,4 @@
-package de.qaware.cloudid.lib.util.config;
+package de.qaware.cloudid.util.config;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.function.Function;
 
-import static de.qaware.cloudid.lib.util.Reflection.getContextClassLoader;
+import static de.qaware.cloudid.util.Reflection.getContextClassLoader;
 import static java.text.MessageFormat.format;
 
 /**

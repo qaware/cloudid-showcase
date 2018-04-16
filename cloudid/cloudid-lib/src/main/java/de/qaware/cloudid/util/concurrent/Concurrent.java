@@ -1,4 +1,4 @@
-package de.qaware.cloudid.lib.util.concurrent;
+package de.qaware.cloudid.util.concurrent;
 
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;

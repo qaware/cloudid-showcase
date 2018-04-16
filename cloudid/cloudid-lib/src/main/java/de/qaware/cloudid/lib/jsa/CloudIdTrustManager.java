@@ -1,7 +1,7 @@
 package de.qaware.cloudid.lib.jsa;
 
 import de.qaware.cloudid.lib.*;
-import de.qaware.cloudid.lib.util.Certificates;
+import de.qaware.cloudid.util.Certificates;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.Validate;
@@ -17,7 +17,7 @@ import java.security.cert.X509Certificate;
 import java.util.Objects;
 import java.util.Optional;
 
-import static de.qaware.cloudid.lib.util.Certificates.getSpiffeId;
+import static de.qaware.cloudid.util.Certificates.getSpiffeId;
 import static java.util.Arrays.stream;
 
 /**

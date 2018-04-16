@@ -2,15 +2,15 @@ package de.qaware.cloudid.lib.spire;
 
 import de.qaware.cloudid.lib.Bundles;
 import de.qaware.cloudid.lib.IdManager;
-import de.qaware.cloudid.lib.util.AsyncUpdater;
-import de.qaware.cloudid.lib.util.concurrent.RandomExponentialBackoffSupplier;
+import de.qaware.cloudid.util.AsyncUpdater;
+import de.qaware.cloudid.util.concurrent.RandomExponentialBackoffSupplier;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Duration;
 
 import static de.qaware.cloudid.lib.Config.*;
-import static de.qaware.cloudid.lib.util.Comparables.max;
-import static de.qaware.cloudid.lib.util.Functions.compose;
+import static de.qaware.cloudid.util.Comparables.max;
+import static de.qaware.cloudid.util.Functions.compose;
 import static java.time.Instant.now;
 
 /**

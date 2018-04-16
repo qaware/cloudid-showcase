@@ -1,5 +1,7 @@
 package de.qaware.cloudid.lib;
 
+import de.qaware.cloudid.util.Updater;
+
 import java.util.function.Consumer;
 
 /**

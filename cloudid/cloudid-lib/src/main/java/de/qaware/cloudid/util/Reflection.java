@@ -1,6 +1,6 @@
-package de.qaware.cloudid.lib.util;
+package de.qaware.cloudid.util;
 
-import de.qaware.cloudid.lib.util.config.Prop;
+import de.qaware.cloudid.util.config.Prop;
 import lombok.experimental.UtilityClass;
 
 import java.lang.reflect.Field;

@@ -1,4 +1,4 @@
-package de.qaware.cloudid.lib.util.concurrent;
+package de.qaware.cloudid.util.concurrent;
 
 /**
  * Runnable that may throw InterruptedExceptions.

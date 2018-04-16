@@ -4,8 +4,8 @@ import de.qaware.cloudid.lib.Bundle;
 import de.qaware.cloudid.lib.Bundles;
 import de.qaware.cloudid.lib.Config;
 import de.qaware.cloudid.lib.IdManager;
-import de.qaware.cloudid.lib.util.Certificates;
-import de.qaware.cloudid.lib.util.config.Props;
+import de.qaware.cloudid.util.Certificates;
+import de.qaware.cloudid.util.config.Props;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -19,7 +19,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 
-import static de.qaware.cloudid.lib.util.Reflection.getContextClassLoader;
+import static de.qaware.cloudid.util.Reflection.getContextClassLoader;
 import static java.text.MessageFormat.format;
 import static java.util.Arrays.stream;
 import static java.util.Collections.emptyMap;

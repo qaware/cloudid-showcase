@@ -1,4 +1,4 @@
-package de.qaware.cloudid.lib.util;
+package de.qaware.cloudid.util;
 
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.epoll.EpollDomainSocketChannel;

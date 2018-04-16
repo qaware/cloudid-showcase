@@ -1,4 +1,4 @@
-package de.qaware.cloudid.lib.util.concurrent;
+package de.qaware.cloudid.util.concurrent;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -7,7 +7,7 @@ import java.time.Duration;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Supplier;
 
-import static de.qaware.cloudid.lib.util.concurrent.Concurrent.sleep;
+import static de.qaware.cloudid.util.concurrent.Concurrent.sleep;
 import static java.lang.Math.*;
 
 /**

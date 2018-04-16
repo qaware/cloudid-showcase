@@ -3,8 +3,8 @@ package de.qaware.cloudid.lib.vault;
 import de.qaware.cloudid.lib.ACL;
 import de.qaware.cloudid.lib.ACLManager;
 import de.qaware.cloudid.lib.Config;
-import de.qaware.cloudid.lib.util.AsyncUpdater;
-import de.qaware.cloudid.lib.util.concurrent.RandomExponentialBackoffSupplier;
+import de.qaware.cloudid.util.AsyncUpdater;
+import de.qaware.cloudid.util.concurrent.RandomExponentialBackoffSupplier;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Duration;

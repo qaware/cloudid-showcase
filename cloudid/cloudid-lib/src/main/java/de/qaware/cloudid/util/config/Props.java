@@ -1,6 +1,6 @@
-package de.qaware.cloudid.lib.util.config;
+package de.qaware.cloudid.util.config;
 
-import de.qaware.cloudid.lib.util.Reflection;
+import de.qaware.cloudid.util.Reflection;
 import lombok.experimental.UtilityClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

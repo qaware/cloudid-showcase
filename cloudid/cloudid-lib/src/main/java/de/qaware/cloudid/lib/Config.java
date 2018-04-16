@@ -1,11 +1,11 @@
 package de.qaware.cloudid.lib;
 
-import de.qaware.cloudid.lib.util.config.Prop;
+import de.qaware.cloudid.util.config.Prop;
 import lombok.experimental.UtilityClass;
 
 import java.time.Duration;
 
-import static de.qaware.cloudid.lib.util.config.Props.*;
+import static de.qaware.cloudid.util.config.Props.*;
 
 /**
  * Utilities for dealing with system properties.
