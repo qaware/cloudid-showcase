@@ -31,7 +31,7 @@ public class VaultACLFactory implements ACLFactory {
     public ACL get() {
         return new ACL(stream(split(getAcl(), "\n"))
                 .map(s -> splitByWholeSeparator(s, "->"))
-                .map(a -> new ACLEntry(trim(a[0]), trim(a[1])))
+                .map(a -> new ACL.Entry(trim(a[0]), trim(a[1])))
                 .collect(toSet()));
     }
 
@@ -48,7 +48,6 @@ public class VaultACLFactory implements ACLFactory {
     }
 
     private Map<String, String> queryVault(String path) {
-        // TODO: Re-use the vault connection
         try {
             KeyStore keyStore = KeyStore.getInstance("SPIRE");
             keyStore.load(null, "".toCharArray());
