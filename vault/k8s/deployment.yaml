@@ -11,17 +11,12 @@ spec:
         instance: vault
     spec:
       containers:
-        - name: vault
-          image: "vault:0.9.6"
+        - name: cloudid-vault
+          image: cloudid-vault:0.1-snapshot
           resources:
             requests:
               cpu: 100m
               memory: 256Mi
-          command:
-          - vault
-          - server
-          - -config
-          - /vault/config/vault.conf
           ports:
           - containerPort: 8200
             name: main-port
@@ -29,7 +24,7 @@ spec:
             httpGet:
               path: /v1/sys/health
               port: 8300
-            initialDelaySeconds: 5
+            initialDelaySeconds: 30
             timeoutSeconds: 1
           volumeMounts:
               - name: vault-config
@@ -42,6 +37,20 @@ spec:
                 mountPath: /vault/file
               - name: vault-logs
                 mountPath: /vault/logs
+              - name: shared
+                mountPath: /shared
+        - name: cloudid-vault-sidecar
+          image: cloudid-vault-sidecar:0.1-snapshot
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+          volumeMounts:
+              - name: spire-agent-socket
+                mountPath: /spire/socket
+                readOnly: false
+              - name: shared
+                mountPath: /shared
       volumes:
         - name: vault-config
           configMap:
@@ -56,3 +65,8 @@ spec:
           emptyDir: {}
         - name: vault-file
           emptyDir: {}
+        - name: shared
+          emptyDir: {}
+        - name: spire-agent-socket
+          hostPath:
+           path: /mnt/spire/agent/socket
