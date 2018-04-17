@@ -21,7 +21,7 @@ delete:
 .PHONY: spire-register
 spire-register:
 	# Wait for the SPIRE server to become "Running"
-	while ! kubectl get pod  | grep 'spire-server.*Running' > /dev/null; do sleep 1; done
+	while ! kubectl get pod  | grep 'spire-server.*Running' > /dev/null; do sleep 2; done
 
 	# Ingress Proxy
 	kubectl exec $$(kubectl get pod | grep -Eo 'spire-server\S*') -- \

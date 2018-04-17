@@ -28,11 +28,11 @@ delete:
 .PHONY: unseal-vault
 unseal-vault:
 	# Wait for Vault to become running
-	while ! kubectl get pod  | grep 'vault.*Running' > /dev/null; do sleep 1; done
+	while ! kubectl get pod  | grep 'vault.*Running' > /dev/null; do sleep 2; done
 	kubectl port-forward $$(kubectl get pod -o name | grep -o 'vault.*$$') $(VAULT_PORT) & echo $$! > port-forward.pid
 
 	# Wait for the port-forward to become active
-	while ! nc -z $(VAULT_HOST) $(VAULT_PORT); do sleep 1; done
+	while ! nc -z $(VAULT_HOST) $(VAULT_PORT); do sleep 2; done
 
 	# Init Vault only if there is no response file
 	-[ ! -f "vault-init-response.json" ] && curl $(VAULT_API_URL)/sys/init --request PUT --data '{"secret_shares":1,"secret_threshold":1}' > vault-init-response.json
