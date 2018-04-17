@@ -1,0 +1,2 @@
+spiffe://salm.qaware.de/cloudid/proxy -> spiffe://salm.qaware.de/cloudid/front
+spiffe://salm.qaware.de/cloudid/front -> spiffe://salm.qaware.de/cloudid/back
