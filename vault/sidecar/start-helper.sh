@@ -5,7 +5,7 @@ echo "Waiting until token for configuring Vault is available..."
 # Wait until root token has been added to the vault-secrets secret and has been refreshed by kubernetes
 while [ ! -f /shared/token.txt ]
 do
-  sleep 1
+  sleep 2
 done
 
 # Directory which will be used by SPIFFE helper to temporarily save the fetched certs

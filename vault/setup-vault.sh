@@ -7,7 +7,7 @@ VAULT_API_URL="http://${VAULT_HOST}:${VAULT_PORT}/v1"
 echo "Waiting until Vault is ready..."
 # Waiting until Vault exit code = 501 -> meaning that Vault is ready for initialization
 while [[ "$(curl -s ${VAULT_API_URL}/sys/health -I 2>/dev/null | head -n 1 | cut -d$' ' -f2)" != "501" ]]; do
-sleep 1
+sleep 2
 done
 
 echo "Initializing Vault..."
