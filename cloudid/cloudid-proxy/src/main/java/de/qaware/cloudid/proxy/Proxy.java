@@ -75,9 +75,9 @@ public class Proxy {
             LOGGER.debug("No demo-trace header found in request. Creating a new one.");
             traceHeaderValue = idManager.getSingleBundle().getSpiffeId() + "#";
         } else {
-            String old_header = headers.nextElement();
-            LOGGER.debug("Received demo-trace header with content: {}", old_header);
-            traceHeaderValue = old_header + idManager.getSingleBundle().getSpiffeId() + "#";
+            String oldHeader = headers.nextElement();
+            LOGGER.debug("Received demo-trace header with content: {}", oldHeader);
+            traceHeaderValue = oldHeader + idManager.getSingleBundle().getSpiffeId() + "#";
         }
         LOGGER.debug("Adding header with name {} and value {} to forwarded request", TRACE_HEADER_NAME, traceHeaderValue);
         requestBuilder.addHeader(TRACE_HEADER_NAME, traceHeaderValue);

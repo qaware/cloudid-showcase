@@ -5,6 +5,7 @@ import de.qaware.cloudid.lib.IdManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -44,7 +45,7 @@ public class DemoResponder {
             trace = "NO TRACE AVAILABLE!";
         }
         String responseBody = generateResponseBody(trace);
-        return ResponseEntity.status(200)
+        return ResponseEntity.status(HttpStatus.OK)
                 .body(responseBody);
     }
 
