@@ -25,7 +25,7 @@ spec:
               path: /v1/sys/health
               port: 8300
             initialDelaySeconds: 30
-            timeoutSeconds: 1
+            timeoutSeconds: 3
           volumeMounts:
               - name: vault-config
                 mountPath: /vault/config

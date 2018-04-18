@@ -48,7 +48,7 @@ spec:
             scheme: HTTP
           initialDelaySeconds: 30
           periodSeconds: 30
-          timeoutSeconds: 1
+          timeoutSeconds: 3
       imagePullSecrets:
         # Needs to be defined for this deployment to work
         - name: qaware-artifactory
