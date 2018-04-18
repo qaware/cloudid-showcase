@@ -1,0 +1,15 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>CNI Demo</title>
+</head>
+<body>
+    <h2>My identity:</h2>
+    <p th:text="${myid}"></p>
+    <h2>Call trace:</h2><br/>
+    <ol>
+        <li th:each="part : ${trace}" th:text="${part}"></li>
+    </ol>
+</body>
+</html>
