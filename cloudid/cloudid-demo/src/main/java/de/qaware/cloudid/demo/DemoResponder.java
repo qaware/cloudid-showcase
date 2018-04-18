@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpServletRequest;
@@ -31,11 +30,10 @@ public class DemoResponder {
      *
      * @param request request
      * @param model   model supplied by and for thymeleaf
-     * @param path    request path
      * @return response entity with the generated html page
      */
-    @RequestMapping("/{path}")
-    public String demoPageRequest(HttpServletRequest request, Model model, @PathVariable("path") String path) {
+    @RequestMapping("/")
+    public String demoPageRequest(HttpServletRequest request, Model model) {
         model
                 .addAttribute("myid", idManager.getSingleBundle().getSpiffeId())
                 .addAttribute("trace", getFormattedTrace(request));

@@ -12,14 +12,13 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.entity.InputStreamEntity;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Enumeration;
 
@@ -40,35 +39,35 @@ public class Proxy {
     /**
      * Forwards a request 1:1 to the target defined in {@code de.qaware.cloud.id.demoserver.backend}.
      *
-     * @param path    request path
      * @param request request
      * @return response entity
      * @throws IOException if a transmission error occurs
      */
-    @RequestMapping("/{path}")
-    public ResponseEntity forwardRequest(@PathVariable String path, HttpServletRequest request) throws IOException {
-        HttpUriRequest backendRequest = buildBackendRequest(path, request);
-        LOGGER.info("Proxy request {} to {}", path, backendRequest);
-        HttpResponse response = httpClient.execute(backendRequest);
+    @RequestMapping("/**")
+    public ResponseEntity forwardRequest(HttpServletRequest request) throws IOException {
+        HttpResponse response = httpClient.execute(buildBackendRequest(request));
 
-        HttpHeaders responseHeaders = convertResponseHeaders(response);
-
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        response.getEntity().writeTo(outputStream);
-        String charsetName = responseHeaders.getContentType() != null ? responseHeaders.getContentType().getCharset().name() : "UTF-8";
         LOGGER.info("Request was successful: {}", response.getStatusLine());
         return ResponseEntity.status(response.getStatusLine()
                 .getStatusCode())
-                .headers(responseHeaders)
-                .body(outputStream.toString(charsetName));
+                .headers(convertResponseHeaders(response))
+                .body(new InputStreamResource(response.getEntity().getContent()));
     }
 
-    private HttpUriRequest buildBackendRequest(String path, HttpServletRequest request) throws IOException {
+    private HttpUriRequest buildBackendRequest(HttpServletRequest request) throws IOException {
         RequestBuilder requestBuilder = RequestBuilder.create(request.getMethod());
 
-        requestBuilder.setUri(appProperties.getBackend() + '/' + path)
+        requestBuilder.setUri(appProperties.getBackend() + '/' + request.getServletPath())
                 .setEntity(new InputStreamEntity(request.getInputStream()));
 
+        addTraceHeader(request, requestBuilder, idManager);
+
+        HttpUriRequest result = requestBuilder.build();
+        LOGGER.info("Proxy request {} to {}", request.getServletPath(), result);
+        return result;
+    }
+
+    private static void addTraceHeader(HttpServletRequest request, RequestBuilder requestBuilder, IdManager idManager) {
         Enumeration<String> headers = request.getHeaders(TRACE_HEADER_NAME);
         String traceHeaderValue;
         if (headers == null || !headers.hasMoreElements()) {
@@ -81,7 +80,6 @@ public class Proxy {
         }
         LOGGER.debug("Adding header with name {} and value {} to forwarded request", TRACE_HEADER_NAME, traceHeaderValue);
         requestBuilder.addHeader(TRACE_HEADER_NAME, traceHeaderValue);
-        return requestBuilder.build();
     }
 
     private HttpHeaders convertResponseHeaders(HttpResponse response) {
