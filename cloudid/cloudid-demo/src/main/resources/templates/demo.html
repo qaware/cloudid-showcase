@@ -3,13 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <title>CNI Demo</title>
+    <link rel="stylesheet" type="text/css" href="../static/css/style.css" th:href="@{css/style.css}"/>
 </head>
 <body>
-    <h2>My identity:</h2>
-    <p th:text="${myid}"></p>
-    <h2>Call trace:</h2><br/>
-    <ol>
-        <li th:each="part : ${trace}" th:text="${part}"></li>
-    </ol>
+<div id="main">
+    <div style="width: 100%; margin: 0 auto;">
+        <img width="100%" src="img/cat-2483826_1280.jpg" >
+    </div>
+    <div id="header">
+        <div id="logo">
+            <div id="logo_text">
+                <h1><a href="">Cloud Native Identity Management</a></h1>
+                <h2>KubeCon 2018</h2>
+            </div>
+        </div>
+    </div>
+    <div id="site_content">
+        <table width="100%">
+            <tr>
+                <th><img src="img/spiffe_logo.png" width="100%"></th>
+                <th><img src="img/spire_logo.png" width="100%"></th>
+            </tr>
+        </table>
+        <h2>My identity:</h2>
+        <p th:text="${myid}"></p>
+        <h2>Call trace:</h2>
+        <ol>
+            <li th:each="part : ${trace}" th:text="${part}"></li>
+        </ol>
+    </div>
+    <div id="footer">
+        <a href="http://www.html5webtemplates.co.uk">design (modified) from HTML5webtemplates.co.uk</a> <a href="https://creativecommons.org/licenses/by/3.0/">(CC BY 3.0)</a>
+    </div>
+</div>
 </body>
 </html>
