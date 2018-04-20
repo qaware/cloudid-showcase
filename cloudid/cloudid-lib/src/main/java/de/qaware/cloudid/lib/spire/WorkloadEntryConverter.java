@@ -1,7 +1,7 @@
 package de.qaware.cloudid.lib.spire;
 
 import com.google.protobuf.ByteString;
-import de.qaware.cloudid.lib.Bundle;
+import de.qaware.cloudid.lib.WorkloadId;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
@@ -30,17 +30,17 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.concat;
 
 /**
- * Converts a workload entry to a SVID bundle.
+ * Converts a workload entry to a workload identity.
  */
 @Slf4j
-class BundleConverter implements Function<WorkloadEntry, Bundle> {
+class WorkloadEntryConverter implements Function<WorkloadEntry, WorkloadId> {
 
     private final CertificateFactory certFactory;
 
     /**
      * Constructor.
      */
-    public BundleConverter() {
+    public WorkloadEntryConverter() {
         try {
             certFactory = CertificateFactory.getInstance("x509");
         } catch (CertificateException e) {
@@ -49,7 +49,7 @@ class BundleConverter implements Function<WorkloadEntry, Bundle> {
     }
 
     @Override
-    public Bundle apply(WorkloadEntry workloadEntry) {
+    public WorkloadId apply(WorkloadEntry workloadEntry) {
         try {
             return convert(workloadEntry);
         } catch (GeneralSecurityException | IOException e) {
@@ -59,17 +59,17 @@ class BundleConverter implements Function<WorkloadEntry, Bundle> {
     }
 
     /**
-     * Converts a workload entry to a SVID bundle.
+     * Converts a workload entry to a workload Id.
      *
      * @param workloadEntry workload entry
-     * @return SVID bundle
+     * @return workload Id
      * @throws IOException          something claiming to be a certificate is not
      * @throws CertificateException one of the certificates is invalid
      */
-    public Bundle convert(WorkloadEntry workloadEntry) throws IOException, CertificateException {
+    public WorkloadId convert(WorkloadEntry workloadEntry) throws IOException, CertificateException {
         List<X509Certificate> certPath = getCertPath(workloadEntry);
 
-        return new Bundle(
+        return new WorkloadId(
                 workloadEntry.getSpiffeId(),
                 certPath.get(0),
                 getKeyPair(workloadEntry),

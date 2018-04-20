@@ -18,26 +18,26 @@ import static java.util.stream.Stream.concat;
  * A workload identity consists of the following parts:
  * <ul>
  * <li>spiffeId: The business identity in SPIFFE format</li>
- * <li>certificate, keyPair, caCertChain: The technical identity as SPIFFE SVID</li>
- * <li>federatedBundles: A set of CAs that should also be trusted</li>
+ * <li>svid, keyPair, chain: The technical identity as SPIFFE SVID</li>
+ * <li>federatedCAs: A set of CAs that should also be trusted</li>
  * </ul>
  */
 @Data
-public class Bundle {
+public class WorkloadId {
 
     private final String spiffeId;
-    private final X509Certificate certificate;
+    private final X509Certificate svid;
     private final KeyPair keyPair;
-    private final List<X509Certificate> caCertChain;
-    private final Map<String, List<X509Certificate>> federatedBundles;
+    private final List<X509Certificate> chain;
+    private final Map<String, List<X509Certificate>> federatedCAs;
 
     /**
-     * Get a copy of the certificate chain as an array.
+     * Get a copy of the svid chain as an array.
      *
-     * @return certificate chain as an array
+     * @return svid chain as an array
      */
     public X509Certificate[] getCaCertChainArray() {
-        return caCertChain.toArray(new X509Certificate[0]);
+        return chain.toArray(new X509Certificate[0]);
     }
 
     /**
@@ -49,8 +49,8 @@ public class Bundle {
      */
     public Set<X509Certificate> getTrustedCAs() {
         return concat(
-                Stream.of(caCertChain.get(caCertChain.size() - 1)),
-                federatedBundles.values().stream().map(l -> l.get(0)))
+                Stream.of(chain.get(chain.size() - 1)),
+                federatedCAs.values().stream().map(l -> l.get(0)))
                 .collect(toSet());
     }
 

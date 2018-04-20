@@ -35,7 +35,7 @@ public class DemoResponder {
     @RequestMapping("/")
     public String demoPageRequest(HttpServletRequest request, Model model) {
         model
-                .addAttribute("myid", idManager.getSingleBundle().getSpiffeId())
+                .addAttribute("myid", idManager.getWorkloadId().getSpiffeId())
                 .addAttribute("trace", getFormattedTrace(request));
         return RESPONSE_TEMPLATE_NAME;
     }

@@ -36,7 +36,7 @@ public class CloudIdTrustManager extends X509ExtendedTrustManager {
     public X509Certificate[] getAcceptedIssuers() {
         LOGGER.trace("getAcceptedIssuers()");
 
-        return idManager.getSingleBundle().getTrustedCAs().toArray(new X509Certificate[0]);
+        return idManager.getWorkloadId().getTrustedCAs().toArray(new X509Certificate[0]);
     }
 
     @Override
@@ -50,13 +50,13 @@ public class CloudIdTrustManager extends X509ExtendedTrustManager {
         if (clientIdOpt.isPresent()) {
             String clientId = clientIdOpt.get();
 
-            Bundle svid = idManager.getSingleBundle();
+            WorkloadId workloadId = idManager.getWorkloadId();
 
-            if (shouldCheckAcl() && !aclManager.get().isAllowed(clientId, svid.getSpiffeId())) {
+            if (shouldCheckAcl() && !aclManager.get().isAllowed(clientId, workloadId.getSpiffeId())) {
                 throw new CertificateException("Client could not be verified against the provided ACL");
             }
 
-            Certificates.validate(chain, svid.getTrustedCAs());
+            Certificates.validate(chain, workloadId.getTrustedCAs());
         } else {
             LOGGER.debug("Client certificate is not a SPIFFE certificate. Delegating to {}", delegate.getClass().getName());
             delegate.checkClientTrusted(chain, authType);
@@ -81,7 +81,7 @@ public class CloudIdTrustManager extends X509ExtendedTrustManager {
 
         Optional<String> clientIdOpt = getSpiffeId(chain[0]);
         if (clientIdOpt.isPresent()) {
-            Certificates.validate(chain, idManager.getSingleBundle().getTrustedCAs());
+            Certificates.validate(chain, idManager.getWorkloadId().getTrustedCAs());
         } else {
             LOGGER.debug("Server certificate is not a SPIFFE certificate. Delegating to {}", delegate.getClass().getName());
             delegate.checkServerTrusted(chain, authType);

@@ -38,7 +38,7 @@ message UpdateEntryRequest {
 
 // A CA bundle for a different Trust Domain than the one used and managed by the Control Plane.
 message FederatedBundle {
-    // A SPIFFE ID that has a Federated Bundle
+    // A SPIFFE ID that has a Federated WorkloadId
     string spiffe_id = 1;
 
     // A trusted cert bundle that is not part of Control Planes trust domain but belongs to a different Trust Domain
@@ -111,9 +111,9 @@ service Registration {
     rpc CreateFederatedBundle(CreateFederatedBundleRequest) returns (spire.common.Empty);
     // Retrieves Federated bundles for all the Federated SPIFFE IDs.
     rpc ListFederatedBundles(spire.common.Empty) returns (ListFederatedBundlesReply);
-    // Updates a particular Federated Bundle. Useful for rotation.
+    // Updates a particular Federated WorkloadId. Useful for rotation.
     rpc UpdateFederatedBundle(FederatedBundle) returns (spire.common.Empty);
-    // Delete a particular Federated Bundle. Used to destroy inter-domain trust.
+    // Delete a particular Federated WorkloadId. Used to destroy inter-domain trust.
     rpc DeleteFederatedBundle(FederatedSpiffeID) returns (spire.common.Empty);
 
     // Create a new join token

@@ -1,7 +1,7 @@
 package de.qaware.cloudid.lib.spire;
 
-import de.qaware.cloudid.lib.Bundles;
 import de.qaware.cloudid.lib.IdManager;
+import de.qaware.cloudid.lib.WorkloadIds;
 import de.qaware.cloudid.util.AsyncUpdater;
 import de.qaware.cloudid.util.concurrent.RandomExponentialBackoffSupplier;
 import lombok.extern.slf4j.Slf4j;
@@ -17,9 +17,9 @@ import static java.time.Instant.now;
  * Default Id manager.
  */
 @Slf4j
-public class DefaultIdManager extends AsyncUpdater<Bundles> implements IdManager {
+public class DefaultIdManager extends AsyncUpdater<WorkloadIds> implements IdManager {
 
-    private static final String THREAD_NAME = "cloudid-bundle-updater";
+    private static final String THREAD_NAME = "cloudid-id-updater";
     private static final Duration MIN_BACKOFF = Duration.ofSeconds(30);
 
     /**

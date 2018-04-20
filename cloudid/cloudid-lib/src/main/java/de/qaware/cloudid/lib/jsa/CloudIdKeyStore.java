@@ -34,20 +34,20 @@ public class CloudIdKeyStore extends ROVirtualKeyStoreSPI {
     @Override
     public Key engineGetKey(String alias, char[] password) {
         LOGGER.trace("engineGetKey({}, ...)", alias);
-        return idManager.getSingleBundle().getKeyPair().getPrivate();
+        return idManager.getWorkloadId().getKeyPair().getPrivate();
     }
 
     @Override
     public Certificate[] engineGetCertificateChain(String alias) {
         LOGGER.trace("engineGetCertificateChain({})", alias);
 
-        return idManager.getSingleBundle().getCaCertChainArray();
+        return idManager.getWorkloadId().getCaCertChainArray();
     }
 
     @Override
     public Certificate engineGetCertificate(String alias) {
         LOGGER.trace("engineGetCertificate({})", alias);
-        return idManager.getSingleBundle().getCertificate();
+        return idManager.getWorkloadId().getSvid();
     }
 
     @Override

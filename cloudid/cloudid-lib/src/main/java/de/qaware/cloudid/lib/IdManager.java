@@ -7,37 +7,37 @@ import java.util.List;
 import java.util.function.Consumer;
 
 /**
- * Manages Id bundles.
+ * Manages workload Ids.
  */
-public interface IdManager extends Updater<Bundles> {
+public interface IdManager extends Updater<WorkloadIds> {
 
     /**
-     * Get the current set of bundles.
+     * Get the current set of workload Ids.
      * <p>
-     * Blocks until bundles become available.
+     * Blocks until workload Ids become available.
      *
-     * @return bundles
+     * @return workload Ids
      */
-    Bundles get();
+    WorkloadIds get();
 
     /**
-     * Add a listener that gets notified whenever the current set of bundles changes.
+     * Add a listener that gets notified whenever the current set of workload Ids changes.
      *
-     * Listeners will be notified immediately if bundles were available before they are added.
+     * Listeners will be notified immediately if workload Ids were available before they are added.
      *
      * @param listener listener
      */
-    void addListener(Consumer<Bundles> listener);
+    void addListener(Consumer<WorkloadIds> listener);
 
     /**
-     * Get the single bundle if there is only one.
+     * Get the single workload Id if there is only one.
      *
-     * @return bundle
+     * @return workload Id
      */
-    default Bundle getSingleBundle() {
-        List<Bundle> bundleList = get().getBundleList();
-        Validate.isTrue(bundleList.size() == 1);
-        return bundleList.get(0);
+    default WorkloadId getWorkloadId() {
+        List<WorkloadId> workloadIdList = get().getWorkloadIdList();
+        Validate.isTrue(workloadIdList.size() == 1);
+        return workloadIdList.get(0);
     }
 
 }

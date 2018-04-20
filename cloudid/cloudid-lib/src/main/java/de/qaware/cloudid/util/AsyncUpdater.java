@@ -83,8 +83,8 @@ public class AsyncUpdater<T> implements Updater<T> {
         sleep(backoff);
     }
 
-    private synchronized void notifyListeners(T bundles) {
-        listeners.forEach(l -> l.accept(bundles));
+    private synchronized void notifyListeners(T value) {
+        listeners.forEach(l -> l.accept(value));
     }
 
 }

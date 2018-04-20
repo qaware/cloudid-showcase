@@ -1,11 +1,11 @@
 package de.qaware.cloudid.lib.spire
 
-import de.qaware.cloudid.lib.Bundles
 import de.qaware.cloudid.lib.TestResources
+import de.qaware.cloudid.lib.WorkloadIds
 import spire.api.workload.WorkloadOuterClass
 import spock.lang.Specification
 
-class BundlesConverterSpec extends Specification {
+class WorkloadIdsConverterSpec extends Specification {
 
     def 'apply'() {
         given:
@@ -32,13 +32,13 @@ class BundlesConverterSpec extends Specification {
         BundlesConverter bundlesConverter = new BundlesConverter()
 
         when:
-        Bundles bundlesResult = bundlesConverter.apply(bundles)
+        WorkloadIds bundlesResult = bundlesConverter.apply(bundles)
 
         then:
         bundlesResult.expiry != null
 
-        bundlesResult.bundleList.get(0) != null
-        bundlesResult.bundleList.get(1) != null
+        bundlesResult.workloadIdList.get(0) != null
+        bundlesResult.workloadIdList.get(1) != null
     }
 
 }

@@ -62,7 +62,7 @@ class CloudIdSpec extends Specification {
 
     def 'bundle is available'() {
         expect:
-        CloudId.idManager.singleBundle != null
+        CloudId.idManager.workloadId != null
     }
 
     def 'callbacks work'() {

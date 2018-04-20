@@ -19,14 +19,14 @@ class TestUtils {
 
         while (Duration.between(start, Instant.now()) < timeout) {
             try {
-                CloudId.getIdManager().getSingleBundle()
+                CloudId.getIdManager().getWorkloadId()
                 return
             } catch (IllegalStateException ignored) {
                 Thread.sleep(100)
             }
         }
 
-        throw new IllegalStateException("Bundle not available after ${timeout}")
+        throw new IllegalStateException("WorkloadId not available after ${timeout}")
     }
 
 }

@@ -69,11 +69,11 @@ class KeyManagementSpec extends Specification {
     }
 
     private static X509Certificate[] getChain() {
-        CloudId.idManager.singleBundle.caCertChainArray
+        CloudId.idManager.workloadId.caCertChainArray
     }
 
     private static PrivateKey getPrivateKey() {
-        CloudId.idManager.singleBundle.keyPair.private
+        CloudId.idManager.workloadId.keyPair.private
     }
 
     private static String getKeyType() {

@@ -58,11 +58,11 @@ public class Config {
 
 
     /**
-     * Get the ACL supplier factory class.
+     * Get the ACL manager class.
      */
     public static final Prop<Class<ACLManager>> ACL_MANAGER_CLASS = classOf("cloudid.aclManagerClass");
     /**
-     * Get the bundles manager class.
+     * Get the Id manager class.
      */
     public static final Prop<Class<IdManager>> ID_MANAGER_CLASS = classOf("cloudid.idManagerClass");
 

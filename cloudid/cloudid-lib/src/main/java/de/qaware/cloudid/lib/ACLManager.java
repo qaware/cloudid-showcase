@@ -21,7 +21,7 @@ public interface ACLManager extends Updater<ACL> {
     /**
      * Add a listener that gets notified whenever the ACL changes.
      * <p>
-     * Listeners will be notified immediately if bundles were available before they are added.
+     * Listeners will be notified immediately if an ACL was available before they are added.
      *
      * @param listener listener
      */

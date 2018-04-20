@@ -31,7 +31,7 @@ public class CloudIdKeyManager extends X509ExtendedKeyManager {
             return null;
         }
 
-        return idManager.getSingleBundle().getKeyPair().getPrivate();
+        return idManager.getWorkloadId().getKeyPair().getPrivate();
     }
 
     @SuppressWarnings("squid:S1168" /* null is required by the interface to signal that the chain is not available */)
@@ -43,7 +43,7 @@ public class CloudIdKeyManager extends X509ExtendedKeyManager {
             return null;
         }
 
-        return idManager.getSingleBundle().getCaCertChainArray();
+        return idManager.getWorkloadId().getCaCertChainArray();
     }
 
     @Override
@@ -84,7 +84,7 @@ public class CloudIdKeyManager extends X509ExtendedKeyManager {
     }
 
     private String getAlias(String ...keyTypes) {
-        String idAlgorithm = idManager.getSingleBundle().getKeyPair().getPrivate().getAlgorithm();
+        String idAlgorithm = idManager.getWorkloadId().getKeyPair().getPrivate().getAlgorithm();
 
         for (String keyType : keyTypes) {
             if (keyType.equals(idAlgorithm)) {

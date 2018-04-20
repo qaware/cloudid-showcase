@@ -11,7 +11,7 @@ syntax = "proto3";
 package spire.api.workload;
 option go_package = "workload";
 
-// The Bundles message carries a group of workload SVIDs and their
+// The WorkloadIds message carries a group of workload SVIDs and their
 // associated information. It also carries a TTL to inform the workload
 // when it should check back next.
 message Bundles {

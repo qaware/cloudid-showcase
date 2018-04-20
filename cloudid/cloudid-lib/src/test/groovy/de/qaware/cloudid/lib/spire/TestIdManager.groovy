@@ -1,8 +1,8 @@
 package de.qaware.cloudid.lib.spire
 
-import de.qaware.cloudid.lib.Bundles
 import de.qaware.cloudid.lib.IdManager
 import de.qaware.cloudid.lib.TestResources
+import de.qaware.cloudid.lib.WorkloadIds
 
 import java.util.function.Consumer
 
@@ -21,12 +21,12 @@ class TestIdManager implements IdManager {
     }
 
     @Override
-    Bundles get() {
+    WorkloadIds get() {
         return bundlesConverter.apply(TestResources.getTestBundles())
     }
 
     @Override
-    void addListener(Consumer<Bundles> listener) {
+    void addListener(Consumer<WorkloadIds> listener) {
         listener.accept(get())
     }
 

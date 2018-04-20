@@ -9,17 +9,18 @@ import java.util.List;
  * List of identities for a workload.
  */
 @Data
-public class Bundles {
+public class WorkloadIds {
 
-    private final List<Bundle> bundleList;
+    private final List<WorkloadId> workloadIdList;
     private final Instant expiry;
 
     /**
-     * Tells whether this bundle is empty.
-     * @return whether this bundle is empty
+     * Tells whether this list of Id is empty.
+     *
+     * @return this list of Id is empty
      */
     public boolean isEmpty() {
-        return bundleList.isEmpty();
+        return workloadIdList.isEmpty();
     }
 
 }

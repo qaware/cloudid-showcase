@@ -1,9 +1,9 @@
 package de.qaware.cloudid.lib.spire;
 
-import de.qaware.cloudid.lib.Bundle;
-import de.qaware.cloudid.lib.Bundles;
 import de.qaware.cloudid.lib.Config;
 import de.qaware.cloudid.lib.IdManager;
+import de.qaware.cloudid.lib.WorkloadId;
+import de.qaware.cloudid.lib.WorkloadIds;
 import de.qaware.cloudid.util.Certificates;
 import de.qaware.cloudid.util.config.Props;
 
@@ -34,8 +34,8 @@ public class DebugIdManager implements IdManager {
 
     private static final String CLASSPATH_PREFIX = "classpath:";
 
-    private final Collection<Consumer<Bundles>> listeners = new ArrayList<>();
-    private Bundles bundles;
+    private final Collection<Consumer<WorkloadIds>> listeners = new ArrayList<>();
+    private WorkloadIds workloadIds;
 
 
     @Override
@@ -43,8 +43,8 @@ public class DebugIdManager implements IdManager {
         Props.debugLog(getClass());
 
         try {
-            bundles = new Bundles(singletonList(loadBundle()), Instant.MAX);
-            listeners.forEach(l -> l.accept(bundles));
+            workloadIds = new WorkloadIds(singletonList(loadBundle()), Instant.MAX);
+            listeners.forEach(l -> l.accept(workloadIds));
         } catch (IOException | GeneralSecurityException e) {
             throw new IllegalStateException(e);
         }
@@ -52,22 +52,22 @@ public class DebugIdManager implements IdManager {
 
     @Override
     public synchronized void stop() {
-        bundles = null;
+        workloadIds = null;
     }
 
     @Override
-    public synchronized Bundles get() {
-        return bundles;
+    public synchronized WorkloadIds get() {
+        return workloadIds;
     }
 
     @Override
-    public synchronized void addListener(Consumer<Bundles> listener) {
+    public synchronized void addListener(Consumer<WorkloadIds> listener) {
         listeners.add(listener);
-        listener.accept(bundles);
+        listener.accept(workloadIds);
     }
 
 
-    private static Bundle loadBundle() throws IOException, GeneralSecurityException {
+    private static WorkloadId loadBundle() throws IOException, GeneralSecurityException {
         KeyStore keystore = loadKeyStore();
 
         String alias = Config.DEBUG_KEYSTORE_ALIAS.get();
@@ -77,7 +77,7 @@ public class DebugIdManager implements IdManager {
         List<X509Certificate> caCertChain = getCaCertChain(keystore, alias);
         String spiffeId = Certificates.getSpiffeId(certificate).orElseThrow(IllegalStateException::new);
 
-        return new Bundle(
+        return new WorkloadId(
                 spiffeId,
                 certificate,
                 new KeyPair(certificate.getPublicKey(), privateKey),

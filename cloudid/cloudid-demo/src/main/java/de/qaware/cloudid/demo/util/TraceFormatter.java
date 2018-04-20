@@ -53,7 +53,7 @@ public class TraceFormatter {
     private static List<String> formatTrace(String raw) {
         assert raw != null;
         List<String> trace = new ArrayList<>(splitTrace(raw));
-        trace.add(idManager.getSingleBundle().getSpiffeId());
+        trace.add(idManager.getWorkloadId().getSpiffeId());
         return trace;
     }
 }

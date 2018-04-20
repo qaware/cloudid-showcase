@@ -112,7 +112,7 @@ public class CloudIdTrustStore extends ROVirtualKeyStoreSPI {
     }
 
     private Set<X509Certificate> getTrustedCAs() {
-        return idManager.getSingleBundle().getTrustedCAs();
+        return idManager.getWorkloadId().getTrustedCAs();
     }
 
 }
