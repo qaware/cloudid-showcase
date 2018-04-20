@@ -13,7 +13,7 @@ data:
       server_port = "8081"
       socket_path ="/spire/socket/agent.sock"
       trust_bundle_path = "/spire/secrets/upstream-ca.pem"
-      trust_domain = "salm.qaware.de"
+      trust_domain = "cloudid.qaware.de"
       umask = ""
       join_token = ""
     }
@@ -34,7 +34,7 @@ data:
         enabled = true
         plugin_cmd = "/opt/spire/plugin/agent/nodeattestor-jointoken"
         plugin_data {
-          trust_domain = "salm.qaware.de"
+          trust_domain = "cloudid.qaware.de"
         }
       }
       WorkloadAttestor "secret_file" {

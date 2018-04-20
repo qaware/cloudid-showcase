@@ -76,7 +76,7 @@ kubectl exec $(kubectl get pod -o name | grep -o 'spire-agent.*$') -- /opt/spire
 
 #### Register workloads
 ```bash
-kubectl exec $(kubectl get pod -o name | grep -o 'spire-server.*$') -- /opt/spire/spire-server register -parentID spiffe://salm.qaware.de/k8s/node/minikube -spiffeID spiffe://salm.qaware.de/host/workload -selector k8s:ns:default
+kubectl exec $(kubectl get pod -o name | grep -o 'spire-server.*$') -- /opt/spire/spire-server register -parentID spiffe://cloudid.qaware.de/k8s/node/minikube -spiffeID spiffe://cloudid.qaware.de/host/workload -selector k8s:ns:default
 ```
 
 ## Known Issues

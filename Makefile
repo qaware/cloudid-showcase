@@ -26,22 +26,22 @@ spire-register:
 	# Ingress Proxy
 	kubectl exec $$(kubectl get pod | grep -Eo 'spire-server\S*') -- \
 		/opt/spire/spire-server entry create \
-		-parentID spiffe://salm.qaware.de/k8s/node/minikube \
-		-spiffeID spiffe://salm.qaware.de/cloudid/proxy \
+		-parentID spiffe://cloudid.qaware.de/k8s/node/minikube \
+		-spiffeID spiffe://cloudid.qaware.de/cloudid/http-proxy \
 		-selector k8s:ns:default
 
 	# Back demo server
 	kubectl exec $$(kubectl get pod | grep -Eo 'spire-server\S*') -- \
 		/opt/spire/spire-server entry create \
-		-parentID spiffe://salm.qaware.de/k8s/node/minikube \
-		-spiffeID spiffe://salm.qaware.de/cloudid/back \
+		-parentID spiffe://cloudid.qaware.de/k8s/node/minikube \
+		-spiffeID spiffe://cloudid.qaware.de/cloudid/demo-server \
 		-selector k8s:ns:back
 
 	# front demo server
 	kubectl exec $$(kubectl get pod | grep -Eo 'spire-server\S*') -- \
 		/opt/spire/spire-server entry create \
-		-parentID spiffe://salm.qaware.de/k8s/node/minikube \
-		-spiffeID spiffe://salm.qaware.de/cloudid/front \
+		-parentID spiffe://cloudid.qaware.de/k8s/node/minikube \
+		-spiffeID spiffe://cloudid.qaware.de/cloudid/tls-proxy \
 		-selector k8s:ns:front
 
 .PHONY: minikube-container-build

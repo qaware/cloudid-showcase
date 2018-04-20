@@ -31,7 +31,7 @@ spec:
             # Path to the agent configuration file
             - /spire/config/agent.conf
             # TrustDomain; Must be the same as in the agent's configuration file!
-            - salm.qaware.de
+            - cloudid.qaware.de
             # Host Name and port of the Spire Server. Must also be the the same as in the agent's configuration file.
             - spire-server:8081
           volumeMounts:

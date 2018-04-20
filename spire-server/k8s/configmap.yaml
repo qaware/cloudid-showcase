@@ -8,7 +8,7 @@ data:
       bind_address = "0.0.0.0"
       bind_port = "8081"
       bind_http_port = "8080"
-      trust_domain = "salm.qaware.de"
+      trust_domain = "cloudid.qaware.de"
       log_level = "DEBUG"
       base_svid_ttl = 999999
       umask = ""
@@ -18,14 +18,14 @@ data:
         enabled = true
         plugin_cmd = "/opt/spire/plugin/server/ca-memory"
         plugin_data {
-          trust_domain = "salm.qaware.de",
+          trust_domain = "cloudid.qaware.de",
           key_size = 2048,
           backdate_seconds = 1,
           default_ttl = 3600,
           cert_subject = {
             Country = ["de"],
-            Organization = ["salm"],
-            CommonName = "spire"
+            Organization = ["qaware"],
+            CommonName = "cloudid"
           }
         }
       }
@@ -40,7 +40,7 @@ data:
         enabled = true
         plugin_cmd = "/opt/spire/plugin/server/nodeattestor-jointoken"
         plugin_data {
-          trust_domain = "salm.qaware.de"
+          trust_domain = "cloudid.qaware.de"
         }
       }
       NodeResolver "noop" {
@@ -52,7 +52,7 @@ data:
         plugin_cmd = "/opt/spire/plugin/server/upstreamca-memory"
         enabled = true
         plugin_data {
-          trust_domain = "salm.qaware.de"
+          trust_domain = "cloudid.qaware.de"
           ttl = "1h"
           key_file_path = "/spire/secrets/ca-key.pem"
           cert_file_path = "/spire/secrets/ca.pem"
