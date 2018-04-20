@@ -57,7 +57,7 @@ minikube-deploy-and-register: minikube-deploy spire-register
 
 .PHONY: minikube-test-service
 minikube-test-service:
-	curl http://$$(minikube ip)/123
+	curl http://$$(minikube ip)/
 
 .PHONY: delete-cloudid-pods
 delete-cloudid-pods:
