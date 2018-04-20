@@ -24,7 +24,8 @@ spec:
             httpGet:
               path: /v1/sys/health
               port: 8300
-            initialDelaySeconds: 30
+            initialDelaySeconds: 15
+            periodSeconds: 60
             timeoutSeconds: 3
           volumeMounts:
               - name: vault-config

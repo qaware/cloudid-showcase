@@ -16,4 +16,10 @@ NODE_NAME=$(curl -Gs http://localhost:10255/pods/ | grep -o '"nodeName":"[^"]*"'
 # Register this node at the SPIRE server
 JOIN_TOKEN=$(/opt/spire/spire-server token generate -spiffeID spiffe://${TRUST_DOMAIN}/k8s/node/${NODE_NAME} -serverAddr ${SPIRE_SERVER} | cut -d : -f 2- | tr -d ' ')
 
-/opt/spire/spire-agent run -config /spire/config/agent.conf -joinToken ${JOIN_TOKEN}
+# Agent terminates if no server is available
+# This may lead to long wait times if K8s determines to backoff from recreating the pod
+while true
+do
+    /opt/spire/spire-agent run -config /spire/config/agent.conf -joinToken ${JOIN_TOKEN}
+    sleep 2
+done

@@ -47,8 +47,8 @@ spec:
             path: /actuator/health
             port: 8081
             scheme: HTTP
-          initialDelaySeconds: 30
-          periodSeconds: 30
+          initialDelaySeconds: 25
+          periodSeconds: 60
           timeoutSeconds: 3
       imagePullSecrets:
         # Needs to be defined for this deployment to work
