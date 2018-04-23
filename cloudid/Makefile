@@ -2,14 +2,6 @@ SHELL = /bin/bash
 
 PROJECT_NAME = cloudid
 
-DEPLOYMENTS =  $(wildcard k8s/*.yaml)
-
-# Deployments in the default namespace
-DEPLOYMENTS_DEFAULT = $(wildcard k8s/default/*.yaml)
-# Deployments in the back namespace
-DEPLOYMENTS_BACK = $(wildcard k8s/back/*.yaml)
-DEPLOYMENTS_FRONT = $(wildcard k8s/front/*.yaml)
-
 ifdef CYGWIN_VERSION
 GRADLEW=./gradlew.bat
 else
@@ -64,37 +56,35 @@ ifneq ($(BRANCH_NAME), master)
 SONAR_BRANCH_NAME = -Dsonar.branch.name=$(BRANCH_NAME)
 endif
 
+.PHONY: deploy-only
+deploy-only:
+	# Create namespaces
+	kubectl create namespace inner
+	kubectl create namespace middle
+	kubectl create namespace outer
+
+	# Deployments in the "inner" namespace
+	$(foreach f, $(wildcard k8s/inner/*.yaml), \
+		sed 's|{{DOCKER_QUALIFIED_NAME}}|$(DOCKER_QUALIFIED_NAME_DEMO)|' $f | \
+		sed "s|{{ADDITIONAL_TRUSTSTORE}}|$$(base64 secrets/additional_truststore.jks | tr -d '\r\n')|" | \
+		kubectl apply --namespace=inner -f -;)
+
+	# Deployments in the "middle" namespace
+	$(foreach f, $(wildcard k8s/middle/*.yaml), \
+		sed 's|{{DOCKER_QUALIFIED_NAME}}|$(DOCKER_QUALIFIED_NAME)|' $f | \
+		sed "s|{{ADDITIONAL_TRUSTSTORE}}|$$(base64 secrets/additional_truststore.jks | tr -d '\r\n')|" | \
+		kubectl apply --namespace=middle -f -;)
+
+	# Deployments in the "outer" namespace
+	$(foreach f, $(wildcard k8s/outer/*.yaml), \
+		sed 's|{{DOCKER_QUALIFIED_NAME}}|$(DOCKER_QUALIFIED_NAME)|' $f | \
+		sed "s|{{ADDITIONAL_TRUSTSTORE}}|$$(base64 secrets/additional_truststore.jks | tr -d '\r\n')|" | \
+		kubectl apply --namespace=outer -f -;)
+
 
 .PHONY: deploy
-deploy: container-build
-	# Create back and front namespace
-	kubectl apply -f k8s/namespace-back.yaml
-	kubectl apply -f k8s/namespace-front.yaml
+deploy: container-build deploy-only
 
-	# Create demo-secrets secret including the upstream-truststore (a different delimiter is necessary because the
-	# base64 encoded starts with /u)
-	sed "s|{{ADDITIONAL_TRUSTSTORE}}|$$(base64 secrets/additional_truststore.jks | tr -d '\r\n')|" \
-    		 k8s/secrets.yaml | kubectl apply -f -
-
-	sed "s|{{ADDITIONAL_TRUSTSTORE}}|$$(base64 secrets/additional_truststore.jks | tr -d '\r\n')|" \
-    		 k8s/secrets.yaml | kubectl apply --namespace=back -f -
-	sed "s|{{ADDITIONAL_TRUSTSTORE}}|$$(base64 secrets/additional_truststore.jks | tr -d '\r\n')|" \
-    		 k8s/secrets.yaml | kubectl apply --namespace=front -f -
-
-	# Deploy in back namespace
-	$(foreach f, $(DEPLOYMENTS_BACK), \
-		sed 's|{{DOCKER_QUALIFIED_NAME}}|$(DOCKER_QUALIFIED_NAME_DEMO)|' $f \
-		| kubectl apply --namespace=back -f -;)
-
-	# Deploy in default namespace
-	$(foreach f, $(DEPLOYMENTS_DEFAULT), \
-		sed 's|{{DOCKER_QUALIFIED_NAME}}|$(DOCKER_QUALIFIED_NAME)|' $f \
-		| kubectl apply -f -;)
-
-	# Deploy in front namespace
-	$(foreach f, $(DEPLOYMENTS_FRONT), \
-		sed 's|{{DOCKER_QUALIFIED_NAME}}|$(DOCKER_QUALIFIED_NAME)|' $f \
-		| kubectl apply --namespace=front -f -;)
 
 .PHONY: container-build
 container-build: build
@@ -121,11 +111,6 @@ sonar:
 
 .PHONY: delete
 delete:
-	-kubectl delete -f k8s/namespace-back.yaml
-	-kubectl delete -f k8s/namespace-front.yaml
-	-kubectl delete deployment ingress-proxy
-	-kubectl get pod -o name | grep -o 'ingress-proxy.*$$' | xargs -n1 kubectl delete pod
-	-kubectl delete configMap ingress-proxy-config
-	-kubectl delete ingress cloudid-ingress
-	-kubectl delete service ingress-proxy-service
-	-kubectl delete secret demo-secrets
+	-kubectl delete namespace inner
+	-kubectl delete namespace middle
+	-kubectl delete namespace outer

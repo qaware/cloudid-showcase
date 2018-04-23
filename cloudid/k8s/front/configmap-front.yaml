@@ -1,8 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: cloudid-config-front
-data:
-  application.properties: |
-    app.backend=https://cloudid-service-back.back:444
-    server.ssl.client-auth=need

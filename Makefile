@@ -23,26 +23,33 @@ spire-register:
 	# Wait for the SPIRE server to become "Running"
 	while ! kubectl get pod  | grep 'spire-server.*Running' > /dev/null; do sleep 2; done
 
-	# Ingress Proxy
+	# HTTP Proxy
 	kubectl exec $$(kubectl get pod | grep -Eo 'spire-server\S*') -- \
 		/opt/spire/spire-server entry create \
 		-parentID spiffe://cloudid.qaware.de/k8s/node/minikube \
-		-spiffeID spiffe://cloudid.qaware.de/cloudid/http-proxy \
-		-selector k8s:ns:default
+		-spiffeID spiffe://cloudid.qaware.de/http-proxy \
+		-selector k8s:ns:outer
 
-	# Back demo server
+	# HTTPs Proxy
 	kubectl exec $$(kubectl get pod | grep -Eo 'spire-server\S*') -- \
 		/opt/spire/spire-server entry create \
 		-parentID spiffe://cloudid.qaware.de/k8s/node/minikube \
-		-spiffeID spiffe://cloudid.qaware.de/cloudid/demo-server \
-		-selector k8s:ns:back
+		-spiffeID spiffe://cloudid.qaware.de/proxy \
+		-selector k8s:ns:middle
 
-	# front demo server
+	# Demo Server
 	kubectl exec $$(kubectl get pod | grep -Eo 'spire-server\S*') -- \
 		/opt/spire/spire-server entry create \
 		-parentID spiffe://cloudid.qaware.de/k8s/node/minikube \
-		-spiffeID spiffe://cloudid.qaware.de/cloudid/tls-proxy \
-		-selector k8s:ns:front
+		-spiffeID spiffe://cloudid.qaware.de/server \
+		-selector k8s:ns:inner
+
+	# Vault
+	kubectl exec $$(kubectl get pod | grep -Eo 'spire-server\S*') -- \
+		/opt/spire/spire-server entry create \
+		-parentID spiffe://cloudid.qaware.de/k8s/node/minikube \
+		-spiffeID spiffe://cloudid.qaware.de/vault \
+		-selector k8s:ns:vault
 
 .PHONY: minikube-container-build
 minikube-container-build:
@@ -58,6 +65,10 @@ minikube-deploy-and-register: minikube-deploy spire-register
 .PHONY: minikube-test-service
 minikube-test-service:
 	curl http://$$(minikube ip)/
+
+.PHONY: minikube-test-service-url
+minikube-test-service-url:
+	@echo http://$$(minikube ip)/
 
 .PHONY: delete-cloudid-pods
 delete-cloudid-pods:

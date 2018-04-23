@@ -1,18 +1,18 @@
 apiVersion: apps/v1beta2 # for versions before 1.9.0 use apps/v1beta2
 kind: Deployment
 metadata:
-  name: cloudid-back
+  name: cloudid-http-proxy
   labels:
-    app: cloudid-back
+    app: cloudid-http-proxy
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: cloudid-back
+      app: cloudid-http-proxy
   template:
     metadata:
       labels:
-        app: cloudid-back
+        app: cloudid-http-proxy
     spec:
       containers:
       - name: cloudid
@@ -33,12 +33,14 @@ spec:
           mountPath: /deployment/secrets
           readOnly: true
         env:
-        - name: JAVA_TOOL_OPTIONS
-          #value: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005 -Djavax.net.debug=all -Djavax.net.ssl.trustStore=/deployment/secrets/additional_truststore.jks -Djavax.net.ssl.trustStorePassword= -Djavax.net.ssl.trustStoreType=jks -Dcloudid.vault.address=https://vault-service.default:8200"
-          value: "-Djavax.net.ssl.trustStore=/deployment/secrets/additional_truststore.jks -Djavax.net.ssl.trustStorePassword= -Djavax.net.ssl.trustStoreType=jks -Dcloudid.vault.address=https://vault-service.default:8200"
+          - name: JAVA_TOOL_OPTIONS
+            valueFrom:
+              configMapKeyRef:
+                name: cloudid-http-proxy-config
+                key: JAVA_TOOL_OPTIONS
         ports:
-        - name: https
-          containerPort: 8443
+        - name: http
+          containerPort: 8080
         - name: jvm-debug
           containerPort: 5005
         livenessProbe:
@@ -56,10 +58,12 @@ spec:
       volumes:
         - name: application-config
           configMap:
-            name: cloudid-config-back
+            name: cloudid-http-proxy-config
             items:
             - key: application.properties
               path: application.properties
+            - key: logback.xml
+              path: logback.xml
         - name: spire-agent-socket
           hostPath:
            path: /mnt/spire/agent/socket

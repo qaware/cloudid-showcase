@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: cloudid-service-front
+  name: cloudid-proxy
 spec:
   type: NodePort
   ports:
@@ -10,4 +10,4 @@ spec:
       targetPort: 8443
       protocol: TCP
   selector:
-    app: cloudid-front
+    app: cloudid-proxy

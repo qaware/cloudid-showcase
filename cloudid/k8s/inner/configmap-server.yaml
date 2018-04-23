@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cloudid-server-config
+data:
+  application.properties: |
+    app.backend=https://xkcd.com
+    server.ssl.client-auth=need
+  logback.xml: |
+    <configuration>
+        <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            </encoder>
+        </appender>
+
+        <logger name="de.qaware" level="INFO" />
+
+        <logger name="io.grpc" level="INFO" />
+        <logger name="io.netty" level="INFO" />
+        <logger name="org.hibernate" level="INFO" />
+
+        <root level="INFO">
+            <appender-ref ref="STDOUT" />
+        </root>
+    </configuration>
+  # -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005 -Djavax.net.debug=all
+  JAVA_TOOL_OPTIONS: -Dlogging.config=/deployment/config/logback.xml -Djavax.net.ssl.trustStore=/deployment/secrets/additional_truststore.jks -Djavax.net.ssl.trustStorePassword= -Djavax.net.ssl.trustStoreType=jks -Dcloudid.vault.address=https://vault-service.vault:8200

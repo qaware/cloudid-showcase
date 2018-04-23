@@ -11,5 +11,5 @@ spec:
       paths:
       - path: /
         backend:
-          serviceName: ingress-proxy-service
+          serviceName: cloudid-http-proxy
           servicePort: 80

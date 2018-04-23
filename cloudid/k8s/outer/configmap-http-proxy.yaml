@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cloudid-http-proxy-config
+data:
+  application.properties: |
+    app.backend=https://cloudid-proxy.middle:443
+    server.port=8080
+    server.ssl.enabled=false
+  logback.xml: |
+    <configuration>
+        <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            </encoder>
+        </appender>
+
+        <logger name="de.qaware" level="INFO" />
+
+        <logger name="io.grpc" level="INFO" />
+        <logger name="io.netty" level="INFO" />
+        <logger name="org.hibernate" level="INFO" />
+
+        <root level="INFO">
+            <appender-ref ref="STDOUT" />
+        </root>
+    </configuration>
+  # -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005 -Djavax.net.debug=all
+  JAVA_TOOL_OPTIONS: -Dlogging.config=/deployment/config/logback.xml -Dcloudid.vault.address=https://vault-service.vault:8200 -Djavax.net.ssl.trustStore=/deployment/secrets/additional_truststore.jks -Djavax.net.ssl.trustStorePassword= -Djavax.net.ssl.trustStoreType=jks

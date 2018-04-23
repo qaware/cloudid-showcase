@@ -15,17 +15,17 @@ mkdir -p certs
 
 echo "Trying to start SPIFFE helper..."
 
-attempt=0
-max_attempts=30
 
 # Try it until the socket is ready
-while [[ ${attempt} < ${max_attempts} ]]; do
-# || true to ignore exit value of sidecar
-# Sidecar fails initially if either the socket is not available yet or zero bundles were returned
-./sidecar -config helper.conf || true
-# Simple backoff
-sleep $(( attempt * 2 + 1 ))
-attempt=$(( attempt + 1 ))
+while true
+do
+    # || true to ignore exit value of sidecar
+    # Sidecar fails initially if either the socket is not available yet or zero bundles were returned
+    ./sidecar -config helper.conf || true
+
+    # Simple backoff
+    sleep 7
 done
 
 # Pod will restart entirely if this point is reached
+echo "SPIFFE helper died"

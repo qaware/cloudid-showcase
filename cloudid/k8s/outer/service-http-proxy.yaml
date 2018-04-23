@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: cloudid-service-back
+  name: cloudid-http-proxy
 spec:
   type: NodePort
   ports:
     - name: http
-      port: 444
-      targetPort: 8443
+      port: 80
+      targetPort: 8080
       protocol: TCP
   selector:
-    app: cloudid-back
+    app: cloudid-http-proxy
