@@ -52,7 +52,7 @@ class UdsBundlesSupplier implements Supplier<WorkloadOuterClass.Bundles> {
                 "Received 0 bundles. Is your workload registered with SPIRE?");
         verify(bundles.getTtl() > 0,
                 "Received bundles with and invalid TTL of %s", bundles.getTtl());
-        LOGGER.debug("Received {} bundles with a TTL of {}s", bundles.getBundlesList().size(), bundles.getTtl());
+        LOGGER.info("Received {} bundles with a TTL of {}s", bundles.getBundlesList().size(), bundles.getTtl());
 
         return bundles;
 
