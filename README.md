@@ -71,7 +71,7 @@ curl -k SERVICE-URL
 
 #### Fetch certificates from the SPIRE agent
 ```bash
-kubectl exec $(kubectl get pod -o name | grep -o 'spire-agent.*$') -- /opt/spire/spire-agent api fetch -socketPath /spire/socket/agent.sock -write /root && kubectl cp $(kubectl get pod -o name | grep -o 'spire-agent.*$'):/root .
+kubectl -n spire exec $(kubectl -n spire get pod -o name | grep -o 'spire-agent.*$') -- /opt/spire/spire-agent api fetch -socketPath /spire/socket/agent.sock -write /root && kubectl -n spire cp $(kubectl -n spire get pod -o name | grep -o 'spire-agent.*$'):/root .
 ```
 
 #### Register workloads
