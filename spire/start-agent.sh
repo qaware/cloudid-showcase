@@ -10,16 +10,21 @@ CONFIG_FILE=$1
 TRUST_DOMAIN=$2
 SPIRE_SERVER=$3
 
-# Get the node name from the K8S API
-NODE_NAME=$(curl -Gs http://localhost:10255/pods/ | grep -o '"nodeName":"[^"]*"' | head -n 1 | cut -d : -f 2- | tr -d '"')
-
-# Register this node at the SPIRE server
-JOIN_TOKEN=$(/opt/spire/spire-server token generate -spiffeID spiffe://${TRUST_DOMAIN}/k8s/node/${NODE_NAME} -serverAddr ${SPIRE_SERVER} | cut -d : -f 2- | tr -d ' ')
+BACKOFF_S=4
 
 # Agent terminates if no server is available
 # This may lead to long wait times if K8s determines to backoff from recreating the pod
 while true
 do
-    /opt/spire/spire-agent run -config /spire/config/agent.conf -joinToken ${JOIN_TOKEN}
-    sleep 2
+    # Get the node name from the K8S API
+    NODE_NAME=$(curl -Gs http://localhost:10255/pods/ | grep -o '"nodeName":"[^"]*"' | head -n 1 | cut -d : -f 2- | tr -d '"')
+    # Register this node at the SPIRE server
+    JOIN_TOKEN=$(/opt/spire/spire-server token generate -spiffeID spiffe://${TRUST_DOMAIN}/k8s/node/${NODE_NAME} -serverAddr ${SPIRE_SERVER} | cut -d : -f 2- | tr -d ' ')
+
+    echo /opt/spire/spire-agent run -config ${CONFIG_FILE} joinToken ${JOIN_TOKEN}
+
+    /opt/spire/spire-agent run -config ${CONFIG_FILE} -joinToken ${JOIN_TOKEN}
+
+    echo "SPIRE agent terminated, backing off for ${BACKOFF_S}s"
+    sleep ${BACKOFF_S}
 done
