@@ -18,6 +18,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static de.qaware.cloudid.util.Certificates.getSpiffeId;
+import static java.text.MessageFormat.format;
 import static java.util.Arrays.stream;
 
 /**
@@ -56,7 +57,9 @@ public class CloudIdTrustManager extends X509ExtendedTrustManager {
             Certificates.validate(chain, workloadId.getTrustedCAs());
 
             if (!acl.isAllowed(clientId, workloadId.getSpiffeId()) && shouldCheckAcl()) {
-                throw new CertificateException("Client could not be verified against the provided ACL");
+                String message = format("{0} tried to access this service but is not allowed to", clientId);
+                LOGGER.error(message);
+                throw new CertificateException(message);
             }
         } else {
             LOGGER.debug("Client certificate is not a SPIFFE certificate. Delegating to {}", delegate.getClass().getName());
