@@ -1,5 +1,7 @@
 PROJECT_NAME = vault
 
+K8S_NAMESPACE = vault
+
 VAULT_HOST = localhost
 VAULT_PORT = 8300
 VAULT_API_URL = http://$(VAULT_HOST):$(VAULT_PORT)/v1
@@ -14,14 +16,14 @@ container-build:
 
 .PHONY: deploy-only
 deploy-only:
-	kubectl create namespace vault
+	kubectl create namespace $(K8S_NAMESPACE)
 
 	$(foreach f, $(wildcard k8s/*.yaml), \
 		sed "s/{{VAULT_KEY}}/$$(base64 secrets/vault-key.pem | tr -d '\r\n')/; \
         		 s/{{UPSTREAM_CERT}}/$$(base64 ../upstream-ca/ca.pem | tr -d '\r\n')/; \
         		 s/{{ACL_PAYLOAD}}/$$(base64 secrets/acl_payload.json | tr -d '\r\n')/; \
         		 s/{{VAULT_CERT}}/$$(base64 secrets/vault.pem | tr -d '\r\n')/" \
-        		 $f | kubectl apply -n vault -f -;)
+        		 $f | kubectl apply -n $(K8S_NAMESPACE) -f -;)
 
 .PHONY: deploy
 deploy: deploy-only container-build
@@ -29,4 +31,4 @@ deploy: deploy-only container-build
 
 .PHONY: delete
 delete:
-	-kubectl delete namespace vault
+	-kubectl delete namespace $(K8S_NAMESPACE)
