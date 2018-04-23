@@ -54,6 +54,8 @@ class VaultACLSupplier implements Supplier<ACL> {
             throw new ACLException("Vault response was empty or did not contain the key 'acl'");
         }
 
+        LOGGER.info("ACL updated from Vault.");
+
         return vaultData.get(VAULT_ACL_KEY);
     }
 
