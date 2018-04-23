@@ -85,6 +85,9 @@ class CloudIdProviderSpec extends Specification {
 
     def 'use for tls connection'() {
         setup:
+        CloudId.reset()
+        System.setProperty(ACL_MANAGER_CLASS.sysProp, TestACLManager.class.getName())
+
         WireMockServer server = new WireMockServer(options()
                 .bindAddress('localhost')
                 .dynamicHttpsPort()

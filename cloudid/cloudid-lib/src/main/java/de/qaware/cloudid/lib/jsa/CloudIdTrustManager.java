@@ -51,12 +51,13 @@ public class CloudIdTrustManager extends X509ExtendedTrustManager {
             String clientId = clientIdOpt.get();
 
             WorkloadId workloadId = idManager.getWorkloadId();
-
-            if (shouldCheckAcl() && !aclManager.get().isAllowed(clientId, workloadId.getSpiffeId())) {
-                throw new CertificateException("Client could not be verified against the provided ACL");
-            }
+            ACL acl = aclManager.get();
 
             Certificates.validate(chain, workloadId.getTrustedCAs());
+
+            if (!acl.isAllowed(clientId, workloadId.getSpiffeId()) && shouldCheckAcl()) {
+                throw new CertificateException("Client could not be verified against the provided ACL");
+            }
         } else {
             LOGGER.debug("Client certificate is not a SPIFFE certificate. Delegating to {}", delegate.getClass().getName());
             delegate.checkClientTrusted(chain, authType);
