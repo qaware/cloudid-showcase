@@ -87,4 +87,9 @@ public class Config {
      * Debug key password.
      */
     public static final Prop<String> DEBUG_KEY_PASSWORD = stringOf("cloudid.debug.key.password");
+
+    static {
+        debugLog(Config.class);
+    }
+
 }
