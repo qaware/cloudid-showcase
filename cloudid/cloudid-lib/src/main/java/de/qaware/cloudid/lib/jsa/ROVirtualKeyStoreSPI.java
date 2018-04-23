@@ -22,27 +22,27 @@ abstract class ROVirtualKeyStoreSPI extends KeyStoreSpi {
 
     @Override
     public final void engineSetKeyEntry(String alias, Key key, char[] password, Certificate[] chain) {
-        LOGGER.warn("engineSetKeyEntry({}, {}, ..., {})", alias, key, chain);
+        LOGGER.debug("Ignoring engineSetKeyEntry({}, {}, ..., {})", alias, key, chain);
     }
 
     @Override
     public final void engineSetKeyEntry(String alias, byte[] key, Certificate[] chain) {
-        LOGGER.warn("engineSetKeyEntry({}, {}, {})", alias, key, chain);
+        LOGGER.debug("Ignoring engineSetKeyEntry({}, {}, {})", alias, key, chain);
     }
 
     @Override
     public final void engineSetCertificateEntry(String alias, Certificate cert) {
-        LOGGER.warn("engineSetCertificateEntry({}, {})", alias, cert);
+        LOGGER.debug("Ignoring engineSetCertificateEntry({}, {})", alias, cert);
     }
 
     @Override
     public final void engineDeleteEntry(String alias) {
-        LOGGER.warn("engineDeleteEntry({}, {})", alias);
+        LOGGER.debug("Ignoring engineDeleteEntry({}, {})", alias);
     }
 
     @Override
     public final void engineStore(OutputStream stream, char[] password) {
-        LOGGER.warn("engineStore({}, ...)", stream);
+        LOGGER.debug("Ignoring engineStore({}, ...)", stream);
     }
 
 }
