@@ -35,7 +35,7 @@ register:
 	while ! kubectl -n $(K8S_NAMESPACE) get pod  | grep 'spire-server.*Running' > /dev/null; do sleep 2; done
 
 	# Register SPIFFE Ids
-	awk '/^[^#]/ {print "-parentID", $$1, "-spiffeID", $$2, "-selector", $$3}' < spiffe-ids.txt | \
+	awk '/^[^#]/ {print "-spiffeID", $$1, "-selector", $$2, "-parentID", $$3}' < spiffe-ids.txt | \
 		xargs -n6 kubectl -n $(K8S_NAMESPACE) exec $$(kubectl -n $(K8S_NAMESPACE) get pod | grep -Eo 'spire-server\S*') -- \
 			/opt/spire/spire-server entry create
 
