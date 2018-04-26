@@ -1,34 +1,15 @@
-# SPIRE on Kubernetes
+# Cloud Native Identity Management Showcase 
 
-This repository contains the docker builds and kubernetes configurations to run the SPIFFE's Runtime, SPIRE, on Kubernetes.
+Provides a showcase for cloud native identity management using SPIFFE, SPIRE and Vault on Kubernetes.
 
-It contains the following parts:
+## Components
+- [SPIRE](spire)
+- [Fixed Upstream CA for SPIRE](upstream-ca)
+- [Vault](vault)
+- [Java showcase](cloudid)
+- [Lateral attack showcase](attack)
 
-## Spire-Server
-The Spire-Server runs as regular [Deployment](spire-server/k8s/deployment.yaml).
-It is exposed as Kubernetes [Service](spire-server/k8s/service.yaml).
-This allows a generic host name within the cluster. 
 
-### Configuring the Spire-Server
-The Spire-Server is configured using a Kuberetes [ConfigMap](spire-server/k8s/configmap.yaml).
-Additionally it requires a [Secret](spire-server/k8s/secrets.yaml) to store the certificates for the Upstream CA.
-
-## Spire-Agent
-The Spire-Agent must run on every node which should schedule SPIRE secured pods.
-To start the agent it automatically retrieves a join token from the Spire-Server.
-
-### Configuring the Spire-Agent
-As the Spire-Server, the spire agent is also be configured using the Kubernetes [ConfigMap](spire-agent/k8s/configmap.yaml).
-If you change the Spire-Server hostname and/or the trust domain you have to change it also within the arguments of the Spire-Agent [DaemonSet](spire-agent/k8s/daemonset.yaml).
-
-## Changing the TrustDomain
-When changing the trust domain it is necessary to adjust them at the following places:
-
- 1. Spire-Server ConfigMap
- 2. Spire-Agent ConfigMap
- 3. Spire-Agent DaemonSet Startup Command
- 
- 
 ## Build & Development
 
 ### Prerequisites
@@ -56,28 +37,28 @@ When changing the trust domain it is necessary to adjust them at the following p
 
 ### Minikube
 
-#### Deployment
+Deployment:
 ```bash
 make minikube-deploy-and-register
 ```
 
-#### Accessing the service
-```bash
-make minikube-show-service
-curl -k SERVICE-URL
-```
+Accessing the demo with a browser:
+- Use `make minikube-test-service-url` to get the URL of the HTTP ingress
+- Access the URL in the browser
+
 
 ### Kubernetes
 
-#### Fetch certificates from the SPIRE agent
+Fetch certificates from the SPIRE agent:
 ```bash
 kubectl -n spire exec $(kubectl -n spire get pod -o name | grep -o 'spire-agent.*$') -- /opt/spire/spire-agent api fetch -socketPath /spire/socket/agent.sock -write /root && kubectl -n spire cp $(kubectl -n spire get pod -o name | grep -o 'spire-agent.*$'):/root .
 ```
 
-#### Register workloads
+Register workloads:
 ```bash
 kubectl exec $(kubectl get pod -o name | grep -o 'spire-server.*$') -- /opt/spire/spire-server register -parentID spiffe://cloudid.qaware.de/k8s/node/minikube -spiffeID spiffe://cloudid.qaware.de/host/workload -selector k8s:ns:default
 ```
 
 ## Known Issues
-- Ingress does not work on Minikube with TLS-protected backends
+- Ingress does not work on Minikube with TLS-protected backends on Minikube up
+- Minikube API server hickups on Minikube 0.26.1 (0.25 works fine)

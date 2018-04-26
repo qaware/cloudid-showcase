@@ -1,4 +1,4 @@
-# Attack showcase
+# Lateral attack showcase
 
 This showcase shows how lateral movement by an attacker is prevented.
 It assumes that a workload has been compromised and an attacker has access to a valid SVID. 
