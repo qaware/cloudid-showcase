@@ -34,33 +34,10 @@ register:
 	# Wait for the SPIRE server to become "Running"
 	while ! kubectl -n $(K8S_NAMESPACE) get pod  | grep 'spire-server.*Running' > /dev/null; do sleep 2; done
 
-	# HTTP Proxy
-	kubectl -n $(K8S_NAMESPACE) exec $$(kubectl -n $(K8S_NAMESPACE) get pod | grep -Eo 'spire-server\S*') -- \
-		/opt/spire/spire-server entry create \
-		-parentID spiffe://cloudid.qaware.de/k8s/node/minikube \
-		-spiffeID spiffe://cloudid.qaware.de/http-proxy \
-		-selector k8s:ns:outer
-
-	# HTTPs Proxy
-	kubectl -n $(K8S_NAMESPACE) exec $$(kubectl -n $(K8S_NAMESPACE) get pod | grep -Eo 'spire-server\S*') -- \
-		/opt/spire/spire-server entry create \
-		-parentID spiffe://cloudid.qaware.de/k8s/node/minikube \
-		-spiffeID spiffe://cloudid.qaware.de/proxy \
-		-selector k8s:ns:middle
-
-	# Demo Server
-	kubectl -n $(K8S_NAMESPACE) exec $$(kubectl -n $(K8S_NAMESPACE) get pod | grep -Eo 'spire-server\S*') -- \
-		/opt/spire/spire-server entry create \
-		-parentID spiffe://cloudid.qaware.de/k8s/node/minikube \
-		-spiffeID spiffe://cloudid.qaware.de/server \
-		-selector k8s:ns:inner
-
-	# Vault
-	kubectl -n $(K8S_NAMESPACE) exec $$(kubectl -n $(K8S_NAMESPACE) get pod | grep -Eo 'spire-server\S*') -- \
-		/opt/spire/spire-server entry create \
-		-parentID spiffe://cloudid.qaware.de/k8s/node/minikube \
-		-spiffeID spiffe://cloudid.qaware.de/vault \
-		-selector k8s:ns:vault
+	# Register SPIFFE Ids
+	awk '/^[^#]/ {print "-parentID", $$1, "-spiffeID", $$2, "-selector", $$3}' < spiffe-ids.txt | \
+		xargs -n6 kubectl -n $(K8S_NAMESPACE) exec $$(kubectl -n $(K8S_NAMESPACE) get pod | grep -Eo 'spire-server\S*') -- \
+			/opt/spire/spire-server entry create
 
 
 .PHONY: delete

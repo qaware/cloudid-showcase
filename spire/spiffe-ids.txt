@@ -1,0 +1,9 @@
+# Node                                          SPIFFE Id                               Selector
+# HTTP Proxy
+spiffe://cloudid.qaware.de/k8s/node/minikube    spiffe://cloudid.qaware.de/http-proxy   k8s:ns:outer
+# TLS Proxy
+spiffe://cloudid.qaware.de/k8s/node/minikube    spiffe://cloudid.qaware.de/proxy        k8s:ns:middle
+# Demo server
+spiffe://cloudid.qaware.de/k8s/node/minikube    spiffe://cloudid.qaware.de/server       k8s:ns:inner
+# Vault
+spiffe://cloudid.qaware.de/k8s/node/minikube    spiffe://cloudid.qaware.de/vault        k8s:ns:vault
