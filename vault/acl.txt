@@ -1,0 +1,2 @@
+spiffe://cloudid.qaware.de/proxy -> spiffe://cloudid.qaware.de/server
+spiffe://cloudid.qaware.de/http-proxy -> spiffe://cloudid.qaware.de/proxy

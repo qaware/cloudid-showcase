@@ -26,7 +26,7 @@ deploy-only:
 	$(foreach f, $(wildcard k8s/*.yaml), \
 		sed "s/{{VAULT_KEY}}/$$(base64 secrets/vault-key.pem | tr -d '\r\n')/; \
         		 s/{{UPSTREAM_CERT}}/$$(base64 ../upstream-ca/ca.pem | tr -d '\r\n')/; \
-        		 s/{{ACL_PAYLOAD}}/$$(base64 secrets/acl_payload.json | tr -d '\r\n')/; \
+        		 s/{{ACL_PAYLOAD}}/$$(echo "{\"acl\":\"$$(awk 'BEGIN{ORS="\\\\n"}{print}' acl.txt)\"}" | base64 | tr -d '\r\n')/; \
         		 s/{{VAULT_CERT}}/$$(base64 secrets/vault.pem | tr -d '\r\n')/" \
         		 $f | kubectl apply -n $(K8S_NAMESPACE) -f -;)
 
