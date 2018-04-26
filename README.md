@@ -62,3 +62,11 @@ kubectl exec $(kubectl get pod -o name | grep -o 'spire-server.*$') -- /opt/spir
 ## Known Issues
 - Ingress does not work on Minikube with TLS-protected backends on Minikube up
 - Minikube API server hickups on Minikube 0.26.1 (0.25 works fine)
+
+
+## Copyright
+
+The showcase is © 2018 QAware, published under the Apache License Version 2.0, with the following exceptions:
+- [SPIFFE](static/img/spiffe_logo.png) and [SPIRE](static/img/spire_logo.png) logos © 2017 The SPIFFE Project & Scytale, Inc. See https://github.com/spiffe.
+- [Cat image](static/img/cat-2483826_1280.jpg), [source: pixabay.com](https://pixabay.com/de/katze-lustig-doof-gesicht-tier-2483826/), subject to the [Creative Commons CC0](https://creativecommons.org/publicdomain/zero/1.0/deed.de)
+- [Demo site template](templates/demo.html), [source: html5webtemplates.co.uk](https://www.html5webtemplates.co.uk/templates/colour_orange/index.html), subject to the [Creative Commons CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
