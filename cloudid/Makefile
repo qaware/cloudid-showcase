@@ -56,6 +56,11 @@ ifneq ($(BRANCH_NAME), master)
 SONAR_BRANCH_NAME = -Dsonar.branch.name=$(BRANCH_NAME)
 endif
 
+
+.PHONY: deploy
+deploy: container-build deploy-only
+
+
 .PHONY: deploy-only
 deploy-only:
 	# Create namespaces
@@ -80,10 +85,6 @@ deploy-only:
 		sed 's|{{DOCKER_QUALIFIED_NAME}}|$(DOCKER_QUALIFIED_NAME)|' $f | \
 		sed "s|{{ADDITIONAL_TRUSTSTORE}}|$$(base64 secrets/additional_truststore.jks | tr -d '\r\n')|" | \
 		kubectl apply --namespace=outer -f -;)
-
-
-.PHONY: deploy
-deploy: container-build deploy-only
 
 
 .PHONY: container-build

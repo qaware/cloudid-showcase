@@ -3,6 +3,10 @@ PROJECT_NAME = spire
 K8S_NAMESPACE = spire
 
 
+.PHONY: deploy
+deploy: container-build deploy-only register
+
+
 .PHONY: container-build
 container-build:
 	docker build -t $(PROJECT_NAME) .
@@ -57,10 +61,6 @@ register:
 		-parentID spiffe://cloudid.qaware.de/k8s/node/minikube \
 		-spiffeID spiffe://cloudid.qaware.de/vault \
 		-selector k8s:ns:vault
-
-
-.PHONY: deploy
-deploy: container-build deploy-only register
 
 
 .PHONY: delete
