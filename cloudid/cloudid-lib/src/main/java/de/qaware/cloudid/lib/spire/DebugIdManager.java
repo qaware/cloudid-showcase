@@ -5,7 +5,6 @@ import de.qaware.cloudid.lib.IdManager;
 import de.qaware.cloudid.lib.WorkloadId;
 import de.qaware.cloudid.lib.WorkloadIds;
 import de.qaware.cloudid.util.Certificates;
-import de.qaware.cloudid.util.config.Props;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -35,28 +34,31 @@ public class DebugIdManager implements IdManager {
     private static final String CLASSPATH_PREFIX = "classpath:";
 
     private final Collection<Consumer<WorkloadIds>> listeners = new ArrayList<>();
-    private WorkloadIds workloadIds;
+    private final WorkloadIds workloadIds;
 
-
-    @Override
-    public synchronized void start() {
-        Props.debugLog(getClass());
-
+    /**
+     * Constructor.
+     */
+    public DebugIdManager() {
         try {
             workloadIds = new WorkloadIds(singletonList(loadBundle()), Instant.MAX);
-            listeners.forEach(l -> l.accept(workloadIds));
         } catch (IOException | GeneralSecurityException e) {
             throw new IllegalStateException(e);
         }
     }
 
     @Override
-    public synchronized void stop() {
-        workloadIds = null;
+    public void start() {
+        // No action neccessary
     }
 
     @Override
-    public synchronized WorkloadIds get() {
+    public void stop() {
+        // No action neccessary
+    }
+
+    @Override
+    public WorkloadIds get() {
         return workloadIds;
     }
 
