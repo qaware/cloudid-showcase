@@ -39,7 +39,7 @@ Provides a showcase for cloud native identity management using SPIFFE, SPIRE and
 
 Deployment:
 ```bash
-make minikube-deploy-and-register
+make minikube-deploy
 ```
 
 Accessing the demo with a browser:
