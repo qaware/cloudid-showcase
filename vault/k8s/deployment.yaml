@@ -12,7 +12,7 @@ spec:
     spec:
       containers:
         - name: cloudid-vault
-          image: cloudid-vault:0.1-snapshot
+          image: cloudid-vault:0.1-SNAPSHOT
           resources:
             requests:
               cpu: 100m
@@ -41,7 +41,7 @@ spec:
               - name: shared
                 mountPath: /shared
         - name: cloudid-vault-sidecar
-          image: cloudid-vault-sidecar:0.1-snapshot
+          image: cloudid-vault-sidecar:0.1-SNAPSHOT
           resources:
             requests:
               cpu: 100m
