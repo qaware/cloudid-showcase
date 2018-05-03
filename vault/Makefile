@@ -6,8 +6,8 @@ VAULT_HOST = localhost
 VAULT_PORT = 8300
 VAULT_API_URL = http://$(VAULT_HOST):$(VAULT_PORT)/v1
 
-DOCKER_QUALIFIED_NAME_VAULT = cloudid-vault:0.1-SNAPSHOT
-DOCKER_QUALIFIED_NAME_SIDECAR = cloudid-vault-sidecar:0.1-SNAPSHOT
+DOCKER_QUALIFIED_NAME_VAULT = cloudid-vault:0.1-snapshot
+DOCKER_QUALIFIED_NAME_SIDECAR = cloudid-vault-sidecar:0.1-snapshot
 
 
 .PHONY: deploy
