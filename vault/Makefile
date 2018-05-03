@@ -11,7 +11,7 @@ DOCKER_QUALIFIED_NAME_SIDECAR = cloudid-vault-sidecar:0.1-SNAPSHOT
 
 
 .PHONY: deploy
-deploy: deploy-only container-build
+deploy: container-build deploy-only
 
 
 .PHONY: container-build
