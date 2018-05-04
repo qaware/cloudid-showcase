@@ -21,7 +21,7 @@ do
     # Register this node at the SPIRE server
     JOIN_TOKEN=$(/opt/spire/spire-server token generate -spiffeID spiffe://${TRUST_DOMAIN}/k8s/node/${NODE_NAME} -serverAddr ${SPIRE_SERVER} | cut -d : -f 2- | tr -d ' ')
 
-    echo /opt/spire/spire-agent run -config ${CONFIG_FILE} joinToken ${JOIN_TOKEN}
+    echo /opt/spire/spire-agent run -config ${CONFIG_FILE} -joinToken ${JOIN_TOKEN}
 
     /opt/spire/spire-agent run -config ${CONFIG_FILE} -joinToken ${JOIN_TOKEN}
 

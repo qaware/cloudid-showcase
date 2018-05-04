@@ -1,5 +1,5 @@
 # Image is based on Debian Sid slim to speed up showcase deployment
-FROM debian:sid-slim
+FROM debian:stable-slim
 
 ARG HELPER_VERSION=0.2
 ARG HELPER_TGZ=https://github.com/spiffe/spiffe-helper/releases/download/${HELPER_VERSION}/sidecar_${HELPER_VERSION}_linux_amd64.tar.gz
