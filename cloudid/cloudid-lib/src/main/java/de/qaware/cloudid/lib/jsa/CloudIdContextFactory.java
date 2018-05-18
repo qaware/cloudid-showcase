@@ -19,7 +19,7 @@ public class CloudIdContextFactory {
      */
     public static SSLContext get() {
         try {
-            SSLContext sslContext = SSLContext.getInstance("TLS");
+            SSLContext sslContext = SSLContext.getInstance("TLSv1.2");
             sslContext.init(
                     new CloudIdKeyManagerFactory().engineGetKeyManagers(),
                     new CloudIdTrustManagerFactory().engineGetTrustManagers(),
