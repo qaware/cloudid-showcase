@@ -28,6 +28,7 @@ class CloudIdProviderSpec extends Specification {
         System.setProperty(ID_MANAGER_CLASS.getSysProp(), DebugIdManager.class.getName())
         System.setProperty(DEBUG_KEYSTORE_LOCATION.getSysProp(), TestResources.testKeystoreLocation)
         System.setProperty(ACL_DISABLED.sysProp, true.toString())
+        System.setProperty(ACL_MANAGER_CLASS.sysProp, TestACLManager.class.getName())
 
         CloudIdProvider.install()
         CloudIdSocketFactory.install()

@@ -8,8 +8,7 @@ import org.springframework.context.ApplicationContext
 import spock.lang.Specification
 import spock.util.environment.RestoreSystemProperties
 
-import static de.qaware.cloudid.lib.Config.DEBUG_KEYSTORE_LOCATION
-import static de.qaware.cloudid.lib.Config.ID_MANAGER_CLASS
+import static de.qaware.cloudid.lib.Config.*
 
 /**
  * Specification for the Spring Boot applicaton
@@ -25,6 +24,8 @@ class AppSpec extends Specification {
     void setupSpec() {
         System.setProperty(ID_MANAGER_CLASS.getSysProp(), DebugIdManager.class.getName())
         System.setProperty(DEBUG_KEYSTORE_LOCATION.getSysProp(), TestResources.testKeystoreLocation)
+        System.setProperty(ACL_DISABLED.sysProp, true.toString())
+        System.setProperty(ACL_MANAGER_CLASS.sysProp, TestACLManager.class.getName())
 
         CloudIdProvider.install()
     }
